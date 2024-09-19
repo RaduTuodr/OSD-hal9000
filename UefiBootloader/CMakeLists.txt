@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.30.2 FATAL_ERROR)
+
+project(UefiBootloader LANGUAGES C)
+
+include(Flags)
+
+file(GLOB_RECURSE UEFI_APP_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.c ${CMAKE_CURRENT_LIST_DIR}/src/*.yasm)
+set(UEFI_APP_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/include/Uefi)
+
+add_executable(BOOTX64.EFI ${UEFI_APP_SOURCES})
+target_include_directories(BOOTX64.EFI PRIVATE ${UEFI_APP_INCLUDES})
+target_compile_options(BOOTX64.EFI PRIVATE ${UEFI_APP_COMPILE_FLAGS})
+target_link_options(BOOTX64.EFI PRIVATE ${UEFI_APP_LINK_FLAGS})
+
+install(TARGETS BOOTX64.EFI DESTINATION bin)

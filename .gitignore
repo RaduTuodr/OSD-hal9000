@@ -1,0 +1,6 @@
+.vscode/*
+build/*
+tools/*
+yasm/build/*
+yasm/yasm_repo/*
+artifacts/*

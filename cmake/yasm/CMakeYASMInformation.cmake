@@ -1,0 +1,7 @@
+set(CMAKE_YASM_COMPILE_OBJECT 
+    "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> -Xvc -pnasm -rnasm -f win64 -o <OBJECT> --objext=yasm.obj <SOURCE>"
+)
+
+set(CMAKE_INCLUDE_FLAG_YASM "-I")
+
+set(CMAKE_YASM_INFORMATION_LOADED 1)
