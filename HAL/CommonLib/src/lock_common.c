@@ -16,7 +16,8 @@ PFUNC_LockIsOwner        LockIsOwner = NULL;
 #pragma warning(push)
 // warning C4028: formal parameter 1 different from declaration
 // David Sipos: Modified to 4113, in VS2022 I get this error
-#pragma warning(disable:4113)
+#pragma warning(disable:4113) // Error for VS2022
+#pragma warning(disable:4028) // Error for VS2019
 
 void
 LockSystemInit(
