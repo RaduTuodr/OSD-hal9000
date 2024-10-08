@@ -26,7 +26,7 @@
 ; 2 MINIHV DEFINES
 ;-----------------------------------------------------------------------;
 %define     PA_2_VA_DIFFERENCE          0xFFFF800000000000
-%define     VIRTUAL_DISPLAY_ADDRESS     0x00007F8000000000
+%define     VIRTUAL_DISPLAY_ADDRESS     0xFFFF850000000000
 %define     KERNEL_BASE_VIRTUAL         (PA_2_VA_DIFFERENCE + KERNEL_BASE)      ; magic 1T
 %define     KERNEL_BASE                 0x01000000                              ; 16 MB
 %define     KERNEL_LENGTH               0x00200000                              ; 2 MB

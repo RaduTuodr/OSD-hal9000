@@ -75,10 +75,29 @@ times ( DATA_SECTION_SIZE - ( data_end- data )) db 'D'
 ;; PML4
 __pml4_table:
 dq              PDP_TABLE_BASE | P_BIT | RW_BIT   ; entry for 0 - 512G, PDP
-times KERNEL_PML4_INDEX - 2 dq 0
-dq              PDP_DISPLAY_TABLE_BASE | P_BIT | RW_BIT ; entry for display, PDP 
+times KERNEL_PML4_INDEX - 1 dq 0
 dq              PDP_TABLE_BASE | P_BIT | RW_BIT   ; entry for 1T - 1,5T, PDP
-times PTE_PER_TABLE - KERNEL_PML4_INDEX - 1 dq 0
+; 1.5T - 2T
+dq 0
+; 2T - 2.5T
+dq 0
+; 2.5T - 3T
+dq 0
+; 3T - 3.5T
+dq 0
+; 3.5T - 4T
+dq 0
+; 4T - 4.5T
+dq 0
+; 4.5T - 5T
+dq 0
+; 5T - 5.5T
+dq 0
+; 5.5 - 6T
+dq 0
+; 6T - 6.5T
+dq              PDP_DISPLAY_TABLE_BASE | P_BIT | RW_BIT ; entry for display, PDP 
+times PTE_PER_TABLE - KERNEL_PML4_INDEX - 11 dq 0
 
 ;; KERNEL_BASE + 0x3000
 ;; PDPT
