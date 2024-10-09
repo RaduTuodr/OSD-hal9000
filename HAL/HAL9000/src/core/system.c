@@ -1,5 +1,6 @@
 #include "HAL9000.h"
 #include "bootinfo.h"
+#include "efi_runtime.h"
 #include "system.h"
 #include "idt.h"
 #include "iomu.h"
@@ -48,6 +49,8 @@ SystemPreinit(
     memcpy(&(displayInformation.FrameBufferPitch), 
            &(BootInformation->Framebuffer.Pitch),
            sizeof(DISPLAY_INFORMATION) - sizeof(QWORD));
+    EFI_RUNTIME_SERVICES *EfiRuntimeServices = 
+           (EFI_RUNTIME_SERVICES *) BootInformation->EfiRuntimeServices;
 
     m_systemData.NumberOfTssStacks = NO_OF_TSS_STACKS;
 
@@ -58,6 +61,7 @@ SystemPreinit(
     LogSystemPreinit();
     OsInfoPreinit();
     MmuPreinitSystem();
+    EfiRuntimePreinit(EfiRuntimeServices);
     IomuPreinitSystem();
     AcpiInterfacePreinit();
     SmpPreinit();
@@ -76,13 +80,11 @@ SystemInit(
     PCPU* pCpu;
     DWORD BootModuleCount;
     PHYSICAL_ADDRESS BootModules;
-    EFI_RUNTIME_SERVICES *EfiRuntimeServices;
 
     status = STATUS_SUCCESS;
     pCpu = NULL;
     BootModuleCount = BootInformation->BootModuleCount;
     BootModules = (PHYSICAL_ADDRESS) ((QWORD) BootInformation->BootModules);
-    EfiRuntimeServices = (EFI_RUNTIME_SERVICES *) BootInformation->EfiRuntimeServices;
 
     LogSystemInit(LogLevelInfo,
                   LogComponentGeneric | LogComponentInterrupt | LogComponentIo | LogComponentAcpi | LogComponentPci,
@@ -150,10 +152,7 @@ SystemInit(
     }
 
     LOGL("InitIdtHandlers succeeded\n");
-
-    // We have to save these values here, because after returning from
-    // MmuInitSystem we do not have identity mappings in the first 4GB
-
+    
     status = MmuInitSystem((PVOID) BootInformation);
     if (!SUCCEEDED(status))
     {
@@ -162,6 +161,15 @@ SystemInit(
     }
 
     LOGL("MmuInitSystem succeeded\n");
+
+    status = EfiRuntimeInit(); 
+    if (!SUCCEEDED(status))
+    {
+        LOG_FUNC_ERROR("EfiRuntimeInitSystem", status);
+        return status;
+    }
+
+    LOGL("EfiRuntimeInitSystem succeeded\n");
 
     // BootInformation contents not valid from here, it is not mapped
     if (BootModuleCount > 0)
