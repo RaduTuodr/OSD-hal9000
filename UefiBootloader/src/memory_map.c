@@ -5,7 +5,8 @@
 UINTN 
 GetMemoryMap(
     EFI_SYSTEM_TABLE *ST,
-    HAL_MEMORY_MAP *MemoryMap
+    HAL_MEMORY_MAP *MemoryMap,
+    UINT32 *DescriptorVersion
     )
 {
     UINTN memoryMapSize = PAGE_SIZE;
@@ -33,6 +34,11 @@ GetMemoryMap(
     MemoryMap->DescriptorSize = (UINT32) descriptorSize;
     MemoryMap->Count = (UINT32) (memoryMapSize / descriptorSize);
     MemoryMap->MapAddress = (UINT64) memoryMapPointer;
+
+    if (DescriptorVersion != NULL)
+    {
+        *DescriptorVersion = descriptorVersion;
+    }
     
     return mapKey;
 }

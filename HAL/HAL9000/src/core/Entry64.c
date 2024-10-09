@@ -16,7 +16,8 @@
 //#define TST
 
 #ifdef TST
-#include "test_common.h"
+#include "test_common
+.h"
 #include "keyboard.h"
 #endif
 

@@ -24,38 +24,38 @@ typedef struct
 
 typedef struct
 {
-    UINT32 Magic;
-    UINT32 Crc32;
+    UINT32 Magic;                  // 0
+    UINT32 Crc32;                  // 4
 
     // Kernel information
-    UINT32 KernelBaseAddress;
-    UINT32 KernelSize;
+    UINT32 KernelBaseAddress;      // 8
+    UINT32 KernelSize;             // 12
      
     // ACPI RSDP
-    UINT64 AcpiRsdp;
+    UINT64 AcpiRsdp;               // 16
 
     // HAL Memory Map
-    HAL_MEMORY_MAP MemoryMap;
+    HAL_MEMORY_MAP MemoryMap;      // 24
 
     // Boot modules
-    UINT32 BootModuleCount;
+    UINT32 BootModuleCount;        // 40
     // HAL_BOOT_MODULE*
-    UINT32 BootModules;
+    UINT32 BootModules;            // 44
 
     // HAL_FRAMEBUFFER
-    HAL_FRAMEBUFFER Framebuffer;
+    HAL_FRAMEBUFFER Framebuffer;   // 48
 
     // EFI_RUNTIME_SERVICES
-    UINT64 EfiRuntimeServicesVirtualAddress;
-    UINT64 EfiRuntimeServicesSize;
-    EFI_RUNTIME_SERVICES EfiRuntimeServices;
+    UINT64 EfiRuntimeVirtualAddress; // 96
+    UINT64 EfiRuntimeSize;             // 104
+    UINT64 EfiRuntimeServices;           // 112
 
     // Serial Ports
-    UINT16 SerialPorts[BIOS_MAX_SERIAL_PORTS];
+    UINT16 SerialPorts[BIOS_MAX_SERIAL_PORTS]; // 120
     
     // Virtual address information
-    UINT64 VirtualToPhysicalOffset;
-    UINT64 VirtualDisplayAddress;
+    UINT64 VirtualToPhysicalOffset;    // 128
+    UINT64 VirtualDisplayAddress;      // 136
 
 } HAL_BOOT_INFORMATION;
 

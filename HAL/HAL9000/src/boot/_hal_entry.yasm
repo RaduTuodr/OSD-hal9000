@@ -27,10 +27,10 @@ EntryAddress             dd HAL_ENTRY_POINT
 FrameBufferWidth         dd HAL_FRAMEBUFFER_WIDTH
 FrameBufferHeight        dd HAL_FRAMEBUFFER_HEIGHT
 
-gHalBootInformation times 1 dd 0
+gHalBootInformation times 1 dq 0
 
 ;; pad until 0x100
-times (HAL_BOOT_SECTION_SIZE - HAL_BOOT_HEADER_SIZE - 4) db 'A'
+times (HAL_BOOT_SECTION_SIZE - HAL_BOOT_HEADER_SIZE - 8) db 'A'
 
 ;;
 ;; KERNEL_BASE + 0x500
@@ -198,7 +198,7 @@ __HalEntry:
     add     eax, HAL_FRAMEBUFFER_OFFSET
     mov     ecx, [eax]
     add     eax, 4
-    mov     edx, [eax]   
+    mov     edx, [eax]
 
     ; Map the display
     mov     eax, PDP_DISPLAY_TABLE_BASE

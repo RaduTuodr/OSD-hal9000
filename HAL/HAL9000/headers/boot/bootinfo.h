@@ -64,9 +64,9 @@ typedef struct _HAL_BOOT_INFORMATION
     HAL_FRAMEBUFFER Framebuffer;
 
     // EFI_RUNTIME_SERVICES
-    QWORD EfiRuntimeServicesVirtualAddress;
-    QWORD EfiRuntimeServicesSize;
-    EFI_RUNTIME_SERVICES EfiRuntimeServices;
+    UINT64 EfiRuntimeVirtualAddress;
+    UINT64 EfiRuntimeSize;
+    UINT64 EfiRuntimeServices;
 
     // Serial Ports
     WORD SerialPorts[BIOS_MAX_NO_OF_SERIAL_PORTS];

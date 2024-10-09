@@ -122,6 +122,10 @@ SystemInit(
 
     LOGL("OsInfoInit succeeded\n");
 
+    LOGL("UEEFI Runtime Services VA is %X\n", BootInformation->EfiRuntimeVirtualAddress);
+    LOGL("EFI Runtime Services Size is %X\n", BootInformation->EfiRuntimeSize);
+    LOGL("EFI Runtime Services pointer is %X\n", BootInformation->EfiRuntimeServices);
+
     status = CpuMuActivateFpuFeatures();
     if (!SUCCEEDED(status))
     {

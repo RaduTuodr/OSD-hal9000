@@ -20,12 +20,14 @@
 %define     HAL_FRAMEBUFFER_WIDTH       1152
 %define     HAL_FRAMEBUFFER_HEIGHT      800
 
-%define     HAL_BOOT_INFO_SIZE          256
+%define     HAL_BOOT_INFO_SIZE          144
 
-%define     HAL_INFO_ADDRESS            HAL_BOOT_BASE + HAL_BOOT_INFO_SIZE
+%define     HAL_INFO_ADDRESS            HAL_BOOT_BASE + HAL_BOOT_HEADER_SIZE
 
 %define     HAL_FRAMEBUFFER_OFFSET      48
-%define     HAL_VIRTUAL_INFO_OFFSET     256
+%define     UEFI_RUNTIME_ADDRESS_OFFSET 96
+%define     UEFI_RUNTIME_SIZE_OFFSET    104 
+%define     HAL_VIRTUAL_INFO_OFFSET     128 
 
 ; 2 MINIHV DEFINES
 ;-----------------------------------------------------------------------;

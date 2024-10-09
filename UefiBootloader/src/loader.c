@@ -8,6 +8,7 @@
 #include <Bootloader/graphics.h>
 #include <Bootloader/memory.h>
 #include <Bootloader/memory_map.h>
+#include <Bootloader/runtime.h>
 #include <Bootloader/types.h>
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -64,6 +65,8 @@ typedef struct
     HAL_FRAMEBUFFER Framebuffer;
     UINTN MemoryMapKey;
     HAL_BOOT_INFORMATION *BootInformation;
+    UINT32 DescriptorVersion;
+    BOOLEAN SwitchedToVirtualRuntime;
 } _LOADER;
 
 static _LOADER gLoader;
@@ -217,28 +220,6 @@ _SearchForHalBootHeader(
     FreeFromPool(gLoader.ST, buffer);
 }
 
-// Taken from Hacker's Delight, no the most efficient but I did not want
-// any lookup table, HAL has the fastest version
-UINT32
-_ComputeCrc32(
-    UINT32 ReversedPolynomial,
-    UINT8 *Message,
-    UINT32 Length
-    ) 
-{
-    UINT32 Byte, Crc, Mask;
-    Crc = 0xFFFFFFFF;
-    for (UINT32 i = 0; i < Length; i++) {
-        Byte = Message[i];
-        Crc = Crc ^ Byte;
-        for (UINT32 j = 8; j >= 1; j--) {
-            Mask = -(Crc & 1);
-            Crc = (Crc >> 1) ^ (ReversedPolynomial & Mask);
-      }
-   }
-   return ~Crc;
-}
-
 static
 void
 _VerifyHalBootHeader(
@@ -249,7 +230,7 @@ _VerifyHalBootHeader(
 
     CopyMemory(&CrcHeader, &(gLoader.BootHeader), sizeof(HAL_BOOT_HEADER));
     CrcHeader.Crc32 = 0;
-    UINT32 Crc32 = _ComputeCrc32(CRC32_REVERSED_POLYNOMIAL, (UINT8 *) &CrcHeader, sizeof(HAL_BOOT_HEADER));
+    UINT32 Crc32 = ComputeCrc32((UINT8 *) &CrcHeader, sizeof(HAL_BOOT_HEADER));
 
     if (Crc32 != gLoader.BootHeader.Crc32)
     {
@@ -512,10 +493,44 @@ _ExitBootServices(
     CloseFileHandle(gLoader.RootDirectory);
     UINTN mapKey = gLoader.MemoryMapKey;
     while(gLoader.ST->BootServices->ExitBootServices(gLoader.ImageHandle, mapKey) != EFI_SUCCESS)
-        mapKey = GetMemoryMap(gLoader.ST, &(gLoader.BootInformation->MemoryMap));
+        mapKey = GetMemoryMap(gLoader.ST, &(gLoader.BootInformation->MemoryMap), &(gLoader.DescriptorVersion));
+}
+
+static
+void
+_SwitchUefiToVirtual(
+    void
+    )
+{
+    // Read UEFI spec about ExitBootServices
+    // Clear EFI System Table
+    gLoader.ST->ConsoleInHandle = NULL;
+    gLoader.ST->ConIn = NULL;
+    gLoader.ST->ConsoleOutHandle = NULL;
+    gLoader.ST->ConOut = NULL;
+    gLoader.ST->StandardErrorHandle = NULL;
+    gLoader.ST->StdErr = NULL;
+    gLoader.ST->BootServices = NULL;
+    
+    // Recompute CRC32
+    gLoader.ST->Hdr.CRC32 = 0;
+    gLoader.ST->Hdr.CRC32 = ComputeCrc32((UINT8 *) gLoader.ST,
+                                         gLoader.ST->Hdr.HeaderSize);
+
+
+    EFI_STATUS status = SwitchToVirtualAdressingMode(gLoader.ST,
+                                                     &(gLoader.BootInformation->MemoryMap),
+                                                     gLoader.DescriptorVersion,
+                                                     &(gLoader.BootInformation->EfiRuntimeVirtualAddress),
+                                                     &(gLoader.BootInformation->EfiRuntimeSize));
+    if (status == EFI_SUCCESS)
+    {
+        gLoader.SwitchedToVirtualRuntime = TRUE;
+        gLoader.BootInformation->EfiRuntimeServices = (UINT64) (gLoader.ST->RuntimeServices);
+    }
     gLoader.BootInformation->Crc32 = 0;
     gLoader.BootInformation->Crc32 = ComputeCrc32((UINT8 *) gLoader.BootInformation,
-                                                  sizeof(HAL_BOOT_INFORMATION ) - 16);
+                                                  sizeof(HAL_BOOT_INFORMATION) - 16);
 }
 
 void
@@ -529,11 +544,14 @@ StartOperatingSystem(
 
     SetGraphicsMode(gLoader.GOP, gLoader.GopModeIndex);
     _ExitBootServices();
+    // Now the machine is ours
+    _SwitchUefiToVirtual();
 
     // Signal that we are done
+    UINT32 lineColor = gLoader.SwitchedToVirtualRuntime ? UINT32_MAX : 0xFF0000;
     UINT32 *buff = (UINT32 *) gLoader.Framebuffer.Address;
     for (int i = 0; i < 100; i++) 
-        buff[i] = UINT32_MAX;
+        buff[i] = lineColor;
 
     (gLoader.StartOsRoutine)(gLoader.BootHeader.EntryAddress,
                              (UINT64) gLoader.BootInformation,
