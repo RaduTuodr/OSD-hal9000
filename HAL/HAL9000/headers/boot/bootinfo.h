@@ -65,7 +65,7 @@ typedef struct _HAL_BOOT_INFORMATION
 
     // EFI_RUNTIME_SERVICES
     UINT64 EfiRuntimeVirtualAddress;
-    UINT64 EfiRuntimeSize;
+    UINT64 EfiRuntimeDescriptorCount;
     UINT64 EfiRuntimeServices;
 
     // Serial Ports

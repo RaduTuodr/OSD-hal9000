@@ -210,6 +210,13 @@ _MmuRemapDisplay(
     );
 
 static
+void
+_MmuMapEfiRuntimeServices(
+    IN PPAGING_DATA   PagingData,
+    IN HAL_MEMORY_MAP *MemoryMap
+    );
+
+static
 STATUS
 _MmuCreatePagingTables(
     OUT_PTR     PPAGING_LOCK_DATA*            PagingTables
@@ -442,6 +449,9 @@ MmuInitSystem(
                      bootInfo->Framebuffer.Address,
                      bootInfo->VirtualDisplayAddress,
                      displaySize);
+
+    _MmuMapEfiRuntimeServices(&m_mmuData.PagingData.Data,
+                             (const HAL_MEMORY_MAP *) &(bootInfo->MemoryMap));
 
     LOG("Will change to new paging structures\n");
     // #PF's are treatable only after we switch to the new CR3
@@ -2000,6 +2010,45 @@ _MmuRemapDisplay(
                          FALSE
                          );
 }
+
+static
+void
+_MmuMapEfiRuntimeServices(
+    IN PPAGING_DATA   PagingData,
+    IN HAL_MEMORY_MAP *MemoryMap
+    )
+{
+    // We will map the UEFI Runtime Code
+    // Not really efficient to traverse again but
+    // we have no choice, this must be done after VMM setup
+    BYTE *mmap;
+    QWORD regionSize;
+    
+    mmap = (BYTE *) MemoryMap->MapAddress;
+    regionSize = 0;
+
+    for (DWORD i = 0; i < MemoryMap->Count; i++)
+    {
+        EFI_MEMORY_DESCRIPTOR *memoryDescriptor = (EFI_MEMORY_DESCRIPTOR *) mmap;
+        mmap += MemoryMap->DescriptorSize;
+
+        if (memoryDescriptor->Attribute & EFI_MEMORY_RUNTIME)
+        {
+            regionSize = memoryDescriptor->NumberOfPages * PAGE_SIZE;
+            // We do not need to reserve this memory, as we did not consider it free earlier 
+            VmmMapMemoryInternal(PagingData,
+                                (PHYSICAL_ADDRESS) memoryDescriptor->PhysicalStart,
+                                AlignAddressUpper(regionSize, PAGE_SIZE),
+                                (PVOID) memoryDescriptor->VirtualStart,
+                                PAGE_RIGHTS_ALL, // TODO: DS, investigate the exact PAGE_RIGHTS for this
+                                TRUE,
+                                FALSE); // TODO: DS, the same
+            LOGPL("Mapping UEFI Runtime %X -> %X size %X\n", memoryDescriptor->PhysicalStart,
+                                                             memoryDescriptor->VirtualStart,
+                                                             regionSize);
+        }
+    }
+}   
 
 static
 STATUS

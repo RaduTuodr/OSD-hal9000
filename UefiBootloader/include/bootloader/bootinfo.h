@@ -46,16 +46,16 @@ typedef struct
     HAL_FRAMEBUFFER Framebuffer;   // 48
 
     // EFI_RUNTIME_SERVICES
-    UINT64 EfiRuntimeVirtualAddress; // 96
-    UINT64 EfiRuntimeSize;             // 104
-    UINT64 EfiRuntimeServices;           // 112
+    UINT64 EfiRuntimeVirtualAddress;     // 96
+    UINT64 EfiRuntimeDescriptorCount;    // 104
+    UINT64 EfiRuntimeServices;        // 112
 
     // Serial Ports
     UINT16 SerialPorts[BIOS_MAX_SERIAL_PORTS]; // 120
     
     // Virtual address information
-    UINT64 VirtualToPhysicalOffset;    // 128
-    UINT64 VirtualDisplayAddress;      // 136
+    UINT64 VirtualToPhysicalOffset;       // 128
+    UINT64 VirtualDisplayAddress;         // 136
 
 } HAL_BOOT_INFORMATION;
 

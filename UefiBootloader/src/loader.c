@@ -522,7 +522,7 @@ _SwitchUefiToVirtual(
                                                      &(gLoader.BootInformation->MemoryMap),
                                                      gLoader.DescriptorVersion,
                                                      &(gLoader.BootInformation->EfiRuntimeVirtualAddress),
-                                                     &(gLoader.BootInformation->EfiRuntimeSize));
+                                                     &(gLoader.BootInformation->EfiRuntimeDescriptorCount));
     if (status == EFI_SUCCESS)
     {
         gLoader.SwitchedToVirtualRuntime = TRUE;

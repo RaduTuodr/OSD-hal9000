@@ -13,5 +13,5 @@ SwitchToVirtualAdressingMode(
     HAL_MEMORY_MAP *MemoryMap,
     UINT32 DescriptorVersion,
     UINT64 *UefiRuntimeAddress,
-    UINT64 *UefiRuntimeSize
+    UINT64 *UefiRuntimeDescriptorCount
     );

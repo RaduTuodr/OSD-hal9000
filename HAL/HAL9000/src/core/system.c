@@ -76,9 +76,13 @@ SystemInit(
     PCPU* pCpu;
     DWORD BootModuleCount;
     PHYSICAL_ADDRESS BootModules;
+    EFI_RUNTIME_SERVICES *EfiRuntimeServices;
 
     status = STATUS_SUCCESS;
     pCpu = NULL;
+    BootModuleCount = BootInformation->BootModuleCount;
+    BootModules = (PHYSICAL_ADDRESS) ((QWORD) BootInformation->BootModules);
+    EfiRuntimeServices = (EFI_RUNTIME_SERVICES *) BootInformation->EfiRuntimeServices;
 
     LogSystemInit(LogLevelInfo,
                   LogComponentGeneric | LogComponentInterrupt | LogComponentIo | LogComponentAcpi | LogComponentPci,
@@ -122,9 +126,9 @@ SystemInit(
 
     LOGL("OsInfoInit succeeded\n");
 
-    LOGL("UEEFI Runtime Services VA is %X\n", BootInformation->EfiRuntimeVirtualAddress);
-    LOGL("EFI Runtime Services Size is %X\n", BootInformation->EfiRuntimeSize);
-    LOGL("EFI Runtime Services pointer is %X\n", BootInformation->EfiRuntimeServices);
+    LOGL("EFI Runtime Services Virtual Address is %X\n", BootInformation->EfiRuntimeVirtualAddress);
+    LOGL("EFI Runtime Services Descriptor Count is %X\n", BootInformation->EfiRuntimeDescriptorCount);
+    LOGL("EFI Runtime Services Pointer is %X\n", BootInformation->EfiRuntimeServices);
 
     status = CpuMuActivateFpuFeatures();
     if (!SUCCEEDED(status))
@@ -149,8 +153,6 @@ SystemInit(
 
     // We have to save these values here, because after returning from
     // MmuInitSystem we do not have identity mappings in the first 4GB
-    BootModuleCount = BootInformation->BootModuleCount;
-    BootModules = (PHYSICAL_ADDRESS) ((QWORD) BootInformation->BootModules);
 
     status = MmuInitSystem((PVOID) BootInformation);
     if (!SUCCEEDED(status))

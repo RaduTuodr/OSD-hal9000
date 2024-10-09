@@ -12,7 +12,10 @@ GetMemoryMap(
     UINTN memoryMapSize = PAGE_SIZE;
     EFI_MEMORY_DESCRIPTOR *memoryMapPointer = (EFI_MEMORY_DESCRIPTOR *) MemoryMap->MapAddress;
     if (!memoryMapPointer)
-        memoryMapPointer = AllocateZeroedPages(ST, EfiLoaderData, 1);
+        memoryMapPointer = AllocateZeroedPagesMaxAddress(ST,
+                                                         EfiLoaderData,
+                                                         (EFI_PHYSICAL_ADDRESS) (BASE_4GB - 1),
+                                                         1);
     UINTN mapKey;
     UINTN descriptorSize;
     UINT32 descriptorVersion;
@@ -25,7 +28,10 @@ GetMemoryMap(
         FreePages(ST, (UINT64) memoryMapPointer, pageCount);
         memoryMapSize += PAGE_SIZE;
         pageCount++;
-        memoryMapPointer = AllocateZeroedPages(ST, EfiLoaderData, pageCount);
+        memoryMapPointer = AllocateZeroedPagesMaxAddress(ST,
+                                                         EfiLoaderData,
+                                                         (EFI_PHYSICAL_ADDRESS) (BASE_4GB - 1),
+                                                         pageCount);
     }
 
     if (status != EFI_SUCCESS || descriptorVersion != EFI_MEMORY_DESCRIPTOR_VERSION)
