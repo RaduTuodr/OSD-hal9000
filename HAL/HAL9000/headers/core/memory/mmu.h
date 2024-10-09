@@ -53,13 +53,7 @@ MmuPreinitSystem(
 _No_competing_thread_
 STATUS
 MmuInitSystem(
-    IN          PVOID                   KernelBaseAddress,
-    IN          DWORD                   KernelSize,
-    IN          PHYSICAL_ADDRESS        MemoryEntries,
-    IN          DWORD                   NumberOfMemoryEntries,
-    IN          QWORD                   DisplayPhysicalAddress,
-    IN          QWORD                   DisplayVirtualAddress,
-    IN          QWORD                   DisplaySize
+    IN PVOID BootInformation
     );
 
 //******************************************************************************

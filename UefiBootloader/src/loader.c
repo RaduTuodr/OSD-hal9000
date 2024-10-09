@@ -1,12 +1,16 @@
-#include <bootloader/loader.h>
+#include <Bootloader/loader.h>
 
-#include <bootloader/acpi.h>
-#include <bootloader/console.h>
-#include <bootloader/filesystem.h>
-#include <bootloader/graphics.h>
-#include <bootloader/memory.h>
-#include <bootloader/memory_map.h>
-#include <bootloader/multiboot.h>
+#include <Bootloader/acpi.h>
+#include <Bootloader/bootinfo.h>
+#include <Bootloader/console.h>
+#include <Bootloader/crc32.h>
+#include <Bootloader/filesystem.h>
+#include <Bootloader/graphics.h>
+#include <Bootloader/memory.h>
+#include <Bootloader/memory_map.h>
+#include <Bootloader/types.h>
+
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 #pragma pack(push, 1)
 
@@ -47,32 +51,22 @@ typedef struct
     EFI_HANDLE ImageHandle;
     EFI_FILE_HANDLE RootDirectory; 
     EFI_FILE_HANDLE OsBinary; 
-    UINT64 MultibootHeaderOffset;
-    MULTIBOOT_HEADER MultibootHeader;
-    UINT8 AlignBootModules;
-    UINT8 ProvideMemoryMap;
-    UINT8 ProvideVideoInformation;
-    UINT64 OsTextOffset;
+    UINT64 LoadAddress;
+    UINT32 BootHeaderOffset;
+    HAL_BOOT_HEADER BootHeader;
     UINT64 OsPageCount;
     UINT32 BootModuleCount;
-    UINT32 BootModuleAddress;
+    UINT32 BootModules;
     StartOS StartOsRoutine;
     UINT64 AcpiRsdp;
     EFI_GRAPHICS_OUTPUT_PROTOCOL *GOP;
     UINT32 GopModeIndex;
-    FRAMEBUFFER Framebuffer;
+    HAL_FRAMEBUFFER Framebuffer;
     UINTN MemoryMapKey;
-    MEMORY_MAP MemoryMap;
-    UINT32 MemoryMapPointer;
-    UINT32 MemoryMapSize;
-    MULTIBOOT_INFORMATION BootInfo;
+    HAL_BOOT_INFORMATION *BootInformation;
 } _LOADER;
 
 static _LOADER gLoader;
-static char loaderName[] = "UEFI Loader";
-static UINT8 MemoryMapMemory[SIZE_16KB]; 
-static UINT8 BootModulesStringPool[SIZE_4KB];
-static MULTIBOOT_BOOT_MODULE BootModules[128];
 
 extern char __start_os[];
 extern char __start_os_bits32[];
@@ -83,7 +77,8 @@ __declspec(align(8)) static _GDT_DESCRIPTOR gdtDescriptor;
 __declspec(align(8)) static _GDT_DESCRIPTOR_64 gdtDescriptor64;
 static _TRANSITION transition;
 
-static void
+static
+void
 _Die(
     CHAR16 *Message
     )
@@ -120,7 +115,8 @@ LoaderInit(
     PrintString(gLoader.ST, EFI_GREEN, L"Loader initialized\r\n");
 }
 
-static void
+static
+void
 _SearchForOperatingSystem(
     void
     )
@@ -162,46 +158,36 @@ _SearchForOperatingSystem(
     PrintString(gLoader.ST, EFI_LIGHTGRAY, L"\r\n");
 }
 
-static void
-_DumpMultibootHeader(
+static
+void
+_DumpHalBootHeader(
     void)
 {
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"Offset", gLoader.MultibootHeaderOffset);
+                         L"Offset", gLoader.BootHeaderOffset);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"Magic", gLoader.MultibootHeader.Magic);
+                         L"Magic", gLoader.BootHeader.Magic);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"Flags", gLoader.MultibootHeader.Flags);
+                         L"Crc32", gLoader.BootHeader.Crc32);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"Checksum", gLoader.MultibootHeader.Checksum);
+                         L"PreferedLoadAddress", gLoader.BootHeader.PreferredLoadAddress);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"HeaderAddress", gLoader.MultibootHeader.HeaderAddress);
+                         L"EntryAddress", gLoader.BootHeader.EntryAddress);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"LoadAddress", gLoader.MultibootHeader.LoadAddress);
+                         L"FrameBufferWidth", gLoader.BootHeader.FramebufferWidth);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"LoadEndAddress", gLoader.MultibootHeader.LoadEndAddress);
-    PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"BssEndAddress", gLoader.MultibootHeader.BssEndAddress);
-    PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"EntryAddress", gLoader.MultibootHeader.EntryAddress);
-    PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"ModeType", gLoader.MultibootHeader.ModeType);
-    PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"Width", gLoader.MultibootHeader.Width);
-    PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"Height", gLoader.MultibootHeader.Height);
-    PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY,
-                         L"Depth", gLoader.MultibootHeader.Depth);
+                         L"FrameBufferHeight", gLoader.BootHeader.FramebufferHeight);
 }
 
-static void
-_SearchForMultibootHeader(
+static
+void
+_SearchForHalBootHeader(
     void
     )
 {
     EFI_STATUS status;
 
-    // Search for Multiboot Header in the first 8 KB
+    // Search for HAL Boot Header in the first 8 KB
     UINT8 *buffer = AllocateFromPool(gLoader.ST, SIZE_8KB);
     UINT64 bufferSize = SIZE_8KB;
     SetMemory(buffer, 0, SIZE_8KB);
@@ -209,13 +195,13 @@ _SearchForMultibootHeader(
     if (EFI_ERROR(status))
         _Die(L"Failed to read from the image\r\n");
 
-    MULTIBOOT_HEADER *header;
+    HAL_BOOT_HEADER *header;
     UINT8 *pos = (UINT8 *) buffer;
-    UINT32 magic = MULTIBOOT_HEADER_MAGIC;
+    UINT32 magic = HAL_BOOT_HEADER_MAGIC;
     UINT8 found = 0;
     while (pos < buffer + SIZE_8KB)
     {
-        header = (MULTIBOOT_HEADER *) pos;
+        header = (HAL_BOOT_HEADER *) pos;
         if (MemoryEquals(&(header->Magic), &magic, sizeof(UINT32)))
         {
             found = 1;
@@ -224,48 +210,59 @@ _SearchForMultibootHeader(
         pos++;
     }
     if (!found)
-        _Die(L"Multiboot header not found\r\n");
+        _Die(L"Boot header not found\r\n");
 
-    gLoader.MultibootHeaderOffset = ((UINT8 *) (header)) - buffer;
-    CopyMemory(&(gLoader.MultibootHeader), header, sizeof(MULTIBOOT_HEADER));
+    gLoader.BootHeaderOffset = ((UINT8 *) (header)) - buffer;
+    CopyMemory(&(gLoader.BootHeader), header, sizeof(HAL_BOOT_HEADER));
     FreeFromPool(gLoader.ST, buffer);
-
-    UINT32 sum = gLoader.MultibootHeader.Magic +
-                 gLoader.MultibootHeader.Flags +
-                 gLoader.MultibootHeader.Checksum;
-    if (sum)
-        _Die(L"Multiboot Checksum is invalid");
 }
 
-static void
-_ParseMultibootHeaderInfo(
+// Taken from Hacker's Delight, no the most efficient but I did not want
+// any lookup table, HAL has the fastest version
+UINT32
+_ComputeCrc32(
+    UINT32 ReversedPolynomial,
+    UINT8 *Message,
+    UINT32 Length
+    ) 
+{
+    UINT32 Byte, Crc, Mask;
+    Crc = 0xFFFFFFFF;
+    for (UINT32 i = 0; i < Length; i++) {
+        Byte = Message[i];
+        Crc = Crc ^ Byte;
+        for (UINT32 j = 8; j >= 1; j--) {
+            Mask = -(Crc & 1);
+            Crc = (Crc >> 1) ^ (ReversedPolynomial & Mask);
+      }
+   }
+   return ~Crc;
+}
+
+static
+void
+_VerifyHalBootHeader(
     void
     )
 {
-    MULTIBOOT_HEADER *header = &(gLoader.MultibootHeader);
+    HAL_BOOT_HEADER CrcHeader;
 
-    if (!(header->Flags & MULTIBOOT_FLAGS_LOAD_INFO))
-        _Die(L"Cannot load Operating System, please provide flags bit 16");
+    CopyMemory(&CrcHeader, &(gLoader.BootHeader), sizeof(HAL_BOOT_HEADER));
+    CrcHeader.Crc32 = 0;
+    UINT32 Crc32 = _ComputeCrc32(CRC32_REVERSED_POLYNOMIAL, (UINT8 *) &CrcHeader, sizeof(HAL_BOOT_HEADER));
 
-    if (header->Flags & MULTIBOOT_FLAGS_MODULE_PAGE_ALIGN)
-        gLoader.AlignBootModules = 1;
-    else
-        gLoader.AlignBootModules = 0;
+    if (Crc32 != gLoader.BootHeader.Crc32)
+    {
+        PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"Correct CRC", Crc32);
+        PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"Received CRC", gLoader.BootHeader.Crc32);
+        _Die(L"Invalid boot header CRC\r\n");
+    }
     
-    if (header->Flags & MULTIBOOT_FLAGS_MEMORY_MAP)
-        gLoader.ProvideMemoryMap = 1;
-    else
-        gLoader.ProvideMemoryMap = 0;
-    
-    if (header->Flags & MULTIBOOT_FLAGS_VIDEO_MODE)
-        gLoader.ProvideVideoInformation = 1;
-    else
-        gLoader.ProvideVideoInformation = 0;
-    
-    gLoader.OsTextOffset = gLoader.MultibootHeaderOffset - (header->HeaderAddress - header->LoadAddress);
+    PrintString(gLoader.ST, EFI_GREEN, L"Boot header CRC32 verified\r\n");
 }
 
-static void
+static
+void
 _CopyOperatingSystem(
     void
     )
@@ -275,17 +272,19 @@ _CopyOperatingSystem(
     UINT64 pageCount = 0;
     UINT64 address = LoadFileToMemoryAt(gLoader.ST,
                                 gLoader.OsBinary,
-                                gLoader.OsTextOffset,
-                                gLoader.MultibootHeader.LoadAddress,
+                                gLoader.BootHeader.LoadOffset,
+                                gLoader.BootHeader.PreferredLoadAddress,
                                 &pageCount);
     if (!address)
         _Die(L"Failed to load Operating System at specified address");
     
+    gLoader.LoadAddress = address;
     gLoader.OsPageCount = pageCount;
     CloseFileHandle(gLoader.OsBinary);
 }
 
-static void
+static
+void
 _LoadBootModules(
     void
     )
@@ -295,7 +294,16 @@ _LoadBootModules(
     EFI_STATUS status;
     EFI_FILE_INFO **dirEntries;
     UINT64 dirCount;
-    
+
+    // Allocate for max module count
+    HAL_BOOT_MODULE *BootModules = AllocateZeroedPagesMaxAddress(
+                                                                gLoader.ST,
+                                                                EfiLoaderData,
+                                                                (EFI_PHYSICAL_ADDRESS) (BASE_4GB - 1),
+                                                                1);
+    if (!BootModules)
+        _Die(L"Failed to allocate boot module memory\r\n");
+
     status = ListDirectory(gLoader.ST,
                            gLoader.RootDirectory,
                            osFilename,
@@ -304,9 +312,8 @@ _LoadBootModules(
     if (EFI_ERROR(status))
         return;
 
-    UINT8 *stringPoolPos = BootModulesStringPool;
     // First two are . and ..
-    UINT64 count = dirCount > 130 ? 130 : dirCount;
+    UINT64 count = dirCount > 34 ? 34 : dirCount;
     for (UINT64 i = 2; i < count; i++)
     {
         PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Loading module: ");
@@ -324,14 +331,10 @@ _LoadBootModules(
             _Die(L"Could not load Boot Module\r\n");
         CloseFileHandle(fileHandle);
 
+        BootModules[i - 2].PhysicalAddress = address;
+        BootModules[i - 2].Size = pageCount * PAGE_SIZE;
         filenameLength /= sizeof(CHAR16);
-        CopyWcharAsChar(stringPoolPos, dirEntries[i]->FileName, filenameLength);
-        BootModules[i - 2].ModuleStart = address;
-        BootModules[i - 2].ModuleEnd = address + pageCount * PAGE_SIZE;
-        // Do not do this
-        BootModules[i - 2].StringAddr = (UINT32) ((UINT64) stringPoolPos);
-        BootModules[i - 2].Reserved = 0;
-        stringPoolPos += filenameLength;
+        CopyWcharAsChar(BootModules[i - 2].Name, dirEntries[i]->FileName, MIN(33, filenameLength));
         
         PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Loaded module ");
         PrintString(gLoader.ST, EFI_LIGHTGRAY, dirEntries[i]->FileName);
@@ -348,11 +351,12 @@ _LoadBootModules(
     {
         // Do not do this
         gLoader.BootModuleCount = (UINT32) (count - 2);
-        gLoader.BootModuleAddress = (UINT32) ((UINT64) BootModules);
+        gLoader.BootModules = (UINT32) ((UINT64) BootModules);
     }
 }
 
-static void
+static
+void
 _PrepareAssembly(
     void
     )
@@ -371,18 +375,18 @@ _PrepareAssembly(
     gLoader.StartOsRoutine = (StartOS) &(__start_os[0]);
 }
 
-static void
+static
+void
 _DumpFramebuffer(
     void
     )
 {
-    FRAMEBUFFER *buff = (FRAMEBUFFER *) &(gLoader.Framebuffer);
+    HAL_FRAMEBUFFER *buff = (HAL_FRAMEBUFFER *) &(gLoader.Framebuffer);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"Address", buff->Address);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"Pitch", buff->Pitch);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"Width", buff->Width);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"Height", buff->Height);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"BitsPerPixel", buff->BitsPerPixel);
-    PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"Type", buff->Type);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"RedFieldPosition", buff->RedFieldPosition);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"RedMaskSize", buff->RedMaskSize);
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"GreenFieldPosition", buff->GreenFieldPosition);
@@ -391,7 +395,8 @@ _DumpFramebuffer(
     PrintIntegerWithName(gLoader.ST, EFI_LIGHTGRAY, L"BlueMaskSize", buff->BlueMaskSize);
 }
 
-static void 
+static
+void 
 _GetDisplayMode(
     void
     )
@@ -402,8 +407,8 @@ _GetDisplayMode(
     gLoader.GOP = gop;
 
     UINT32 mode = ObtainClosestGraphicsMode(gop,
-                                            gLoader.MultibootHeader.Width,
-                                            gLoader.MultibootHeader.Height,
+                                            gLoader.BootHeader.FramebufferWidth,
+                                            gLoader.BootHeader.FramebufferHeight,
                                             &(gLoader.Framebuffer));
     if (mode == UINT32_MAX)
         _Die(L"Could not obtain GOP mode\r\n");
@@ -414,143 +419,41 @@ _GetDisplayMode(
     _DumpFramebuffer();
 }
 
-static UINT8
-_IsMemoryUsable(
-    EFI_MEMORY_TYPE MemoryType
-    )
-{
-    return (// MemoryType == EfiLoaderCode ||
-            // MemoryType == EfiLoaderData ||
-            MemoryType == EfiBootServicesCode ||
-            MemoryType == EfiBootServicesData ||
-            MemoryType == EfiConventionalMemory ||
-            MemoryType == EfiPersistentMemory);
-
-}
-
-static UINT8
-_IsMemoryReserved(
-    EFI_MEMORY_TYPE MemoryType
-    )
-{
-    return (MemoryType == EfiReservedMemoryType ||
-            MemoryType == EfiUnacceptedMemoryType ||
-            MemoryType == EfiMemoryMappedIO ||
-            MemoryType == EfiMemoryMappedIOPortSpace ||
-            MemoryType == EfiPalCode);
-}
-
-static UINT8
-_IsMemoryAcpiReclaimable(
-    EFI_MEMORY_TYPE MemoryType
-    )
-{
-    return MemoryType == EfiACPIReclaimMemory;
-}
-
-static UINT8
-_IsMemoryAcpiNvs(
-    EFI_MEMORY_TYPE MemoryType
-    )
-{
-    return MemoryType == EfiACPIMemoryNVS;
-}
-
-static UINT32
-_GetBiosMemoryType(
-    EFI_MEMORY_TYPE MemoryType
-    )
-{
-    if (_IsMemoryUsable(MemoryType))
-        return 1;
-    
-    if (_IsMemoryReserved(MemoryType))
-        return 2;
-    
-    if (_IsMemoryAcpiReclaimable(MemoryType))
-        return 3;
-
-    if (_IsMemoryAcpiNvs(MemoryType))
-        return 4;
-    
-    return 5;
-}
-
-static void
-_PrepareMemoryMap(
+static
+void
+_FillHalBootInformation(
     void
     )
 {
-    UINTN mapKey = GetMemoryMap(gLoader.ST, &(gLoader.MemoryMap));
-    if (mapKey == UINT64_MAX)
-        _Die(L"Could not get memory map\r\n");
-    gLoader.MemoryMapKey = mapKey;
+    HAL_BOOT_INFORMATION *bootInfo = 
+        AllocateZeroedPagesMaxAddress(
+            gLoader.ST,
+            EfiLoaderData,
+            (EFI_PHYSICAL_ADDRESS) (SIZE_4GB - 1),
+            1
+        );
+    if (!bootInfo)
+        _Die(L"Failed to allocate boot information\n");
 
-    // Convert EFI Memory Map to BIOS memory map
-    MEMORY_MAP *mmap = (MEMORY_MAP *) &(gLoader.MemoryMap);
-    UINT8 *buffer = (UINT8 *) mmap->MapAddress;
-    UINT8 *pos = MemoryMapMemory;
-    for (UINT64 i = 0; i < mmap->Count; i++)
-    {
-        EFI_MEMORY_DESCRIPTOR *desc = (EFI_MEMORY_DESCRIPTOR *) buffer;
+    SetMemory(bootInfo, 0, sizeof(HAL_BOOT_INFORMATION));
 
-        UINT32 *sz = (UINT32 *) pos; 
-        *sz = sizeof(MULTIBOOT_MEMORY_MAP);
-        pos += sizeof(UINT32);
-        MULTIBOOT_MEMORY_MAP *curr = (MULTIBOOT_MEMORY_MAP *) pos;
-        pos += sizeof(MULTIBOOT_MEMORY_MAP);
+    bootInfo->Magic = HAL_BOOT_MAGIC;
 
-        curr->BaseAddr = desc->PhysicalStart;
-        curr->Length = desc->NumberOfPages * PAGE_SIZE;
-        curr->Type = _GetBiosMemoryType(desc->Type);
-        curr->ExtendedAttributes = 1;
+    bootInfo->KernelBaseAddress = gLoader.LoadAddress; 
+    bootInfo->KernelSize = gLoader.OsPageCount * PAGE_SIZE;
 
-        buffer += mmap->DescriptorSize;
-    }
+    bootInfo->AcpiRsdp = gLoader.AcpiRsdp;
 
-    gLoader.MemoryMapPointer = (UINT64) MemoryMapMemory;
-    gLoader.MemoryMapSize = mmap->Count * (sizeof(UINT32) + sizeof(MULTIBOOT_MEMORY_MAP));
-}
+    bootInfo->BootModuleCount = gLoader.BootModuleCount;
+    bootInfo->BootModules = gLoader.BootModules;
 
-static void
-_FillMultibootInformation(
-    void
-    )
-{
-    MULTIBOOT_INFORMATION *info = (MULTIBOOT_INFORMATION *) &(gLoader.BootInfo);
+    CopyMemory(&(bootInfo->Framebuffer), &(gLoader.Framebuffer), sizeof(HAL_FRAMEBUFFER));
 
-    SetMemory(info, 0, sizeof(MULTIBOOT_INFORMATION));
+    // Known serial port numbers
+    bootInfo->SerialPorts[0] = 0x3F8;
+    bootInfo->SerialPorts[1] = 0x2F8; 
 
-    if (gLoader.BootModuleCount)
-    {
-        info->Flags |= BIT3;
-        info->ModuleCount = gLoader.BootModuleCount;
-        info->ModuleAddress = gLoader.BootModuleAddress;
-    }
-
-    info->AcpiRdsp = gLoader.AcpiRsdp;
-
-    info->Flags |= BIT6;
-    info->MemoryMapLength = gLoader.MemoryMapSize;    
-    info->MemoryMapAddress = gLoader.MemoryMapPointer;
-
-    info->Flags |= BIT9;
-    info->BootLoaderName = (UINT32) ((UINT64) loaderName);
-
-    FRAMEBUFFER *buff = (FRAMEBUFFER *) &(gLoader.Framebuffer);
-    info->Flags |= BIT12;
-    info->FrameBufferAddress = buff->Address;
-    info->FrameBufferPitch = buff->Pitch;
-    info->FrameBufferWidth = buff->Width;
-    info->FrameBufferHeight = buff->Height;
-    info->FrameBufferBpp = buff->BitsPerPixel;
-    info->FrameBufferType = buff->Type;
-    info->FrameBufferRedFieldPosition = buff->RedFieldPosition;
-    info->FrameBufferRedMaskSize = buff->RedMaskSize;
-    info->FrameBufferGreenFieldPosition = buff->GreenFieldPosition;
-    info->FrameBufferGreenMaskSize = buff->GreenMaskSize;
-    info->FrameBufferBlueFieldPosition = buff->BlueFieldPosition;
-    info->FrameBufferBlueMaskSize = buff->BlueMaskSize;
+    gLoader.BootInformation = bootInfo;
 }
 
 void 
@@ -562,17 +465,17 @@ LoadOperatingSystem(
     
     PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Searching for an Operating System\r\n");
     _SearchForOperatingSystem();
-    _SearchForMultibootHeader();
+    _SearchForHalBootHeader();
 
-    PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Found Multiboot header:\r\n");
-    _DumpMultibootHeader();
+    PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Found boot header:\r\n");
+    _DumpHalBootHeader();
 
-    _ParseMultibootHeaderInfo();
+    _VerifyHalBootHeader();
 
     PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Loading Operating System to ");
-    PrintIntegerInHexadecimal(gLoader.ST, EFI_LIGHTGRAY, gLoader.MultibootHeader.LoadAddress);
+    PrintIntegerInHexadecimal(gLoader.ST, EFI_LIGHTGRAY, gLoader.BootHeader.PreferredLoadAddress);
     PrintString(gLoader.ST, EFI_LIGHTGRAY, L" starting from offset ");
-    PrintIntegerInHexadecimal(gLoader.ST, EFI_LIGHTGRAY, gLoader.OsTextOffset);
+    PrintIntegerInHexadecimal(gLoader.ST, EFI_LIGHTGRAY, gLoader.BootHeader.LoadOffset);
     PrintString(gLoader.ST, EFI_LIGHTGRAY, L"\r\n");
     _CopyOperatingSystem();
     PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Operating System Loaded\r\n");
@@ -593,18 +496,15 @@ LoadOperatingSystem(
     PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Obtaining a framebuffer\r\n");
     _GetDisplayMode();
 
-    PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Preparing memory map\r\n");
-    _PrepareMemoryMap();
-    PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Prepared memory map\r\n");
-
-    PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Filling Multiboot Information\r\n");
-    _FillMultibootInformation();
-    PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Filled Multiboot Information\r\n");
+    PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Filling HAL Boot Information\r\n");
+    _FillHalBootInformation();
+    PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Filled HAL Boot Information\r\n");
 
     PrintString(gLoader.ST, EFI_GREEN, L"Loaded Operating System\r\n");
 }
 
-static void 
+static
+void 
 _ExitBootServices(
     void
     )
@@ -612,7 +512,10 @@ _ExitBootServices(
     CloseFileHandle(gLoader.RootDirectory);
     UINTN mapKey = gLoader.MemoryMapKey;
     while(gLoader.ST->BootServices->ExitBootServices(gLoader.ImageHandle, mapKey) != EFI_SUCCESS)
-        mapKey = GetMemoryMap(gLoader.ST, &(gLoader.MemoryMap));
+        mapKey = GetMemoryMap(gLoader.ST, &(gLoader.BootInformation->MemoryMap));
+    gLoader.BootInformation->Crc32 = 0;
+    gLoader.BootInformation->Crc32 = ComputeCrc32((UINT8 *) gLoader.BootInformation,
+                                                  sizeof(HAL_BOOT_INFORMATION ) - 16);
 }
 
 void
@@ -626,13 +529,13 @@ StartOperatingSystem(
 
     SetGraphicsMode(gLoader.GOP, gLoader.GopModeIndex);
     _ExitBootServices();
-    
+
     // Signal that we are done
     UINT32 *buff = (UINT32 *) gLoader.Framebuffer.Address;
     for (int i = 0; i < 100; i++) 
         buff[i] = UINT32_MAX;
 
-    (gLoader.StartOsRoutine)(gLoader.MultibootHeader.EntryAddress,
-                             (UINT64) &(gLoader.BootInfo),
+    (gLoader.StartOsRoutine)(gLoader.BootHeader.EntryAddress,
+                             (UINT64) gLoader.BootInformation,
                              (UINT64) &transition);
 }

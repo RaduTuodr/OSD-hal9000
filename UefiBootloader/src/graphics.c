@@ -1,7 +1,5 @@
 #include <bootloader/graphics.h>
 
-#include <bootloader/multiboot.h>
-
 EFI_GRAPHICS_OUTPUT_PROTOCOL*
 GetGraphicsProtocol(
     EFI_SYSTEM_TABLE *ST
@@ -16,11 +14,12 @@ GetGraphicsProtocol(
 }
 
 // Dumb way
-UINT32 ObtainClosestGraphicsMode(
+UINT32
+ObtainClosestGraphicsMode(
     EFI_GRAPHICS_OUTPUT_PROTOCOL *GOP,
     UINT32 Width,
     UINT32 Height,
-    FRAMEBUFFER *Framebuffer
+    HAL_FRAMEBUFFER *Framebuffer
     ) 
 {
     UINT32 maxMode = GOP->Mode->MaxMode;
@@ -56,7 +55,6 @@ UINT32 ObtainClosestGraphicsMode(
     Framebuffer->Width = mode->HorizontalResolution;
     Framebuffer->Height = mode->VerticalResolution;
     Framebuffer->BitsPerPixel = sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * 8;
-    Framebuffer->Type = MULTIBOOT_FRAMEBUFFER_RGB;
     // 00000000 RRRRRRRR GGGGGGGG BBBBBBBB
     Framebuffer->RedFieldPosition = 16; 
     Framebuffer->RedMaskSize = 8;

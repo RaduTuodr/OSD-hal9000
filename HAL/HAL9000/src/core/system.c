@@ -1,5 +1,5 @@
 #include "HAL9000.h"
-#include "multiboot.h"
+#include "bootinfo.h"
 #include "system.h"
 #include "idt.h"
 #include "iomu.h"
@@ -38,16 +38,15 @@ QWORD gAcpiRsdpAddress;
 
 void
 SystemPreinit(
-    IN  ASM_PARAMETERS*     Parameters
+    IN  HAL_BOOT_INFORMATION*     BootInformation
     )
 {
     memzero(&m_systemData, sizeof(SYSTEM_DATA));
 
-    PMULTIBOOT_INFORMATION multibootInformation = Parameters->MultibootInformation;
     DISPLAY_INFORMATION displayInformation;
-    displayInformation.FrameBufferAddress = Parameters->VirtualDisplayAddress;
+    displayInformation.FrameBufferAddress = BootInformation->VirtualDisplayAddress;
     memcpy(&(displayInformation.FrameBufferPitch), 
-           &(multibootInformation->FrameBufferPitch),
+           &(BootInformation->Framebuffer.Pitch),
            sizeof(DISPLAY_INFORMATION) - sizeof(QWORD));
 
     m_systemData.NumberOfTssStacks = NO_OF_TSS_STACKS;
@@ -70,18 +69,16 @@ SystemPreinit(
 
 STATUS
 SystemInit(
-    IN  ASM_PARAMETERS*     Parameters
+    IN  HAL_BOOT_INFORMATION*     BootInformation
     )
 {
     STATUS status;
     PCPU* pCpu;
-    PMULTIBOOT_INFORMATION multibootInformation;
-    QWORD displaySize;
+    DWORD BootModuleCount;
+    PHYSICAL_ADDRESS BootModules;
 
     status = STATUS_SUCCESS;
     pCpu = NULL;
-    multibootInformation = Parameters->MultibootInformation;
-    displaySize = 0;
 
     LogSystemInit(LogLevelInfo,
                   LogComponentGeneric | LogComponentInterrupt | LogComponentIo | LogComponentAcpi | LogComponentPci,
@@ -102,7 +99,7 @@ SystemInit(
     }
 
     // initialize serial communication
-    status = SerialCommunicationInitialize(Parameters->BiosSerialPorts, BIOS_MAX_NO_OF_SERIAL_PORTS);
+    status = SerialCommunicationInitialize(BootInformation->SerialPorts, BIOS_MAX_NO_OF_SERIAL_PORTS);
     if (!SUCCEEDED(status))
     {
         LOG_FUNC_ERROR("SerialCommunicationInitialize", status);
@@ -133,7 +130,7 @@ SystemInit(
     }
 
     LOGL("CpuMuActivateFpuFeatures succeeded\n");
-
+     
     // IDT handlers need to be initialized before
     // MmuInitSystem is called because the VMM
     // needs page fault handling to allocate memory
@@ -146,18 +143,12 @@ SystemInit(
 
     LOGL("InitIdtHandlers succeeded\n");
 
-    displaySize = 
-        multibootInformation->FrameBufferHeight *
-        multibootInformation->FrameBufferPitch;
+    // We have to save these values here, because after returning from
+    // MmuInitSystem we do not have identity mappings in the first 4GB
+    BootModuleCount = BootInformation->BootModuleCount;
+    BootModules = (PHYSICAL_ADDRESS) ((QWORD) BootInformation->BootModules);
 
-    status = MmuInitSystem(Parameters->KernelBaseAddress,
-                           (DWORD) Parameters->KernelSize,
-                           Parameters->MemoryMapAddress,
-                           Parameters->MemoryMapEntries,
-                           multibootInformation->FrameBufferAddress,
-                           Parameters->VirtualDisplayAddress,
-                           displaySize
-                           );
+    status = MmuInitSystem((PVOID) BootInformation);
     if (!SUCCEEDED(status))
     {
         LOG_FUNC_ERROR("MmuInitSystem", status);
@@ -166,10 +157,12 @@ SystemInit(
 
     LOGL("MmuInitSystem succeeded\n");
 
-    if (IsBooleanFlagOn(Parameters->MultibootInformation->Flags, MULTIBOOT_FLAG_BOOT_MODULES_PRESENT))
+    // BootInformation contents not valid from here, it is not mapped
+    if (BootModuleCount > 0)
     {
-        status = BootModulesInit((PHYSICAL_ADDRESS)(QWORD)Parameters->MultibootInformation->ModuleAddress,
-                                Parameters->MultibootInformation->ModuleCount);
+        LOG("We have %d boot modules at %X\n", BootModuleCount, BootModules);
+        status = BootModulesInit(BootModules,
+                                 BootModuleCount);
         if (!SUCCEEDED(status))
         {
             LOG_FUNC_ERROR("BootModulesMap", status);

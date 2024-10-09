@@ -1,9 +1,9 @@
 #include "HAL9000.h"
 #include "boot_module.h"
 #include "mmu.h"
-#include "multiboot.h"
+#include "bootinfo.h"
 
-#define BOOT_MODULE_MAX_NAME_LEN        100
+#define BOOT_MODULE_MAX_NAME_LEN        33
 
 typedef struct _BOOT_MODULE_INFORMATION
 {
@@ -26,7 +26,7 @@ static
 STATUS
 _MapSingleModule(
     OUT     PBOOT_MODULE_INFORMATION            MappedModule,
-    IN      PMULTIBOOT_MODULE_INFORMATION       MultibootModule
+    IN      HAL_BOOT_MODULE                     *BootModule
     );
 
 static
@@ -62,7 +62,7 @@ BootModulesInit(
 {
     STATUS status;
     PBOOT_MODULE_INFORMATION pModuleInformation;
-    PMULTIBOOT_MODULE_INFORMATION pMultibootModules;
+    HAL_BOOT_MODULE *pBootModules;
 
     if (NumberOfModules == 0)
     {
@@ -77,7 +77,7 @@ BootModulesInit(
 
     status = STATUS_SUCCESS;
     pModuleInformation = NULL;
-    pMultibootModules = NULL;
+    pBootModules = NULL;
 
     __try
     {
@@ -92,17 +92,18 @@ BootModulesInit(
             __leave;
         }
 
-        pMultibootModules = MmuMapSystemMemory(BootModulesStart, NumberOfModules * sizeof(MULTIBOOT_MODULE_INFORMATION));
-        if (pMultibootModules == NULL)
+        pBootModules = MmuMapSystemMemory(BootModulesStart, NumberOfModules * sizeof(HAL_BOOT_MODULE));
+        LOG("Boot module vector mapped\n");
+        if (pBootModules == NULL)
         {
             status = STATUS_MEMORY_CANNOT_BE_MAPPED;
-            LOG_FUNC_ERROR_ALLOC("MmuMapSystemMemory",NumberOfModules * sizeof(MULTIBOOT_MODULE_INFORMATION));
+            LOG_FUNC_ERROR_ALLOC("MmuMapSystemMemory",NumberOfModules * sizeof(HAL_BOOT_MODULE));
             __leave;
         }
 
         for (DWORD i = 0; i < NumberOfModules; ++i)
         {
-            status = _MapSingleModule(&pModuleInformation[i], &pMultibootModules[i]);
+            status = _MapSingleModule(&pModuleInformation[i], &pBootModules[i]);
             if (!SUCCEEDED(status))
             {
                 LOG_WARNING("_MapSingleModule failed with status 0x%x\n", status);
@@ -118,10 +119,10 @@ BootModulesInit(
     }
     __finally
     {
-        if (pMultibootModules != NULL)
+        if (pBootModules != NULL)
         {
-            MmuUnmapSystemMemory(pMultibootModules, NumberOfModules * sizeof(MULTIBOOT_MODULE_INFORMATION));
-            pMultibootModules = NULL;
+            MmuUnmapSystemMemory(pBootModules, NumberOfModules * sizeof(HAL_BOOT_MODULE));
+            pBootModules = NULL;
         }
 
         if (!SUCCEEDED(status))
@@ -194,44 +195,33 @@ static
 STATUS
 _MapSingleModule(
     OUT     PBOOT_MODULE_INFORMATION            MappedModule,
-    IN      PMULTIBOOT_MODULE_INFORMATION       MultibootModule
+    IN      HAL_BOOT_MODULE                     *BootModule
     )
 {
     STATUS status;
     DWORD modNameLen;
     PVOID pModuleData;
-    PVOID pMappedString;
     BOOT_MODULE_INFORMATION bootMod;
 
     ASSERT(MappedModule != NULL);
-    ASSERT(MultibootModule != NULL);
+    ASSERT(BootModule != NULL);
 
     status = STATUS_SUCCESS;
     pModuleData = NULL;
-    pMappedString = NULL;
     memzero(&bootMod, sizeof(BOOT_MODULE_INFORMATION));
 
     __try
     {
-        // The �string� field may be 0 if there is no string associated with the module.
-        if (MultibootModule->StringPhysAddr != 0)
+        // The string field may be 0 if there is no string associated with the module.
+        if (BootModule->Name != 0)
         {
-            pMappedString = MmuMapSystemMemory((PHYSICAL_ADDRESS)(QWORD)MultibootModule->StringPhysAddr,
-                                               BOOT_MODULE_MAX_NAME_LEN);
-            if (pMappedString == NULL)
-            {
-                status = STATUS_MEMORY_CANNOT_BE_MAPPED;
-                LOG_FUNC_ERROR_ALLOC("MmuMapSystemMemory", BOOT_MODULE_MAX_NAME_LEN);
-                __leave;
-            }
+            LOG("Mapping module %s\n", BootModule->Name);
 
-            // The �string� field provides an arbitrary string to be associated with that particular boot module;
+            // The string field provides an arbitrary string to be associated with that particular boot module;
             // it is a zero-terminated ASCII string
-            modNameLen = strlen_s(pMappedString, BOOT_MODULE_MAX_NAME_LEN);
+            modNameLen = strlen_s(BootModule->Name, BOOT_MODULE_MAX_NAME_LEN);
             ASSERT(modNameLen != INVALID_STRING_SIZE);
 
-            // It seems that the MB loader gives us an extra space (' ') character at the end of each module name,
-            // we will replace this space with a NULL terminator => no reason to allocate an extra byte
             bootMod.Name = ExAllocatePoolWithTag(0, modNameLen + 1, HEAP_BOOT_TAG, 0);
             if (bootMod.Name == NULL)
             {
@@ -239,11 +229,11 @@ _MapSingleModule(
                 LOG_FUNC_ERROR_ALLOC("ExAllocatePoolWithTag", modNameLen);
                 __leave;
             }
-            memcpy(bootMod.Name, pMappedString, modNameLen);
+            memcpy(bootMod.Name, BootModule->Name, modNameLen);
             bootMod.Name[modNameLen + 1] = '\0';
         }
 
-        bootMod.Length = MultibootModule->ModuleEndPhysAddr - MultibootModule->ModuleStartPhysAddr;
+        bootMod.Length = BootModule->Size;
 
         if (bootMod.Length == 0)
         {
@@ -253,10 +243,10 @@ _MapSingleModule(
         }
 
         LOG("Will try to map module between 0x%x -> 0x%x with name [%s] of size 0x%x\n",
-            MultibootModule->ModuleStartPhysAddr, MultibootModule->ModuleEndPhysAddr,
+            BootModule->PhysicalAddress, BootModule->PhysicalAddress + bootMod.Length,
             bootMod.Name, bootMod.Length);
 
-        pModuleData = MmuMapSystemMemory((PHYSICAL_ADDRESS)(QWORD)MultibootModule->ModuleStartPhysAddr,
+        pModuleData = MmuMapSystemMemory((PHYSICAL_ADDRESS)(QWORD)BootModule->PhysicalAddress,
                                          bootMod.Length);
         if (pModuleData == NULL)
         {
@@ -284,12 +274,6 @@ _MapSingleModule(
 
             MmuUnmapSystemMemory(pModuleData, bootMod.Length);
             pModuleData = NULL;
-        }
-
-        if (pMappedString != NULL)
-        {
-            MmuUnmapSystemMemory(pMappedString, BOOT_MODULE_MAX_NAME_LEN);
-            pMappedString = NULL;
         }
 
         if (!SUCCEEDED(status))

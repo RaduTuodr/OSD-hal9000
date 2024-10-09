@@ -5,50 +5,6 @@
 ; STRUCTURE DEFINITIONS
 ;-----------------------------------------------------------------------;
 
-struc MULTIBOOT_INFORMATION
-    .Flags                             resd     1
-    .LowerMemorySize                   resd     1
-    .HigherMemorySize                  resd     1
-    .BootDevice                        resd     1
-    .CommandLine                       resd     1
-    .ModuleCount                       resd     1
-    .ModuleAddress                     resd     1
-    .AcpiRsdp                          resq     1
-    .Reserved                          resq     1
-    .MemoryMapLength                   resd     1
-    .MemoryMapAddress                  resd     1
-    .DrivesLength                      resd     1
-    .DrivesAddress                     resd     1
-    .ConfigTable                       resd     1
-    .BootLoaderName                    resd     1
-    .ApmTable                          resd     1
-    .Vbe                               resb     16
-    .FrameBufferAddress                resq     1
-    .FrameBufferPitch                  resd     1
-    .FrameBufferWidth                  resd     1
-    .FrameBufferHeight                 resd     1
-    .FrameBufferBpp                    resd     1
-    .FrameBufferType                   resd     1
-    .FrameBufferRedFieldPosition       resd     1
-    .FrameBufferRedMaskSize            resd     1
-    .FrameBufferGreenFieldPosition     resd     1
-    .FrameBufferGreenMaskSize          resd     1
-    .FrameBufferBlueFieldPosition      resd     1
-    .FrameBufferBlueMaskSize           resd     1
-endstruc
-
-struc ASM_PARAMETERS
-    .MultibootInformation               resq    1                           ; 0x00
-    .KernelBaseAddress                  resq    1                           ; 0x08
-    .KernelSize                         resq    1                           ; 0x10
-    .VirtualToPhysicalOffset            resq    1                           ; 0x18
-    .VirtualDisplayOffset               resq    1
-    .MemoryMapAddress                   resq    1                           ; 0x20
-    .MemoryMapEntries                   resd    1                           ; 0x28
-    .BiosSerialPorts                    resw    4                           ; 0x2C
-                                                                            ; 0x34
-endstruc
-
 struc XSAVE_LEGACY_REGION
     .ControlWord                        resw    1                           ; 0x00
     .StatusWord                         resw    1                           ; 0x02
@@ -122,13 +78,6 @@ struc DISK_ADDRESS_PACKET
     .BufferSegment                      resw    1
     .StartingLBA                        resd    1
     .UpperLBAPart                       resd    1
-endstruc
-
-struc INT15_MEMORY_MAP_ENTRY
-    .BaseAddress                        resq    1
-    .Length                             resq    1
-    .Type                               resd    1
-    .ExtendedAttributes                 resd    1
 endstruc
 
 struc TRANSITION_CONFIG

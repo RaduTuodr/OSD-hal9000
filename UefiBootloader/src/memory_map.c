@@ -1,11 +1,11 @@
-#include <bootloader/memory_map.h>
+#include <Bootloader/memory_map.h>
 
-#include <bootloader/memory.h>
+#include <Bootloader/memory.h>
 
 UINTN 
 GetMemoryMap(
     EFI_SYSTEM_TABLE *ST,
-    MEMORY_MAP *MemoryMap
+    HAL_MEMORY_MAP *MemoryMap
     )
 {
     UINTN memoryMapSize = PAGE_SIZE;
@@ -30,8 +30,8 @@ GetMemoryMap(
     if (status != EFI_SUCCESS || descriptorVersion != EFI_MEMORY_DESCRIPTOR_VERSION)
         return UINT64_MAX;
 
-    MemoryMap->DescriptorSize = descriptorSize;
-    MemoryMap->Count = memoryMapSize / descriptorSize;
+    MemoryMap->DescriptorSize = (UINT32) descriptorSize;
+    MemoryMap->Count = (UINT32) (memoryMapSize / descriptorSize);
     MemoryMap->MapAddress = (UINT64) memoryMapPointer;
     
     return mapKey;

@@ -1,6 +1,6 @@
 %define CODE_SEGMENT 0x08
 %define DATA_SEGMENT 0x10
-%define MULTIBOOT_LOADER_MAGIC 0x2BADB002
+%define HAL_BOOT_MAGIC 0xC00010FF
 
 global __start_os
 global __start_os_bits32
@@ -107,7 +107,7 @@ __start_os_pm:
     mov gs, ax
     
     ; Load magic
-    mov eax, MULTIBOOT_LOADER_MAGIC 
+    mov eax, HAL_BOOT_MAGIC 
 
     ; Load BootInfo
     mov ebx, [esp]

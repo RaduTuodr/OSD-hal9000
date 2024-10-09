@@ -5,23 +5,27 @@
 ; DEFINES
 ;-----------------------------------------------------------------------;
 
-; 1 MULTIBOOT DEFINES
+; 1 HAL BOOT DEFINES
 ;-----------------------------------------------------------------------;
 
 ;
-; we use hardcoded address space / map for our data structures, the multiboot header and the entry point
+; we use hardcoded address space / map for our data structures, the boot header and the entry point
 ; the plain binary image is loaded to 0x00200000 (2MB), the entry point is fixed to 0x00209000
 ;
-%define     MULTIBOOT_HEADER_SIZE       48                                      ; check out '3.1.1 The layout of Multiboot header'
-%define     MULTIBOOT_HEADER_MAGIC      0x1BADB002
-%define     MULTIBOOT_HEADER_FLAGS      0x00010001                              ; flags[16] | flags[0]
-%define     MULTIBOOT_LOADER_MAGIC      0x2BADB002
+%define     HAL_BOOT_HEADER_SIZE        28                                      ; check out the UefiBootloader
+%define     HAL_HEADER_MAGIC            0xFEE1DEAD
+%define     HAL_HEADER_CRC32            0xC30CA5E
+%define     HAL_BOOT_MAGIC              0xC00010FF
+%define     HAL_ENTRY_POINT             KERNEL_CODE_START_ADDRESS               ; at EIP = 0x20C000 we start the execution (32 bit, non-paged)
+%define     HAL_FRAMEBUFFER_WIDTH       1152
+%define     HAL_FRAMEBUFFER_HEIGHT      800
 
-%define     MULTIBOOT_ENTRY_POINT       KERNEL_CODE_START_ADDRESS               ; at EIP = 0x20C000 we start the execution (32 bit, non-paged)
+%define     HAL_BOOT_INFO_SIZE          256
 
-%define     MULTIBOOT_INFO_STRUCT_SIZE  140
+%define     HAL_INFO_ADDRESS            HAL_BOOT_BASE + HAL_BOOT_INFO_SIZE
 
-%define     MULTIBOOT_INFO_ADDRESS      MULTIBOOT_BASE + MULTIBOOT_HEADER_SIZE
+%define     HAL_FRAMEBUFFER_OFFSET      48
+%define     HAL_VIRTUAL_INFO_OFFSET     256
 
 ; 2 MINIHV DEFINES
 ;-----------------------------------------------------------------------;
@@ -60,13 +64,13 @@
 
 ; 4 Upper MEMORY LAYOUT DEFINES
 ;-----------------------------------------------------------------------;
-%define     MULTIBOOT_SECTION_SIZE              0x100
+%define     HAL_BOOT_SECTION_SIZE               0x100
 %define     GDT_SECTION_SIZE                    0x200
 %define     DATA_SECTION_SIZE                   0x1900
 
-%define     MULTIBOOT_BASE                      (KERNEL_BASE + 0x400)           ; take into account the MZ/PE header + 0x400 allignment
-                                                                                ; the multiboot header begins in the _text section
-%define     GDT_BASE_ADDRESS                    (MULTIBOOT_BASE+MULTIBOOT_SECTION_SIZE)  
+%define     HAL_BOOT_BASE                       (KERNEL_BASE + 0x400)           ; take into account the MZ/PE header + 0x400 allignment
+                                                                                ; the hal boot header begins in the _text section
+%define     GDT_BASE_ADDRESS                    (HAL_BOOT_BASE+HAL_BOOT_SECTION_SIZE)  
 %define     GDT_DESCRIPTOR_ADDRESS              (GDT_BASE_ADDRESS + __gdt_base.end - __gdt_base )
 %define     DATA_BASE_ADDRESS                   (GDT_BASE_ADDRESS+GDT_SECTION_SIZE)
 %define     PML4_TABLE_BASE                     (DATA_BASE_ADDRESS + DATA_SECTION_SIZE)

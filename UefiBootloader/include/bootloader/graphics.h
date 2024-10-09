@@ -3,23 +3,7 @@
 #include <Uefi.h>
 #include <Protocol/GraphicsOutput.h>
 
-#define UINT32_MAX 4294967295U
-
-typedef struct
-{
-    UINT64 Address;
-    UINT32 Pitch;
-    UINT32 Width;
-    UINT32 Height;
-    UINT32 BitsPerPixel;
-    UINT32 Type;
-    UINT32 RedFieldPosition;
-    UINT32 RedMaskSize;
-    UINT32 GreenFieldPosition;
-    UINT32 GreenMaskSize;
-    UINT32 BlueFieldPosition;
-    UINT32 BlueMaskSize;
-} FRAMEBUFFER;
+#include <Bootloader/types.h>
 
 EFI_GRAPHICS_OUTPUT_PROTOCOL*
 GetGraphicsProtocol(
@@ -30,7 +14,7 @@ UINT32 ObtainClosestGraphicsMode(
     EFI_GRAPHICS_OUTPUT_PROTOCOL *GOP,
     UINT32 Width,
     UINT32 Height,
-    FRAMEBUFFER *Framebuffer
+    HAL_FRAMEBUFFER *Framebuffer
     );
  
 EFI_STATUS

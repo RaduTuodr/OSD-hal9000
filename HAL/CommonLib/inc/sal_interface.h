@@ -70,5 +70,7 @@ C_HEADER_START
 // return types
 #define RET_NOT_NULL                                _Ret_notnull_
 
+#define OPTIONAL
+
 #include "sal_intrinsic.h"
 C_HEADER_END

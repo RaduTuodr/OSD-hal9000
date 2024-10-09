@@ -1,6 +1,6 @@
 #include "HAL9000.h"
+#include "bootinfo.h"
 #include "mmu.h"
-#include "int15.h"
 #include "pmm.h"
 #include "vmm.h"
 #include "pte.h"
@@ -272,47 +272,46 @@ MmuPreinitSystem(
 _No_competing_thread_
 STATUS
 MmuInitSystem(
-    IN          PVOID                   KernelBaseAddress,
-    IN          DWORD                   KernelSize,
-    IN          PHYSICAL_ADDRESS        MemoryEntries,
-    IN          DWORD                   NumberOfMemoryEntries,
-    IN          QWORD                   DisplayPhysicalAddress,
-    IN          QWORD                   DisplayVirtualAddress,
-    IN          QWORD                   DisplaySize
+    IN PVOID BootInformation
     )
 {
     STATUS status;
-    PINT15_MEMORY_MAP_ENTRY pMemoryMap;
     PBYTE pPagingStructuresAddrBase;
     PBYTE pmmBaseAddress;
     PBYTE pVmmAddressBase;
     DWORD pmmSizeRequired;
     DWORD alignedKernelSize;
     PBYTE pNewStackTop;
+    const HAL_BOOT_INFORMATION *bootInfo;
+    QWORD KernelBaseAddress;
+    QWORD displaySize;
 
-    if (NULL == KernelBaseAddress)
+    bootInfo = (const HAL_BOOT_INFORMATION *) BootInformation;
+    KernelBaseAddress = PA2VA((QWORD) bootInfo->KernelBaseAddress);
+
+    if (0 == KernelBaseAddress)
     {
         return STATUS_INVALID_PARAMETER1;
     }
 
-    if (0 == KernelSize)
+    if (0 == bootInfo->KernelSize)
     {
         return STATUS_INVALID_PARAMETER2;
     }
 
-    if (0 == NumberOfMemoryEntries)
+    if (0 == bootInfo->MemoryMap.Count)
     {
         return STATUS_INVALID_PARAMETER3;
     }
 
     status = STATUS_SUCCESS;
-    pMemoryMap = (PINT15_MEMORY_MAP_ENTRY) PA2VA(MemoryEntries);
     pPagingStructuresAddrBase = NULL;
     pVmmAddressBase = NULL;
-    pmmBaseAddress = (PBYTE) KernelBaseAddress + KernelSize;
+    pmmBaseAddress = (PBYTE) KernelBaseAddress + bootInfo->KernelSize;
     pmmSizeRequired = 0;
     alignedKernelSize = 0;
     pNewStackTop = NULL;
+    displaySize = 0;
 
     status = ExEventInit(&m_mmuData.ZeroThreadData.NewPagesEvent,
                          ExEventTypeNotification,
@@ -325,8 +324,8 @@ MmuInitSystem(
     }
     LOGL("ExEventInit succeeded\n");
 
-    status = _MmuRetrieveKernelInfoAndValidate(KernelBaseAddress,
-                                               KernelSize,
+    status = _MmuRetrieveKernelInfoAndValidate((PVOID) KernelBaseAddress,
+                                               bootInfo->KernelSize,
                                                &m_mmuData.KernelInfo
                                                );
     if (!SUCCEEDED(status))
@@ -347,8 +346,7 @@ MmuInitSystem(
     CpuMuChangeStack(pNewStackTop);
 
     status = PmmInitSystem(pmmBaseAddress,
-                           pMemoryMap,
-                           NumberOfMemoryEntries,
+                           (const PVOID) &(bootInfo->MemoryMap),
                            &pmmSizeRequired
                            );
     if (!SUCCEEDED(status))
@@ -436,10 +434,14 @@ MmuInitSystem(
     }
     LOGL("_MmuRemapStack succeeded\n");
 
+    displaySize = 
+        bootInfo->Framebuffer.Pitch *
+        bootInfo->Framebuffer.Height; 
+
     _MmuRemapDisplay(&m_mmuData.PagingData.Data,
-                     DisplayPhysicalAddress,
-                     DisplayVirtualAddress,
-                     DisplaySize);
+                     bootInfo->Framebuffer.Address,
+                     bootInfo->VirtualDisplayAddress,
+                     displaySize);
 
     LOG("Will change to new paging structures\n");
     // #PF's are treatable only after we switch to the new CR3

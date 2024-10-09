@@ -1,7 +1,6 @@
 #include "HAL9000.h"
 
-#include "multiboot.h"
-#include "dmp_multiboot.h"
+#include "bootinfo.h"
 
 #include "system.h"
 #include "cmd_interpreter.h"
@@ -25,8 +24,8 @@ int _fltused = 1;
 
 void
 Entry64(
-    IN  int                 argc,
-    IN  ASM_PARAMETERS*     argv
+    IN  int                       argc,
+    IN  HAL_BOOT_INFORMATION*     argv
     )
 {
     STATUS status;
@@ -61,11 +60,14 @@ Entry64(
         __halt();
     }
 
-    gVirtualToPhysicalOffset = argv->VirtualToPhysicalOffset;
-    gAcpiRsdpAddress = argv->MultibootInformation->AcpiRsdp;
-    SystemPreinit(argv);
+    if (!SUCCEEDED(ValidateHalBootInformation(argv)))
+    {
+        __halt();
+    }
 
-    DumpParameters(argv);
+    gVirtualToPhysicalOffset = argv->VirtualToPhysicalOffset;
+    gAcpiRsdpAddress = argv->AcpiRsdp;
+    SystemPreinit(argv);
 
     status = SystemInit(argv);
 

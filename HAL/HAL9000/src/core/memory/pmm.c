@@ -1,12 +1,12 @@
 #include "HAL9000.h"
 #include "pmm.h"
-#include "int15.h"
+#include "bootinfo.h"
 #include "bitmap.h"
 #include "synch.h"
 
 typedef struct _MEMORY_REGION_LIST
 {
-    MEMORY_MAP_TYPE     Type;
+    EFI_MEMORY_TYPE     Type;
     DWORD               NumberOfEntries;
 } MEMORY_REGION_LIST, *PMEMORY_REGION_LIST;
 
@@ -30,7 +30,7 @@ typedef struct _PMM_DATA
     // Total size of available memory over 1MB
     QWORD               PhysicalMemorySize;
 
-    MEMORY_REGION_LIST  MemoryRegionList[MemoryMapTypeMax];
+    MEMORY_REGION_LIST  MemoryRegionList[EfiMaxMemoryType];
 
     LOCK                AllocationLock;
 
@@ -41,14 +41,19 @@ typedef struct _PMM_DATA
 static PMM_DATA m_pmmData;
 
 static
+BOOLEAN
+_PmmIsMemoryUsable(
+    EFI_MEMORY_TYPE MemoryType
+    );
+
+static
 void
 _PmmDetermineMemoryLimits(
-    IN_READS(NoOfEntries)               INT15_MEMORY_MAP_ENTRY*     MemoryMap,
-    IN_RANGE_LOWER(1)                   DWORD                       NoOfEntries,
+    IN                                  HAL_MEMORY_MAP*             MemoryMap,
     OUT                                 QWORD*                      AvailableSystemMemory,
     OUT                                 PHYSICAL_ADDRESS*           HighestPresentPhysicalAddress,
     OUT                                 PHYSICAL_ADDRESS*           HighestAvailablePhysicalAddress,
-    INOUT_UPDATES_ALL(MemoryMapTypeMax) PMEMORY_REGION_LIST         MemoryRegions
+    INOUT_UPDATES_ALL(EfiMaxMemoryType) PMEMORY_REGION_LIST         MemoryRegions
     );
 
 static
@@ -56,8 +61,7 @@ void
 _PmmInitializeAllocationBitmap(
     IN                          PVOID                       CurrentVirtualAddress,
     IN                          QWORD                       HighestMemoryAddress,
-    IN                          PINT15_MEMORY_MAP_ENTRY     MemoryEntries,
-    IN                          DWORD                       NumberOfMemoryEntries,
+    IN                          HAL_MEMORY_MAP*             MemoryMap,
     OUT                         PBITMAP                     Bitmap,
     OUT                         DWORD*                      SizeReserved
     );
@@ -72,7 +76,7 @@ PmmPreinitSystem(
 
     memzero(&m_pmmData, sizeof(PMM_DATA));
 
-    for (i = MemoryMapTypeUsableRAM; i < MemoryMapTypeMax; ++i)
+    for (i = EfiReservedMemoryType; i < EfiMaxMemoryType; ++i)
     {
         m_pmmData.MemoryRegionList[i].Type = i;
     }
@@ -84,25 +88,25 @@ _No_competing_thread_
 STATUS
 PmmInitSystem(
     IN          PVOID                   BaseAddress,
-    IN          PINT15_MEMORY_MAP_ENTRY MemoryEntries,
-    IN          DWORD                   NumberOfMemoryEntries,
+    IN          PVOID                   MemoryMap,
     OUT         DWORD*                  SizeReserved
     )
 {
     QWORD pagingStructuresSize;
     DWORD sizeReserved;
+    const HAL_MEMORY_MAP *mmap = (const HAL_MEMORY_MAP *) MemoryMap;
 
     if (NULL == BaseAddress)
     {
         return STATUS_INVALID_PARAMETER1;
     }
 
-    if (NULL == MemoryEntries)
+    if (NULL == mmap)
     {
         return STATUS_INVALID_PARAMETER2;
     }
 
-    if (0 == NumberOfMemoryEntries)
+    if (0 == mmap->Count)
     {
         return STATUS_INVALID_PARAMETER3;
     }
@@ -115,8 +119,7 @@ PmmInitSystem(
     pagingStructuresSize = 0;
     sizeReserved = 0;
 
-    _PmmDetermineMemoryLimits(MemoryEntries,
-                              NumberOfMemoryEntries,
+    _PmmDetermineMemoryLimits(MemoryMap,
                               &m_pmmData.PhysicalMemorySize,
                               &m_pmmData.HighestPhysicalAddressPresent,
                               &m_pmmData.HighestPhysicalAddressAvailable,
@@ -129,8 +132,7 @@ PmmInitSystem(
 
     _PmmInitializeAllocationBitmap(BaseAddress,
                                    (QWORD) m_pmmData.HighestPhysicalAddressPresent,
-                                   MemoryEntries,
-                                   NumberOfMemoryEntries,
+                                   MemoryMap,
                                    &m_pmmData.AllocationBitmap,
                                    &sizeReserved
                                    );
@@ -230,22 +232,23 @@ PmmGetHighestPhysicalMemoryAddressAvailable(
 static
 void
 _PmmDetermineMemoryLimits(
-    IN_READS(NoOfEntries)               INT15_MEMORY_MAP_ENTRY*     MemoryMap,
-    IN_RANGE_LOWER(1)                   DWORD                       NoOfEntries,
+    IN                                  HAL_MEMORY_MAP*             MemoryMap,
     OUT                                 QWORD*                      AvailableSystemMemory,
     OUT                                 PHYSICAL_ADDRESS*           HighestPresentPhysicalAddress,
     OUT                                 PHYSICAL_ADDRESS*           HighestAvailablePhysicalAddress,
-    INOUT_UPDATES_ALL(MemoryMapTypeMax) PMEMORY_REGION_LIST         MemoryRegions
+    INOUT_UPDATES_ALL(EfiMaxMemoryType) PMEMORY_REGION_LIST         MemoryRegions
     )
 {
     DWORD i;
     QWORD sizeOfAvailableMemory;
     QWORD highestMemoryAddressPresent;
     QWORD highestMemoryAddressAvailable;
+    const BYTE *mmap;
     DWORD memoryType;
+    QWORD length;
 
     ASSERT(NULL != MemoryMap);
-    ASSERT(0 != NoOfEntries);
+    ASSERT(0 != MemoryMap->Count);
     ASSERT(NULL != AvailableSystemMemory);
     ASSERT(NULL != HighestPresentPhysicalAddress);
     ASSERT(NULL != HighestAvailablePhysicalAddress);
@@ -254,36 +257,43 @@ _PmmDetermineMemoryLimits(
     sizeOfAvailableMemory = 0;
     highestMemoryAddressPresent = 0;
     highestMemoryAddressAvailable = 0;
+    
+    mmap = (const BYTE*) MemoryMap->MapAddress;
 
-    for (i = 0; i < NoOfEntries; ++i)
+    // LOG("We have %d entries at %X\n", MemoryMap->Count, MemoryMap->MapAddress);
+    // LOG("Descriptor size is %d\n", MemoryMap->DescriptorSize);
+    for (i = 0; i < MemoryMap->Count; ++i)
     {
-        memoryType = MemoryMap[i].Type;
+        EFI_MEMORY_DESCRIPTOR *memoryDescriptor = (EFI_MEMORY_DESCRIPTOR *) mmap;
+        mmap += MemoryMap->DescriptorSize;
+        // LOG("\n");
+        // LOG("Entry %d at %X\n", i, mmap);
+        // LOG("Type %d\n", memoryDescriptor->Type);
+        // LOG("PhysicalStart %d\n", memoryDescriptor->PhysicalStart);
+        // LOG("NumberOfpages %d\n", memoryDescriptor->NumberOfPages);
+        // LOG("\n");
+        memoryType = memoryDescriptor->Type;
+        length = memoryDescriptor->NumberOfPages * PAGE_SIZE;
 
-        if (MemoryMap[i].BaseAddress + MemoryMap[i].Length > highestMemoryAddressPresent)
+        if (memoryDescriptor->PhysicalStart + length > highestMemoryAddressPresent)
         {
-            highestMemoryAddressPresent = MemoryMap[i].BaseAddress + MemoryMap[i].Length;
-        }
-
-        if (!IsBooleanFlagOn(MemoryMap[i].ExtendedAttributes, MEMORY_MAP_ENTRY_EA_VALID_ENTRY))
-        {
-            // if this flag is clear => entry should be ignored
-            continue;
+            highestMemoryAddressPresent = memoryDescriptor->PhysicalStart + length;
         }
 
         MemoryRegions[memoryType].NumberOfEntries++;
 
-        if (MemoryMapTypeUsableRAM != memoryType)
+        if (!_PmmIsMemoryUsable(memoryType))
         {
             // we only care about usable RAM memory
             continue;
         }
 
-        if (MemoryMap[i].BaseAddress + MemoryMap[i].Length > highestMemoryAddressAvailable)
+        if (memoryDescriptor->PhysicalStart + length - 1 > highestMemoryAddressAvailable)
         {
-            highestMemoryAddressAvailable = MemoryMap[i].BaseAddress + MemoryMap[i].Length;
+            highestMemoryAddressAvailable = memoryDescriptor->PhysicalStart + length;
         }
 
-        sizeOfAvailableMemory = sizeOfAvailableMemory + MemoryMap[i].Length;
+        sizeOfAvailableMemory = sizeOfAvailableMemory + length; 
     }
 
     *AvailableSystemMemory = sizeOfAvailableMemory;
@@ -296,8 +306,7 @@ void
 _PmmInitializeAllocationBitmap(
     IN                          PVOID                       CurrentVirtualAddress,
     IN                          QWORD                       HighestMemoryAddress,
-    IN                          PINT15_MEMORY_MAP_ENTRY     MemoryEntries,
-    IN                          DWORD                       NumberOfMemoryEntries,
+    IN                          HAL_MEMORY_MAP*             MemoryMap,
     OUT                         PBITMAP                     Bitmap,
     OUT                         DWORD*                      SizeReserved
     )
@@ -305,6 +314,7 @@ _PmmInitializeAllocationBitmap(
     DWORD bitmapSize;
     QWORD noOfPhysicalFrames;
     DWORD i;
+    const BYTE* mmap;
     DWORD memoryType;
 
     LOG_FUNC_START;
@@ -333,38 +343,54 @@ _PmmInitializeAllocationBitmap(
 
     LOG("All memory is now reserved\n");
 
-    for (i = 0; i < NumberOfMemoryEntries; ++i)
+    mmap = (const BYTE*) MemoryMap->MapAddress;
+
+    for (i = 0; i < MemoryMap->Count; ++i)
     {
-        memoryType = MemoryEntries[i].Type;
+        EFI_MEMORY_DESCRIPTOR *memoryDescriptor = (EFI_MEMORY_DESCRIPTOR *) mmap;
+        mmap += MemoryMap->DescriptorSize;
 
-        if (!IsBooleanFlagOn(MemoryEntries[i].ExtendedAttributes, MEMORY_MAP_ENTRY_EA_VALID_ENTRY))
-        {
-            // if this flag is clear => entry should be ignored
-            continue;
-        }
+        memoryType =  memoryDescriptor->Type;
 
-        if (MemoryMapTypeUsableRAM != memoryType)
+        if (!_PmmIsMemoryUsable(memoryType))
         {
             // we only care about usable RAM memory
             continue;
         }
 
-        if (MemoryEntries[i].BaseAddress < 1 * MB_SIZE)
+        if (memoryDescriptor->PhysicalStart < 1 * MB_SIZE)
         {
             // we won't be allocating any memory under 1MB
             continue;
         }
 
-        PHYSICAL_ADDRESS physAddr = (PHYSICAL_ADDRESS) AlignAddressUpper(MemoryEntries[i].BaseAddress, PAGE_SIZE);
-        QWORD noOfFrames = MemoryEntries[i].Length / PAGE_SIZE;
+        DWORD noOfFrames = (DWORD) memoryDescriptor->NumberOfPages;
+        PHYSICAL_ADDRESS physAddr = (PHYSICAL_ADDRESS) AlignAddressUpper(memoryDescriptor->PhysicalStart, PAGE_SIZE);
 
         ASSERT( noOfFrames <= MAX_DWORD);
 
         // here it is necessary to use PmmReleaseMemory
-        PmmReleaseMemory(physAddr, (DWORD) noOfFrames );
+        PmmReleaseMemory(physAddr, noOfFrames );
 
         LOG("Releasing %d frames of memory starting from PA 0x%X\n", noOfFrames, physAddr );
     }
 
     LOG_FUNC_END;
+}
+
+static
+BOOLEAN
+_PmmIsMemoryUsable(
+    EFI_MEMORY_TYPE MemoryType
+    )
+{
+    return (
+        // Bootloader allocates few pages as EfiLoaderData, including boot module data
+        // so we consider it not usable
+        MemoryType == EfiLoaderCode ||
+        MemoryType == EfiBootServicesCode ||
+        MemoryType == EfiBootServicesData ||
+        MemoryType == EfiConventionalMemory ||
+        MemoryType == EfiPersistentMemory // standard says it can be used as EfiConventionalMemory
+    );
 }

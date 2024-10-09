@@ -1,10 +1,10 @@
 #include <Uefi.h>
 
-#include <bootloader/loader.h>
+#include <Bootloader/loader.h>
 
 // Loader expects kernel in \EFI\OS
 // Loader expects modules in \EFI\MODULES
-// Max Boot Module count is 128
+// Max Boot Module count is 32
 // Max Boot Module name length 32
 // We return closest resolution to the requested one,
 // if no match return a larger one, i.e more width and height

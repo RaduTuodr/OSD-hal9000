@@ -2,12 +2,12 @@
 
 void
 SystemPreinit(
-    IN  ASM_PARAMETERS*     Parameters
+    IN  HAL_BOOT_INFORMATION*     BootInformation
     );
 
 STATUS
 SystemInit(
-    IN  ASM_PARAMETERS*     Parameters
+    IN  HAL_BOOT_INFORMATION*     BootInformation
     );
 
 void

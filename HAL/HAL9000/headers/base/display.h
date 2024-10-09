@@ -38,7 +38,6 @@ typedef struct _DISPLAY_INFORMATION
     DWORD       FrameBufferWidth;
     DWORD       FrameBufferHeight;
     DWORD       FrameBufferBpp;
-    DWORD       FrameBufferType;
     DWORD       FrameBufferRedFieldPosition;
     DWORD       FrameBufferRedMaskSize;
     DWORD       FrameBufferGreenFieldPosition;

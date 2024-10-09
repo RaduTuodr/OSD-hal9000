@@ -111,87 +111,87 @@ RM16_to_PM32:
 
 times               (0x100 - ( RM16_to_PM32.end - RM16_to_PM32 ) ) db 'r'
 ; __cdecl void proc16 RetrieveInt15Map( WORD BufferSelector, WORD BufferAddress, WORD* NumberOfEntries )
-[bits 16]
-RetrieveInt15Map:
-    push    bp
-    mov     bp,         sp
-    sub     sp,         2
+; [bits 16]
+; RetrieveInt15Map:
+;     push    bp
+;     mov     bp,         sp
+;     sub     sp,         2
 
-    xor     ax,         ax
-    mov     [esp],      ax
+;     xor     ax,         ax
+;     mov     [esp],      ax
 
-    xor     ebx,        ebx                             ; continuation code
+;     xor     ebx,        ebx                             ; continuation code
     
-    mov     ax,         [p16(0)]
-    mov     es,         ax
+;     mov     ax,         [p16(0)]
+;     mov     es,         ax
 
-    mov     ax,         [p16(1)]
-    mov     di,         ax
+;     mov     ax,         [p16(1)]
+;     mov     di,         ax
 
-.loop:
-    mov     eax,        INT15_E820_CODE
+; .loop:
+;     mov     eax,        INT15_E820_CODE
     
-    mov     ecx,        INT15_MEMORY_MAP_ENTRY_size
-    mov     edx,        INT15_E820_SIGNATURE
+;     mov     ecx,        INT15_MEMORY_MAP_ENTRY_size
+;     mov     edx,        INT15_E820_SIGNATURE
 
-    sti
-    int     15h
-    jc      .finished
+;     sti
+;     int     15h
+;     jc      .finished
 
-    cmp     eax,        INT15_E820_SIGNATURE
-    jne     .error
+;     cmp     eax,        INT15_E820_SIGNATURE
+;     jne     .error
 
-    cmp     ecx,        INT15_MEMORY_MAP_ENTRY_MIN_SIZE
-    jl      .error
+;     cmp     ecx,        INT15_MEMORY_MAP_ENTRY_MIN_SIZE
+;     jl      .error
 
-    cmp     ecx,        INT15_MEMORY_MAP_ENTRY_size
-    jnl     .next_entry
+;     cmp     ecx,        INT15_MEMORY_MAP_ENTRY_size
+;     jnl     .next_entry
 
-    mov     si,         di
-    add     si,         INT15_MEMORY_MAP_ENTRY_MIN_SIZE
+;     mov     si,         di
+;     add     si,         INT15_MEMORY_MAP_ENTRY_MIN_SIZE
 
-    ; extended attribute
-    mov     eax,        1
+;     ; extended attribute
+;     mov     eax,        1
 
-    mov     [es:si],    eax
+;     mov     [es:si],    eax
 
-.next_entry:
-    mov     ax,         [esp]
-    inc     ax
-    mov     [esp],      ax
+; .next_entry:
+;     mov     ax,         [esp]
+;     inc     ax
+;     mov     [esp],      ax
 
-    add     di,         INT15_MEMORY_MAP_ENTRY_size
+;     add     di,         INT15_MEMORY_MAP_ENTRY_size
 
-    test    ebx, ebx
-    jz      .finished
-    jmp     .loop
-.error:
-    mov     ax,         0xB800
-    mov     fs,         ax
-    mov     si,         0x230
-    mov     ax,         'KK'
-    mov     [fs:si],    ax
+;     test    ebx, ebx
+;     jz      .finished
+;     jmp     .loop
+; .error:
+;     mov     ax,         0xB800
+;     mov     fs,         ax
+;     mov     si,         0x230
+;     mov     ax,         'KK'
+;     mov     [fs:si],    ax
 
-    cli
-    hlt
+;     cli
+;     hlt
            
-.finished:
-    mov     ax,     [esp]
-    test    ax,     ax
-    jz      .error
+; .finished:
+;     mov     ax,     [esp]
+;     test    ax,     ax
+;     jz      .error
 
-    mov     si,     [p16(2)]
-    mov     [si],   ax
+;     mov     si,     [p16(2)]
+;     mov     [si],   ax
 
-    add     sp,     2
-    pop     bp
+;     add     sp,     2
+;     pop     bp
 
-    cli
+;     cli
 
-    ret     2*3
-.end:
+;     ret     2*3
+; .end:
 
-times               (0x100 - ( RetrieveInt15Map.end - RetrieveInt15Map ) ) db 'k'
+; times               (0x100 - ( RetrieveInt15Map.end - RetrieveInt15Map ) ) db 'k'
 CallToRM:
     [bits 32]
     push        ebp

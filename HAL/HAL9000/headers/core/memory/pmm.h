@@ -14,8 +14,7 @@ _No_competing_thread_
 STATUS
 PmmInitSystem(
     IN          PVOID                   BaseAddress,
-    IN          PHYSICAL_ADDRESS        MemoryEntries,
-    IN          DWORD                   NumberOfMemoryEntries,
+    IN          PVOID                   MemoryMap,
     OUT         DWORD*                  SizeReserved
     );
 

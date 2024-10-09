@@ -36,14 +36,18 @@ typedef unsigned __int64    QWORD, *PQWORD;
 typedef unsigned __int8     UINT8, *PUINT8;
 typedef unsigned __int16    UINT16, *PUINT16;
 typedef unsigned __int32    UINT32, *PUINT32;
-typedef unsigned __int64    UINT64, *PUINT64;
+typedef unsigned __int64    UINT64, *PUINT64, UINTN, *PUINTN;
 
 typedef signed __int8       INT8;
 typedef signed __int16      INT16;
 typedef signed __int32      INT32;
-typedef signed __int64      INT64;
+typedef signed __int64      INT64, INTN;
+
+typedef char                CHAR8;
+typedef unsigned short      CHAR16;
 
 // pointer
+typedef void                VOID;
 typedef void*               PVOID;
 
 // bool

@@ -1,4 +1,4 @@
-#include <bootloader/console.h>
+#include <Bootloader/console.h>
 
 EFI_STATUS 
 PrepareConsole(

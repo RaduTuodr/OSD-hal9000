@@ -61,7 +61,7 @@ set(HAL9000_COMMON_LINK_FLAGS
     /MANIFESTUAC:uiAccess='false'
     /MAPINFO:EXPORTS
     /SUBSYSTEM:NATIVE
-    /ENTRY:__EntryMultiboot
+    /ENTRY:__HalEntry
     /BASE:0xFFFF800001000000
     /DYNAMICBASE:NO
     /FIXED
@@ -70,7 +70,7 @@ set(HAL9000_COMMON_LINK_FLAGS
     /ERRORREPORT:PROMPT
     /ALIGN:512
     /IGNORE:4108
-    /MERGE:.mboot=.text
+    /MERGE:.halboot=.text
     /DEBUG:FULL
 )
 

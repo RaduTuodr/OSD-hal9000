@@ -1,7 +1,7 @@
-#include <bootloader/filesystem.h>
+#include <Bootloader/filesystem.h>
 
-#include <bootloader/console.h>
-#include <bootloader/memory.h>
+#include <Bootloader/console.h>
+#include <Bootloader/memory.h>
 
 EFI_FILE_HANDLE
 GetRootDirectory(
@@ -142,7 +142,7 @@ LoadFileToMemory(
         return 0;
     UINT64 fileSize = GetFileSize(ST, FileHandle);
     *PageCount = GetPageCount(fileSize);
-    void *buffer = AllocateZeroedPages(ST, EfiLoaderData, *PageCount);
+    void *buffer = AllocateZeroedPagesMaxAddress(ST, EfiLoaderData, (EFI_PHYSICAL_ADDRESS) (BASE_4GB - 1) , *PageCount);
     if (!buffer)
         return 0;
     UINT64 bufferSize = *PageCount * PAGE_SIZE;
