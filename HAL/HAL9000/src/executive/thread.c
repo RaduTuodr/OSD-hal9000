@@ -5,6 +5,7 @@
 #include "ex_event.h"
 #include "core.h"
 #include "vmm.h"
+#include "exe_loader.h"
 #include "process_internal.h"
 #include "isr.h"
 #include "gdtmu.h"
@@ -337,6 +338,9 @@ ThreadCreateEx(
     // the reference must be done outside _ThreadInit
     _ThreadReference(pThread);
 
+    PVOID entryAddress;
+    ExecutableLoaderGetEntryPoint(Process->LoaderContext, &entryAddress);
+
     if (!Process->PagingData->Data.KernelSpace)
     {
         // Create user-mode stack
@@ -351,7 +355,7 @@ ThreadCreateEx(
             return status;
         }
 
-        bProcessIniialThread = (Function == Process->HeaderInfo->Preferred.AddressOfEntryPoint);
+        bProcessIniialThread = (Function == entryAddress);
 
         // We are the first thread => we must pass the argc and argv parameters
         // and the whole command line which spawned the process
@@ -374,7 +378,7 @@ ThreadCreateEx(
             pThread->UserStack = (PVOID) PtrDiff(pThread->UserStack, SHADOW_STACK_SIZE + sizeof(PVOID));
         }
 
-        pStartFunction = (PVOID) (bProcessIniialThread ? Process->HeaderInfo->Preferred.AddressOfEntryPoint : Function);
+        pStartFunction = (PVOID) (bProcessIniialThread ? entryAddress : Function);
         firstArg       = (QWORD) (bProcessIniialThread ? Process->NumberOfArguments : (QWORD) Context);
         secondArg      = (QWORD) (bProcessIniialThread ? PtrOffset(pThread->UserStack, SHADOW_STACK_SIZE + sizeof(PVOID)) : 0);
     }

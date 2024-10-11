@@ -11,6 +11,7 @@
 #include "thread.h"
 #include "pe_parser.h"
 #include "ex_event.h"
+#include "exe_loader.h"
 #include "process_internal.h"
 #include "thread_internal.h"
 #include "io.h"
@@ -951,9 +952,17 @@ MmuCreateAddressSpaceForProcess(
 
         // Create the VMM management structures (VMM_RESERVATION_SPACE) to describe the processes
         // virtual memory allocations
+        PVOID virtualImageBase = NULL;
+        status = ExecutableLoaderGetVirtualImageBase(Process->LoaderContext, &virtualImageBase);
+        if (!SUCCEEDED(status))
+        {
+            LOG_FUNC_ERROR("ExecutableLoaderGetImageBase", status);
+            __leave;
+        }
+
         status = VmmCreateVirtualAddressSpace(&Process->VaSpace,
                                               VA_METADATA_SIZE_FOR_UM_PROCESS,
-                                              PtrOffset(Process->HeaderInfo->Preferred.ImageBase, VA_ALLOCATIONS_START_OFFSET_FROM_IMAGE_BASE));
+                                              PtrOffset(virtualImageBase, VA_ALLOCATIONS_START_OFFSET_FROM_IMAGE_BASE));
         if(!SUCCEEDED(status))
         {
             LOG_FUNC_ERROR("VmmCreateVirtualAddressSpace", status);
@@ -1027,7 +1036,8 @@ MmuInitAddressSpaceForSystemProcess(
 
     /// TODO: I have no idea why the PE_NT_HEADER_INFO is allocated dynamically
     /// Nothing bad happens, I just don't know if we should keep this
-    memcpy(pProcess->HeaderInfo, &m_mmuData.KernelInfo, sizeof(PE_NT_HEADER_INFO));
+    // DS: Now it must be allocated dynamically...
+    ExectuableLoaderInitFromPEHeader(&(pProcess->LoaderContext), &m_mmuData.KernelInfo);
 
     MmuActivateProcessIds();
 }
@@ -1189,8 +1199,14 @@ MmuIsBufferValid(
 
     // This is a temporary hack, we should also check the access rights, however HAL9000 currently does not support
     // these checks in case the buffer is inside the binary
-    if (Process->HeaderInfo->Preferred.ImageBase <= Buffer
-        && Buffer < (PVOID)PtrOffset(Process->HeaderInfo->Preferred.ImageBase, Process->HeaderInfo->Size))
+    PVOID virtualBase;
+    DWORD imageSize;
+
+    ExecutableLoaderGetVirtualImageBase(Process->LoaderContext, &virtualBase);
+    ExecutableLoaderGetImageSize(Process->LoaderContext, &imageSize);
+
+    if (virtualBase <= Buffer
+        && Buffer < (PVOID)PtrOffset(virtualBase, imageSize))
     {
         return STATUS_SUCCESS;
     }

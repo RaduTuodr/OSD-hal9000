@@ -1,12 +1,13 @@
 #include "HAL9000.h"
 #include "mutex.h"
+#include "mmu.h"
+#include "exe_loader.h"
 #include "thread_internal.h"
 #include "process_internal.h"
 #include "vmm.h"
 #include "um_application.h"
 #include "bitmap.h"
 #include "pte.h"
-#include "pe_exports.h"
 
 typedef struct _PROCESS_SYSTEM_DATA
 {
@@ -254,13 +255,13 @@ ProcessCreate(
         // This function must be called before MmuCreateAddressSpaceForProcess to be able to
         // determine the address from which the VA allocations should start (so they'll not
         // conflict with the PE image)
-        status = UmApplicationRetrieveHeader(PathToExe, pProcess->HeaderInfo);
+        status = UmApplicationRetrieveHeader(PathToExe, pProcess);
         if (!SUCCEEDED(status))
         {
             LOG_TRACE_USERMODE("[ERROR]UmApplicationRetrieveHeader failed with status 0x%x\n", status);
             __leave;
         }
-        LOG_TRACE_PROCESS("Successfully retrieved process NT header!\n");
+        LOG_TRACE_PROCESS("Successfully retrieved process executable header!\n");
 
         status = MmuCreateAddressSpaceForProcess(pProcess);
         if (!SUCCEEDED(status))
@@ -478,11 +479,10 @@ _ProcessInit(
 
         InitializeListHead(&pProcess->NextProcess);
 
-        pProcess->HeaderInfo = ExAllocatePoolWithTag(PoolAllocateZeroMemory, sizeof(PE_NT_HEADER_INFO), HEAP_PROCESS_TAG, 0);
-        if (NULL == pProcess->HeaderInfo)
+        status = ExecutableLoaderPreinit(&(pProcess->LoaderContext)); 
+        if (!SUCCEEDED(status))
         {
-            LOG_FUNC_ERROR_ALLOC("ExAllocatePoolWithTag", sizeof(PE_NT_HEADER_INFO));
-            status = STATUS_HEAP_INSUFFICIENT_RESOURCES;
+            LOG_FUNC_ERROR("ExecutableLoaderPreinit", status);
             __leave;
         }
 
@@ -742,10 +742,9 @@ _ProcessDestroy(
         Process->ProcessName = NULL;
     }
 
-    if (NULL != Process->HeaderInfo)
+    if (NULL != Process->LoaderContext)
     {
-        ExFreePoolWithTag(Process->HeaderInfo, HEAP_PROCESS_TAG);
-        Process->HeaderInfo = NULL;
+        ExecutableLoaderUninit(&(Process->LoaderContext));
     }
 
     // Because the system process will never be destroyed it is ok to free

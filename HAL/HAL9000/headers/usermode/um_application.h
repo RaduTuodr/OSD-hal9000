@@ -6,7 +6,7 @@ typedef struct _PE_NT_HEADER_INFO* PPE_NT_HEADER_INFO;
 STATUS
 UmApplicationRetrieveHeader(
     IN_Z        char*                   Path,
-    OUT         PPE_NT_HEADER_INFO      NtHeaderInfo
+    IN          PPROCESS                Process
     );
 
 STATUS

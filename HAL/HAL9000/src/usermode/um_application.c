@@ -4,6 +4,8 @@
 #include "pe_parser.h"
 #include "vmm.h"
 #include "thread_internal.h"
+#include "mmu.h"
+#include "exe_loader.h"
 #include "process_internal.h"
 
 static
@@ -24,11 +26,11 @@ _UmApplicationDiscardKernelExecutableMapping(
 STATUS
 UmApplicationRetrieveHeader(
     IN_Z        char*                   Path,
-    OUT         PPE_NT_HEADER_INFO      NtHeaderInfo
+    IN          PPROCESS                Process
     )
 {
     STATUS status;
-    QWORD peSize;
+    QWORD exeSize;
     PVOID pBuffer;
 
     if (Path == NULL)
@@ -36,7 +38,7 @@ UmApplicationRetrieveHeader(
         return STATUS_INVALID_PARAMETER1;
     }
 
-    if (NtHeaderInfo == NULL)
+    if (Process == NULL)
     {
         return STATUS_INVALID_PARAMETER2;
     }
@@ -45,8 +47,7 @@ UmApplicationRetrieveHeader(
 
     pBuffer = NULL;
     status = STATUS_SUCCESS;
-    peSize = 0;
-    memzero(NtHeaderInfo, sizeof(PE_NT_HEADER_INFO));
+    exeSize = 0;
 
     __try
     {
@@ -54,26 +55,24 @@ UmApplicationRetrieveHeader(
 
         status = _UmApplicationReadExecutableContents(Path,
                                                       &pBuffer,
-                                                      &peSize);
+                                                      &exeSize);
         if (!SUCCEEDED(status))
         {
             LOG_TRACE_USERMODE("[ERROR]_UmApplicationReadExecutableContents failed with status 0x%x", status);
             __leave;
         }
 
-        LOG_TRACE_USERMODE("Will parse NT header!\n");
+        LOG_TRACE_USERMODE("Will initialize ExecutableLoader!\n");
 
-        ASSERT(peSize <= MAX_DWORD);
-        status = PeRetrieveNtHeader(pBuffer,
-                                    (DWORD)peSize,
-                                    NtHeaderInfo);
+        ASSERT(exeSize <= MAX_DWORD);
+        status = ExecutableLoaderInit(Process->LoaderContext, pBuffer, (DWORD) exeSize);
         if (!SUCCEEDED(status))
         {
-            LOG_FUNC_ERROR("PeRetrieveNtHeader", status);
+            LOG_FUNC_ERROR("ExecutableLoaderInit", status);
             __leave;
         }
 
-        LOG_TRACE_USERMODE("Successfully parsed NT header!\n");
+        LOG_TRACE_USERMODE("Successfully initialized ExecutableLoader!\n");
     }
     __finally
     {
@@ -113,26 +112,29 @@ UmApplicationRun(
     __try
     {
         // Loads the kernel image at the preferred image dictated by the NT header
-        status = MmuLoadPe(Process->HeaderInfo,
-                           Process->PagingData);
+        status = ExecutableLoaderMemoryMap(Process->LoaderContext, Process->PagingData);
         if (!SUCCEEDED(status))
         {
-            LOG_FUNC_ERROR("MmuLoadPe", status);
+            LOG_FUNC_ERROR("ExecutableLoaderMemoryMap", status);
             __leave;
         }
 
-        LOG_TRACE_USERMODE("Successfully loaded PE file!\n");
+        LOG_TRACE_USERMODE("Successfully loaded executable file!\n");
 
         // After we loaded the PE into the appropriate process there is no need to keep the kernel mapping
-        _UmApplicationDiscardKernelExecutableMapping(Process->HeaderInfo->ImageBase);
+        PVOID physicalImageBase;
+        ExecutableLoaderGetPhysicalImageBase(Process->LoaderContext, &physicalImageBase);
+        _UmApplicationDiscardKernelExecutableMapping(physicalImageBase);
 
-        LOG_TRACE_USERMODE("Will create thread with entry point at 0x%X\n", Process->HeaderInfo->Preferred.AddressOfEntryPoint);
+        PVOID entryPoint;
+        ExecutableLoaderGetEntryPoint(Process->LoaderContext, &entryPoint);
+        LOG_TRACE_USERMODE("Will create thread with entry point at 0x%X\n", entryPoint);
 
         status = ThreadCreateEx("Test",
                                 ThreadPriorityDefault,
                                 //  warning C4055: 'type cast': from data pointer 'PVOID' to function pointer 'PFUNC_ThreadStart'
 #pragma warning(suppress:4055)
-                                (PFUNC_ThreadStart)Process->HeaderInfo->Preferred.AddressOfEntryPoint,
+                                (PFUNC_ThreadStart) entryPoint,
                                 NULL,
                                 &pThread,
                                 Process);

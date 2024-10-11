@@ -53,8 +53,8 @@ typedef struct _PROCESS
     // Pointer to the process' paging structures
     struct _PAGING_LOCK_DATA*       PagingData;
 
-    // Pointer to the process' NT header information
-    struct _PE_NT_HEADER_INFO*      HeaderInfo;
+    // Pointer to the process' executable loader context
+    PVOID                           LoaderContext;
 
     // VaSpace used only for UM virtual memory allocations
     struct _VMM_RESERVATION_SPACE*  VaSpace;
