@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #include "eth_82574L_regs.h"
 #include "lock_common.h"
 
@@ -37,7 +39,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -240,10 +242,10 @@ typedef struct _TRANSMIT_DESCRIPTOR_SHADOW
         // When IFCS is set, hardware appends the MAC FCS at the end of the packet.When
         // cleared, software should calculate the FCS for proper CRC check.The software must set
         // IFCS in the following instances :
-        //  • Transmission of short packets while padding is enabled by the TCTL.PSP bit
-        //  • Checksum offload is enabled by the IC bit in the TDESC.CMD
-        //  • VLAN header insertion enabled by the VLE bit in the TDESC.CMD
-        //  • Large send or TCP / IP checksum offload using context descriptor
+        //  ï¿½ Transmission of short packets while padding is enabled by the TCTL.PSP bit
+        //  ï¿½ Checksum offload is enabled by the IC bit in the TDESC.CMD
+        //  ï¿½ VLAN header insertion enabled by the VLE bit in the TDESC.CMD
+        //  ï¿½ Large send or TCP / IP checksum offload using context descriptor
         BYTE                                IFCS                : 1;
 
         // When IC is set, hardware inserts a checksum value calculated from the CSS bit value to
@@ -323,7 +325,7 @@ typedef struct _TX_DATA
     LOCK                                    TxInterruptLock;
 } TX_DATA, *PTX_DATA;
 
-#pragma warning(pop)
+WARNING_POP
 
 typedef struct _ETH_DEVICE
 {

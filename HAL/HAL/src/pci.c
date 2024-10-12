@@ -7,7 +7,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -35,7 +35,7 @@ typedef union _PCI_CONFIG_REGISTER
 } PCI_CONFIG_REGISTER, *PPCI_CONFIG_REGISTER;
 STATIC_ASSERT(sizeof(PCI_CONFIG_REGISTER) == sizeof(DWORD));
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 #define PCI_SET_CONFIG_REGISTER(X,Bus,Dev,Func,Reg)     \

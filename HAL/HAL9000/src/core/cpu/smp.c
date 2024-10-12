@@ -202,7 +202,7 @@ SmpInit(
 
     LOGL("SMP interrupt routines successfully registered!\n");
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         status = AcpiRetrieveNextCpu(bRestartSearch, &pDummy);
@@ -255,7 +255,7 @@ SmpSetupLowerMemory(
     apTrampCodeAddress = 0;
     pWakeUpEvent = NULL;
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         ASSERT(NULL == pCpu);
@@ -290,7 +290,7 @@ SmpSetupLowerMemory(
             // this is an AP
             status = CpuMuAllocCpu(&pCpu,
             // C28039: The type of actual parameter 'pEntry->Id' should exactly match the type 'APIC_ID'
-#pragma warning(suppress: 28039)
+MSVC_WARNING_SUPPRESS(28039)
                                    (APIC_ID) pEntry->Id,
                                    STACK_DEFAULT_SIZE,
                                    NumberOfTssStacks

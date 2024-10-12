@@ -159,7 +159,7 @@ STATUS
     pDriverExtension = IoGetDriverExtension(pPortDevice->Miniport->DeviceObject);
     ASSERT(NULL != pDriverExtension);
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         pDescriptorEntry = NULL;
@@ -236,7 +236,7 @@ _NetDispatchReceiveFrame(
     bufferSize = 0;
 
 // warning C4127: conditional expression is constant
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         LockAcquire(&Device->RxData.Buffers.FramesLock, &oldState);

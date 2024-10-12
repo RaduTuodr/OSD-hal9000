@@ -1,6 +1,9 @@
 #pragma once
 
 C_HEADER_START
+
+#include "cal_warning.h"
+
 typedef enum _EVENT_TYPE
 {
     EventTypeNotification,
@@ -9,16 +12,16 @@ typedef enum _EVENT_TYPE
     EventTypeReserved
 } EVENT_TYPE, *PEVENT_TYPE;
 
-#pragma warning(push)
+WARNING_PUSH
 
 // nonstandard extension used : nameless struct/union
-#pragma warning(disable:4201)
+MSVC_WARNING_DISABLE(4201)
 typedef struct _EVENT
 {
     volatile BYTE       State;
     EVENT_TYPE          EventType;
 } EVENT, *PEVENT;
-#pragma warning(pop)
+WARNING_POP
 
 //******************************************************************************
 // Function:     EvtInitialize

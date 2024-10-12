@@ -53,7 +53,7 @@ TestNetwork(
     pThreadContexts = NULL;
     pNetDevices = NULL;
     // C28113: Accessing a local variable via an Interlocked function : This is an unusual usage which could be reconsidered
-#pragma warning(suppress: 28113)
+MSVC_WARNING_SUPPRESS(28113)
     _InterlockedExchange8(&bStopRequests, FALSE);
 
     status = NetGetNetworkDevices(NULL, &noOfDevices);
@@ -95,7 +95,7 @@ TestNetwork(
 
             // A variable which is accessed via an Interlocked function must always be accessed via an Interlocked function
             /// there is no access to memory, SAL is just being crazy
-#pragma warning(suppress: 28112)
+MSVC_WARNING_SUPPRESS(28112)
             pThreadContexts[i].StopRequests = &bStopRequests;
             pThreadContexts[i].ResendRequests = ResendRequets;
 
@@ -120,7 +120,7 @@ TestNetwork(
         LOG("Will stop receiver threads\n");
 
         // C28113: Accessing a local variable via an Interlocked function : This is an unusual usage which could be reconsidered
-#pragma warning(suppress: 28113)
+MSVC_WARNING_SUPPRESS(28113)
         _InterlockedExchange8(&bStopRequests, 1);
 
         for (i = 0; i < noOfDevices; ++i)

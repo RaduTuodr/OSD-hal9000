@@ -8,7 +8,7 @@
 
 // warning C26165: Possibly failing to release lock '* pCtx->FirstMutex' in function '_ThreadChainer'.
 // Noone cares about these mutexes, noone uses them besides the tests => no deadlock
-#pragma warning(push)
+WARNING_PUSH
 #pragma warning(disable:26165)
 
 typedef struct _TEST_PRIORITY_DONATION_MUTEX_CTX
@@ -212,7 +212,7 @@ STATUS
 
 // warning C28199: Using possibly uninitialized memory 'pThreads':  The variable has had its address taken but no assignment to it has been discovered.
 // nope, pThreads array is initialized to a NULL pointer, which the cleanup does check :)
-#pragma warning(push)
+WARNING_PUSH
 #pragma warning(disable:28199)
 
 STATUS
@@ -375,7 +375,7 @@ STATUS
     return status;
 }
 
-#pragma warning(pop)
+WARNING_POP
 
 typedef struct _DONATION_CHAIN_THREAD_CTX
 {
@@ -592,4 +592,4 @@ STATUS
     return STATUS_SUCCESS;
 }
 
-#pragma warning(pop)
+WARNING_POP

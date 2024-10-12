@@ -133,7 +133,7 @@ UmApplicationRun(
         status = ThreadCreateEx("Test",
                                 ThreadPriorityDefault,
                                 //  warning C4055: 'type cast': from data pointer 'PVOID' to function pointer 'PFUNC_ThreadStart'
-#pragma warning(suppress:4055)
+MSVC_WARNING_SUPPRESS(4055)
                                 (PFUNC_ThreadStart) entryPoint,
                                 NULL,
                                 &pThread,

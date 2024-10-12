@@ -17,7 +17,7 @@ RELEASES_EXCL_AND_REENTRANT_LOCK(m_dumpLock)
 INTR_STATE
 // Warning C26165 Possibly failing to release lock 'm_dumpLock' in function 'DumpTakeLock'
 // This is because SAL does not understand who m_dumpLock is
-#pragma warning(suppress: 26165)
+MSVC_WARNING_SUPPRESS(26165)
 DumpTakeLock(
     void
     )

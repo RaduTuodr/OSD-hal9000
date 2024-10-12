@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define     MSR_DATA_SIZE                       0x8
 
 // specifies the filter size of the MONITOR instruction
@@ -291,7 +293,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -308,7 +310,7 @@ typedef union _IA32_STAR_MSR_DATA
 } IA32_STAR_MSR_DATA, *PIA32_STAR_MSR_DATA;
 STATIC_ASSERT(sizeof(IA32_STAR_MSR_DATA) == MSR_DATA_SIZE);
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 #define     IA32_STAR                           0xC0000081

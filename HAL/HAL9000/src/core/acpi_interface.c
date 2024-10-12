@@ -802,7 +802,7 @@ _AcpiRetrieveBusAndSegmentNumber(
     currentObj = Object;
     bFoundInParent = FALSE;
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while(TRUE)
     {
         acpiStatus = AcpiUtEvaluateNumericObject(METHOD_NAME__BBN, currentObj, &busValue);

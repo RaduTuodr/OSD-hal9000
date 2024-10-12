@@ -1,9 +1,11 @@
 #pragma once
 
-#pragma warning(push)
+#include "cal_warning.h"
+
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(disable:4201)
+MSVC_WARNING_DISABLE(4201)
 
 typedef unsigned __int64    ULONGLONG, DWORD64;
 typedef __int64             LONGLONG;
@@ -187,4 +189,4 @@ typedef struct _DISPATCHER_CONTEXT
     DWORD Fill0;
 } DISPATCHER_CONTEXT, *PDISPATCHER_CONTEXT;
 
-#pragma warning(pop)
+WARNING_POP

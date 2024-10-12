@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define LAPIC_VERSION_REGISTER_OFFSET                   0x030
 #define LAPIC_ERROR_REGISTER_OFFSET                     0x280
 #define LAPIC_LVT_TIMER_REGISTER_OFFSET                 0x320
@@ -27,7 +29,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4214: nonstandard extension used: bit field types other than int
 #pragma warning(disable:4214)
@@ -247,5 +249,5 @@ STATIC_ASSERT(FIELD_OFFSET(LAPIC,TimerInitialCount) == LAPIC_TIMER_INITIAL_COUNT
 STATIC_ASSERT(FIELD_OFFSET(LAPIC,TimerCurrentCount) == LAPIC_TIMER_CURRENT_COUNT_REGISTER_OFFSET );
 STATIC_ASSERT(FIELD_OFFSET(LAPIC,TimerDivideConfiguration) == LAPIC_TIMER_DIVIDE_REGISTER_OFFSET );
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

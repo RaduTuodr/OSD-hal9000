@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define MBR_PARTITION_ENTRY_SIZE            16
 #define MBR_SIZE                            512
 #define MBR_NO_OF_PARTITIONS                4
@@ -18,7 +20,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4214: nonstandard extension used: bit field types other than int
 #pragma warning(disable:4214)
@@ -54,5 +56,5 @@ typedef struct _MBR
 } MBR, *PMBR;
 STATIC_ASSERT(sizeof(MBR) == MBR_SIZE);
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

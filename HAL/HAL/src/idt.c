@@ -8,7 +8,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 //warning C4214: nonstandard extension used : bit field types other than int
 #pragma warning(disable:4214)
 // 6.14.1, Vol 3, No. 56
@@ -35,7 +35,7 @@ typedef struct _IDT_ENTRY
     DWORD           Reserved;
 } IDT_ENTRY, *PIDT_ENTRY;
 STATIC_ASSERT( sizeof( IDT_ENTRY ) == PREDEFINED_IDT_ENTRY_SIZE );
-#pragma warning(pop)
+WARNING_POP
 
 typedef struct _IDT
 {

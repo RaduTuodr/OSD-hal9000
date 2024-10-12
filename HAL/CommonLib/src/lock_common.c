@@ -13,7 +13,7 @@ PFUNC_LockRelease        LockRelease = NULL;
 
 PFUNC_LockIsOwner        LockIsOwner = NULL;
 
-#pragma warning(push)
+WARNING_PUSH
 // warning C4028: formal parameter 1 different from declaration
 // David Sipos: Modified to 4113, in VS2022 I get this error
 #pragma warning(disable:4113) // Error for VS2022
@@ -44,6 +44,6 @@ LockSystemInit(
         LockRelease = SpinlockRelease;
     }
 }
-#pragma warning(pop)
+WARNING_POP
 
 #endif // _COMMONLIB_NO_LOCKS_

@@ -387,7 +387,7 @@ ThreadCreateEx(
         // Kernel mode
 
         // warning C4152: nonstandard extension, function/data pointer conversion in expression
-#pragma warning(suppress:4152)
+MSVC_WARNING_SUPPRESS(4152)
         pStartFunction = _ThreadKernelFunction;
 
         firstArg =  (QWORD) Function;
@@ -901,7 +901,7 @@ _ThreadSetupInitialState(
     pStack = pStack - 1;
 
     // warning C4054: 'type cast': from function pointer 'void (__cdecl *)(const PFUNC_ThreadStart,const PVOID)' to data pointer 'PVOID'
-#pragma warning(suppress:4054)
+MSVC_WARNING_SUPPRESS(4054)
     *pStack = (PVOID) ThreadStart;
 
     pStack = (PVOID*) PtrDiff(pStack, sizeof(COMPLETE_PROCESSOR_STATE));
@@ -1090,7 +1090,7 @@ STATUS
     ExEventSignal(pEvent);
 
     // warning C4127: conditional expression is constant
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         CpuIntrDisable();

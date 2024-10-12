@@ -730,7 +730,7 @@ IoGetDevicesByType(
 
     // warning C6001: Using uninitialized memory (this warning is a caused by a SAL bug)
     // NumberOfDevices is an OUT parameter to IomuGetDevicesByType as well
-#pragma warning(suppress: 6001)
+MSVC_WARNING_SUPPRESS(6001)
     return IomuGetDevicesByType(DeviceType, DeviceObjects, NumberOfDevices);
 }
 
@@ -754,7 +754,7 @@ PIRP
 // the function does not set the named _Out_ parameter.
 // I'm really not proud of this, but there is no other way to tell SAL what's going on
 // and Microsoft does the exact same hack... You learn from the best!
-#pragma warning(suppress: 6101)
+MSVC_WARNING_SUPPRESS(6101)
 IoBuildDeviceIoControlRequest(
     IN          DWORD            IoControlCode,
     IN          PDEVICE_OBJECT   DeviceObject,

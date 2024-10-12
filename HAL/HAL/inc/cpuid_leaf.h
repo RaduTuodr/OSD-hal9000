@@ -1,8 +1,10 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used : nameless struct/union
 #pragma warning(disable:4201)
@@ -372,5 +374,5 @@ typedef struct _CPUID_INFO
     };
 } CPUID_INFO, *PCPUID_INFO;
 STATIC_ASSERT(sizeof(CPUID_INFO) == sizeof(DWORD) * 4);
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

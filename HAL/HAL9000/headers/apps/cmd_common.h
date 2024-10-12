@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 // warning C28208: Function was previously defined with a different parameter list
 // warning C28250: Inconsistent annotation for Function: the prior instance has trailing unannotated parameters
 // warning C28251: Inconsistent annotation for Function: this instance has trailing unannotated parameters.

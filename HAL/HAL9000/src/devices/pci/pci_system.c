@@ -121,7 +121,7 @@ PciSystemInit(
     pEntry = FALSE;
     pMcfg = NULL;
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         ASSERT( NULL == pMcfg);
@@ -696,7 +696,7 @@ _PciSystemRetrievePciExpressDevices(
         BOOLEAN bRestartSearch = TRUE;
         PCI_DEVICE_LIST_ENTRY* pPciDeviceEntry = NULL;
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
         while (TRUE)
         {
             ASSERT(NULL == pPciDeviceEntry);
@@ -770,7 +770,7 @@ _PciSystemRetrievePciDevices(
     bRestartSearch = TRUE;
     status = STATUS_SUCCESS;
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         ASSERT(NULL == pPciDeviceEntry);

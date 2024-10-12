@@ -2,6 +2,7 @@
 
 C_HEADER_START
 
+#include "cal_warning.h"
 #include "native/string.h"
 
 //******************************************************************************
@@ -33,7 +34,7 @@ typedef FUNC_AssertFunction*        PFUNC_AssertFunction;
                                         AssertInfo( "[ASSERT][%s][%d]Condition: (" ## #Cond ## ") failed\n" ##Msg, cl_strrchr(__FILE__, '\\') + 1, __LINE__, __VA_ARGS__ );      \
                                     }
 
-#define NOT_REACHED                 __pragma(warning(suppress: 4127)) ASSERT(FALSE)
+#define NOT_REACHED                  MSVC_WARNING_SUPPRESS(4127) ASSERT(FALSE)
 
 void
 AssertInfo(
@@ -53,7 +54,7 @@ RELEASES_EXCL_AND_NON_REENTRANT_LOCK(m_assertLock)
 #ifndef COMMONLIB_LIB_IMPL
 // Warning C28285 For function 'AssertFreeLock' 'return' syntax error
 // This is suppressed only for external projects because they have no idea who m_assertLock is
-#pragma warning(suppress: 28285)
+MSVC_WARNING_SUPPRESS(28285)
 #endif
 void
 AssertFreeLock(

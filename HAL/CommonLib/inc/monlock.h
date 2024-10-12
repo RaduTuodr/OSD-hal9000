@@ -1,13 +1,16 @@
 #pragma once
 
 C_HEADER_START
+
+#include "cal_warning.h"
+
 #define MONITOR_FILTER_SIZE     64
 
 #pragma pack(push,16)
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(disable:4201)
+MSVC_WARNING_DISABLE(4201)
 typedef struct _MONITOR_LOCK
 {
     union
@@ -17,7 +20,7 @@ typedef struct _MONITOR_LOCK
     };
 } MONITOR_LOCK, *PMONITOR_LOCK;
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 void

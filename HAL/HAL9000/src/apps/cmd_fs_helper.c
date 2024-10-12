@@ -10,7 +10,7 @@
 #include "strutils.h"
 #include "iomu.h"
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4212: nonstandard extension used: function declaration used ellipsis
 #pragma warning(disable:4212)
@@ -793,4 +793,4 @@ _ListDirectory(
     }
 }
 
-#pragma warning(pop)
+WARNING_POP

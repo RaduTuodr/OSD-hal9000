@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////                                    DEFINES                                    /////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +112,7 @@ typedef     DWORD   FAT32_ENTRY;
 // Directory entry structure
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 //warning C4214: nonstandard extension used: bit field types other than int
 #pragma warning(disable:4214)
@@ -134,7 +136,7 @@ typedef struct _FATTIME
     WORD        Hour    : 5;
 } FATTIME, *PFATTIME;
 STATIC_ASSERT(sizeof(FATTIME) == sizeof(WORD));
-#pragma warning(pop)
+WARNING_POP
 
 typedef struct _DIR_ENTRY
 {

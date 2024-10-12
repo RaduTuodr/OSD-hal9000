@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.30.2 FATAL_ERROR)
 
 set(HAL9000_C_INCLUDES
+    ${CMAKE_SOURCE_DIR}/CompilerAbstraction/inc
     ${CMAKE_CURRENT_LIST_DIR}/headers/apps
     ${CMAKE_CURRENT_LIST_DIR}/headers/base
     ${CMAKE_CURRENT_LIST_DIR}/headers/boot

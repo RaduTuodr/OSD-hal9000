@@ -223,7 +223,7 @@ SystemInit(
     // by the time we enable interrupts we want our TSS descriptor to be installed
     status = CpuMuAllocAndInitCpu(&pCpu,
     // C28039: The type of actual parameter 'CpuGetApicId()' should exactly match the type 'APIC_ID'
-#pragma warning(suppress: 28039)
+MSVC_WARNING_SUPPRESS(28039)
                                   CpuGetApicId(),
                                   STACK_DEFAULT_SIZE,
                                   m_systemData.NumberOfTssStacks

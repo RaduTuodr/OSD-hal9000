@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define MAXPHYADDR                                  52
 
 #define PAGING_TABLES_FIRST_LEVEL                   1
@@ -34,7 +36,7 @@ typedef WORD PCID;
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -340,7 +342,7 @@ typedef struct _PTE_MAP_FLAGS
     WORD            __Reserved0          :    7;
 } PTE_MAP_FLAGS, *PPTE_MAP_FLAGS;
 STATIC_ASSERT(sizeof(PTE_MAP_FLAGS) == sizeof(WORD));
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 void

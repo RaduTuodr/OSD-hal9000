@@ -37,7 +37,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4214: nonstandard extension used: bit field types other than int
 #pragma warning(disable:4214)
@@ -58,7 +58,7 @@ typedef union _PIT_COMMAND_REGISTER
 } PIT_COMMAND_REGISTER, *PPIT_COMMAND_REGISTER;
 STATIC_ASSERT(sizeof(PIT_COMMAND_REGISTER) == sizeof(BYTE));
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 static

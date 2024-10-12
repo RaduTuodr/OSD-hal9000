@@ -3,10 +3,10 @@
 #include "synch.h"
 #include "smp.h"
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 
 typedef struct _IPC_EVENT
 {
@@ -25,7 +25,7 @@ typedef struct _IPC_EVENT
     IPC_EVENT_CPU           CpuEvents[0];
 } IPC_EVENT, *PIPC_EVENT;
 
-#pragma warning(pop)
+WARNING_POP
 
 static FUNC_FreeFunction _IpcFreeEvent;
 

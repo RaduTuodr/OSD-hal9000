@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define PREDEFINED_PCI_DEVICE_SPACE_SIZE            256
 #define PREDEFINED_PCI_EXPRESS_DEVICE_SPACE_SIZE    4096
 
@@ -81,7 +83,7 @@ typedef enum _PCI_BRIDGE_SUBCLASS
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4214: nonstandard extension used: bit field types other than int
 #pragma warning(disable:4214)
@@ -205,7 +207,7 @@ typedef union _PCI_COMMAND_REGISTER
 
         // This bit disables the device / function from asserting INTx#.A value of
         // 0 enables the assertion of its INTx# signal.A value of 1 disables the
-        // assertion of its INTx# signal.This bit’s state after RST# is 0. Refer to
+        // assertion of its INTx# signal.This bitï¿½s state after RST# is 0. Refer to
         // Section 6.8.1.3 for control of MSI.
         WORD            InterruptDisable    :   1;
 
@@ -271,13 +273,13 @@ typedef volatile union _PCI_MSI_ADDRESS_REGISTER
         DWORD       RedirectionHint         :   1;
         DWORD       __Reserved1             :   8;
 
-        // This field contains an 8 - bit destination ID.It identifies the message’s target processor(s).
+        // This field contains an 8 - bit destination ID.It identifies the messageï¿½s target processor(s).
         // The destination ID corresponds to bits 63:56 of the I / O APIC Redirection Table Entry if the IOAPIC is used to
         // dispatch the interrupt to the processor(s).
         DWORD       DestinationId           :   8;
 
         // These bits contain a fixed value for interrupt messages(0FEEH).This value locates interrupts at
-        // the 1 - MByte area with a base address of 4G – 18M.All accesses to this region are directed as interrupt
+        // the 1 - MByte area with a base address of 4G ï¿½ 18M.All accesses to this region are directed as interrupt
         // messages.Care must to be taken to ensure that no other device claims the region as I / O space.
         DWORD       UpperFixedAddress       :  12;
     };
@@ -459,5 +461,5 @@ typedef volatile struct _PCI_COMMON_HEADER
 } PCI_COMMON_HEADER, *PPCI_COMMON_HEADER;
 STATIC_ASSERT(sizeof(PCI_COMMON_HEADER) == PREDEFINED_PCI_COMMON_HEADER_SIZE);
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

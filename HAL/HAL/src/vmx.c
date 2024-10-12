@@ -1,7 +1,7 @@
 #include "hal_base.h"
 #include "vmx.h"
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C28039: The type of actual parameter '24576|2048|((0<<1))|0' should exactly match the type 'VMCS_FIELD':
 #pragma warning(disable: 28039)
@@ -98,4 +98,4 @@ VmxWrite(
         Field, Value, errCode);
 }
 
-#pragma warning(pop)
+WARNING_POP

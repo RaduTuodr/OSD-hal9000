@@ -186,7 +186,7 @@ _InitInternalHandlers(
 
     status = STATUS_SUCCESS;
 
-#pragma warning(push)
+WARNING_PUSH
     // warning C4152: nonstandard extension, function/data pointer conversion in expression
 #pragma warning(disable:4152)
     // 00 - #DE - Divide Error
@@ -269,7 +269,7 @@ _InitInternalHandlers(
     status = CREATE_INTERRUPT_GATE_DESC(VirtualizationException, ExceptionVirtualizationException, CodeSelector, 0);
     ASSERT(SUCCEEDED(status));
 
-#pragma warning(pop)
+WARNING_POP
 
     return status;
 }
@@ -284,7 +284,7 @@ _InitExternalInterruptHandlers(
 
     status = STATUS_SUCCESS;
 
-#pragma warning(push)
+WARNING_PUSH
     // warning C4152: nonstandard extension, function/data pointer conversion in expression
 #pragma warning(disable:4152)
     CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(32); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(33); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(34); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(35);
@@ -356,7 +356,7 @@ _InitExternalInterruptHandlers(
     CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(244); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(245); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(246); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(247);
     CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(248); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(249); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(250); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(251);
     CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(252); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(253); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(254); CREATE_EXT_INTERRUPT_GATE_AND_CHECK_FAILURE(255);
-#pragma warning(pop)
+WARNING_POP
 
     return status;
 }

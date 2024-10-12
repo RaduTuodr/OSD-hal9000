@@ -32,7 +32,7 @@
 
 #define HAL9000_SYSTEM_FILE_NAME            "HAL9000.ini"
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -45,7 +45,7 @@ typedef union __declspec(align(8)) _UPTIME
     };
     volatile        QWORD   Raw;
 } UPTIME, *PUPTIME;
-#pragma warning(pop)
+WARNING_POP
 
 typedef struct _REGISTERED_INTERRUPT_ENTRY
 {
@@ -372,7 +372,7 @@ IomuAckInterrupt(
     // 10.8.5 - Vol 3 US 057
     // System software desiring to perform directed EOIs for level - triggered interrupts should set bit 12 of the Spurious
     // Interrupt Vector Register and follow each the EOI to the local xAPIC for a level triggered interrupt with a directed
-    // EOI to the I / O APIC generating the interrupt(this is done by writing to the I / O APIC’s EOI register).
+    // EOI to the I / O APIC generating the interrupt(this is done by writing to the I / O APICï¿½s EOI register).
 }
 
 static
@@ -897,7 +897,7 @@ IomuRegisterInterrupt(
             // try to install handler
 
             // warning C4306: 'type cast': conversion from 'const BYTE' to 'PVOID' of greater size
-#pragma warning(suppress:4306)
+MSVC_WARNING_SUPPRESS(4306)
             status = IsrInstallEx(interruptVector, _IomuGenericInterrupt, (PVOID)interruptIndex);
             if (!SUCCEEDED(status))
             {
@@ -1097,7 +1097,7 @@ BOOLEAN
     ASSERT(CpuIntrGetState() == INTR_OFF);
 
     // warning C4305: 'type cast': truncation from 'const PVOID' to 'BYTE'
-#pragma warning(suppress:4305)
+MSVC_WARNING_SUPPRESS(4305)
     interrupt = (BYTE) Context;
 
     bFoundEntry = FALSE;

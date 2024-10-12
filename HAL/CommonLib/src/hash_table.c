@@ -1,15 +1,15 @@
 #include "common_lib.h"
 #include "hash_table.h"
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 typedef struct _HASH_TABLE_DATA
 {
     HASH_ENTRY          Entries[0];
 } HASH_TABLE_DATA, *PHASH_TABLE_DATA;
-#pragma warning(pop)
+WARNING_POP
 
 static FUNC_CompareFunction _HashTableSearchElem;
 

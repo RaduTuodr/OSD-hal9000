@@ -35,7 +35,7 @@ __main(
     __try
     {
         //  warning C4054: 'type cast': from function pointer 'STATUS (__cdecl *)(const PVOID)' to data pointer 'PVOID'
-#pragma warning(suppress:4054)
+MSVC_WARNING_SUPPRESS(4054)
         status = UmThreadCreate(_ThreadFunc, (PVOID)_ThreadFunc, &hThread);
         if (!SUCCEEDED(status))
         {

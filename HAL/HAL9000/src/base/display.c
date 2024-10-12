@@ -287,7 +287,7 @@ _DispScrollScreen(
     // we scroll the screen
 
     // warning C4312: 'type cast': conversion from 'DWORD' to 'PVOID' of greater size
-#pragma warning(suppress:4312)
+MSVC_WARNING_SUPPRESS(4312)
     memmove(m_displayData.StartOfUsableScreen, 
            (*m_displayData.StartOfUsableScreen)[1], 
            m_displayData.TotalUsableBytes - BYTES_PER_LINE );
@@ -322,7 +322,7 @@ _DispPutChar(
     PSCREEN_CHARACTER pScreenAddress;
 
 // warning C4312: 'type cast': conversion from 'unsigned long' to 'WORD *' of greater size
-#pragma warning(suppress:4312)
+MSVC_WARNING_SUPPRESS(4312)
     pScreenAddress = (PSCREEN_CHARACTER) &((*m_displayData.MappedScreenAddress)[Line][Column]);
 
     pScreenAddress->Color = m_displayData.CurrentColor;

@@ -1,8 +1,10 @@
 #pragma once
 
-#pragma warning(push)
+#include "cal_warning.h"
+
+WARNING_PUSH
 #include "acpi.h"
-#pragma warning(pop)
+WARNING_POP
 
 void
 AcpiInterfacePreinit(

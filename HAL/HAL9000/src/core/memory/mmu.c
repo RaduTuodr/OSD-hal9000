@@ -43,7 +43,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -65,7 +65,7 @@ typedef union _PAGE_FAULT_ERR_CODE
 } PAGE_FAULT_ERR_CODE, *PPAGE_FAULT_ERR_CODE;
 STATIC_ASSERT( sizeof(PAGE_FAULT_ERR_CODE) == sizeof(DWORD));
 
-#pragma warning(pop)
+WARNING_POP
 
 #pragma pack(pop)
 
@@ -2230,7 +2230,7 @@ _MmuZeroWorkerThreadFunction(
     pCtx = NULL;
 
     // warning C4127: conditional expression is constant
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         PMMU_ZERO_WORKER_ITEM pItem;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #include "time.h"
 
 /// never do this at home kids
@@ -10,7 +12,7 @@
 // common packing
 #pragma pack(push,8)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -42,7 +44,7 @@ typedef struct _FILE_INFORMATION
 
 // IRP_MN_QUERY_DIRECTORY
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 typedef
 _Struct_size_bytes_(sizeof(FILE_DIRECTORY_INFORMATION) + FilenameLength)
 struct _FILE_DIRECTORY_INFORMATION
@@ -194,7 +196,7 @@ typedef struct _IO_STATUS_BLOCK
 } IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 typedef struct _IRP
 {
     PVOID               Buffer;
@@ -214,7 +216,7 @@ typedef struct _MDL_TRANSLATION_PAIR
 } MDL_TRANSLATION_PAIR, *PMDL_TRANSLATION_PAIR;
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 typedef
 _Struct_size_bytes_(sizeof(MDL) + NumberOfTranslationPairs * sizeof(MDL_TRANSLATION_PAIR))
 struct _MDL
@@ -263,7 +265,7 @@ typedef FUNC_DriverEntry*           PFUNC_DriverEntry;
 /////////                        IRP_MJ_DEVICE_CONTROL                                  /////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 
 // IOCTL_DISK_GET_LENGTH_INFO
 typedef struct _GET_LENGTH_INFORMATION
@@ -334,5 +336,5 @@ typedef struct _NET_GET_LINK_STATUS
 #define IOCTL_NET_GET_LINK_STATUS           0x9
 
 // end of common packing
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

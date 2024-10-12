@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #include "register.h"
 #include "tss.h"
 #include "cpu.h"
@@ -163,6 +165,6 @@ PVOID
 CpuGetCurrent(void)
 {
     // warning C4306: 'type cast': conversion from 'BYTE' to 'PVOID' of greater size
-#pragma warning(suppress:4306)
+MSVC_WARNING_SUPPRESS(4306)
     return (PVOID) ( CURRENT_CPU_MASK | CpuGetApicId());
 }

@@ -131,7 +131,7 @@ _DumpPciCapabilities(
     LOG("Device capabilities list:\n");
 
     // warning C4127: conditional expression is constant
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while(TRUE)
     {
         status = PciDevRetrieveNextCapability(Device, pciCap, &pciCap );

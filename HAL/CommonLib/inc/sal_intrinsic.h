@@ -1,8 +1,11 @@
 #pragma once
 
 C_HEADER_START
+
+#include "cal_warning.h"
+
 #ifndef CL_NON_NATIVE
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4391: incorrect return type for intrinsic function
 #pragma warning(disable:4391)
@@ -156,6 +159,6 @@ _rdrand64_step(
     OUT QWORD*      Value
     );
 
-#pragma warning(pop)
+WARNING_POP
 #endif // CL_NON_NATIVE
 C_HEADER_END

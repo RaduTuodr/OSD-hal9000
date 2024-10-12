@@ -1,10 +1,12 @@
 #pragma once
 
+#include "cal_warning.h"
+
 typedef DWORD VMCS_FIELD;
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4214: nonstandard extension used : bit field types other than int
 #pragma warning(disable:4214)
@@ -454,5 +456,5 @@ STATIC_ASSERT(sizeof(EXIT_REASON_STRUCT) == sizeof(DWORD));
 #define VMCS_HOST_RSP                                       (VMCS_FIELD)( VMCS_FIELD_NATURAL | VMCS_TYPE_HOST | ( 10 << 1 ) | VMCS_ACCESS_FULL )
 #define VMCS_HOST_RIP                                       (VMCS_FIELD)( VMCS_FIELD_NATURAL | VMCS_TYPE_HOST | ( 11 << 1 ) | VMCS_ACCESS_FULL )
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

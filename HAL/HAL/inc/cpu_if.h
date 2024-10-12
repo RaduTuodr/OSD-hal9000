@@ -1,8 +1,10 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #pragma pack(push, 1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used : nameless struct/union
 #pragma warning(disable:4201)
@@ -39,7 +41,7 @@ typedef union _CPU_RST_CTRL_REG
         //     SLP_S5# after a CF9 hard reset(SYS_RST = 1 and RST_CPU is set to 1), after PWROK going low
         //     (with RSMRST# high), or after two TCO timeouts.
         //     0 = PCH will keep SLP_S3#, SLP_S4# and SLP_S5# high.
-        //     1 = PCH will drive SLP_S3#, SLP_S4# and SLP_S5# low for 3–5 seconds.
+        //     1 = PCH will drive SLP_S3#, SLP_S4# and SLP_S5# low for 3ï¿½5 seconds.
         //     Note : When this bit is set, it also causes the full power cycle(SLP_S3 / 4 / 5# assertion) in response
         //     to SYS_RESET#, PWROK#, and Watchdog timer reset sources.
         BYTE                                        FULL_RST                    : 1;
@@ -52,5 +54,5 @@ typedef union _CPU_RST_CTRL_REG
 STATIC_ASSERT_INFO(sizeof(CPU_RST_CTRL_REG) == PREDEFINED_CPU_RST_CTRL_REG_SIZE,
     "See Intel 9 Series Chipset Family Platform Controller Hub(PCH) section 12.7.5 RST_CNT - Reset Control Register");
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

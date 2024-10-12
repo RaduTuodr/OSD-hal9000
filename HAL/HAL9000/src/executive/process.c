@@ -191,7 +191,7 @@ ProcessExecuteForEachProcessEntry(
 //  warning C26130: Missing annotation _Requires_lock_held_(Process->PagingData->Lock) or _No_competing_thread_ at function 'ProcessActivatePagingTables'.
 // Otherwise it could be a race condition. Variable 'Process->PagingData->Data' should be protected by lock 'Process->PagingData->Lock'.
 // I do remember having a look at this function a lot of times, it's OK (I don't remember what the problem is though :( )
-#pragma warning(push)
+WARNING_PUSH
 #pragma warning(disable:26130)
 
 void
@@ -208,7 +208,7 @@ ProcessActivatePagingTables(
                  (PCID)Process->Id,
                  InvalidateAddressSpace);
 }
-#pragma warning(pop)
+WARNING_POP
 
 STATUS
 ProcessCreate(

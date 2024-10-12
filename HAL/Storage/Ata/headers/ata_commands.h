@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 // ATA commands
 
 // The extended version is needed for LBA48 addressing

@@ -9,10 +9,10 @@
 
 #define PRIORITY_SCHEDULER_NO_OF_ITERATIONS             16
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 typedef struct _TEST_PRIORITY_EXEC_CTX
 {
     BOOLEAN                 MultipleThreads;
@@ -23,7 +23,7 @@ typedef struct _TEST_PRIORITY_EXEC_CTX
 
     TID                     WakeupTids[0];
 } TEST_PRIORITY_EXEC_CTX, *PTEST_PRIORITY_EXEC_CTX;
-#pragma warning(pop)
+WARNING_POP
 
 typedef struct _TEST_PRIORITY_WAKEUP_CTX
 {
@@ -69,7 +69,7 @@ void
     pMutex = &pWakeupCtx->Mutex;
 
     // warning C4305: 'type cast': truncation from 'const PVOID' to 'BOOLEAN'
-#pragma warning(suppress:4305)
+MSVC_WARNING_SUPPRESS(4305)
     acquireMutex = (BOOLEAN) PrepareContext;
 
     MutexInit(pMutex, FALSE);
@@ -343,7 +343,7 @@ void
     ASSERT(Context != NULL);
 
     // warning C4305: 'type cast': truncation from 'const PVOID' to 'BOOLEAN'
-#pragma warning(suppress:4305)
+MSVC_WARNING_SUPPRESS(4305)
     bMultipleThreads = (BOOLEAN) PrepareContext;
 
     pNewContext = ExAllocatePoolWithTag(PoolAllocateZeroMemory | PoolAllocatePanicIfFail,

@@ -37,7 +37,7 @@ MonitorLockAcquire(
                 );
 
 // warning C4127: conditional expression is constant
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while(TRUE)
     {
         _mm_monitor(Lock, 0, 0);

@@ -1,9 +1,11 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #include "pci_device.h"
 #include "list.h"
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4214: nonstandard extension used: bit field types other than int
 #pragma warning(disable:4214)
@@ -47,7 +49,7 @@ typedef struct _PCI_SPEC_LOCATION
     BOOLEAN             MatchDevice     : 1;
     BOOLEAN             MatchFunction   : 1;
 } PCI_SPEC_LOCATION, *PPCI_SPEC_LOCATION;
-#pragma warning(pop)
+WARNING_POP
 
 void
 PciSystemPreinit(

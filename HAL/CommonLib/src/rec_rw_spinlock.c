@@ -27,7 +27,7 @@ RecRwSpinlockInit(
 
 // warning C26165 : Possibly failing to release lock '* Spinlock' in function 'RecRwSpinlockAcquire'.
 // well we're not actually attempting to release a lock in this function...
-#pragma warning(push)
+WARNING_PUSH
 #pragma warning(disable:26165)
 
 REQUIRES_NOT_HELD_LOCK(*Spinlock)
@@ -77,14 +77,14 @@ RecRwSpinlockAcquire(
         Spinlock->Holder = CpuGetCurrent();
     }
 }
-#pragma warning(pop)
+WARNING_POP
 
 // warning C26167: Possibly releasing unheld lock '* Spinlock' in function 'RecRwSpinlockRelease'.
 // FALSE, even if we tell SAL we used reentrant locks it's still stupid, and wants a release on
 // each call, so we need to tell him we release the lock in the first branch, and as a result
 // there's a situation in which he thinks we release the lock twice, one on the first branch
 // and second on the RwSpinlockRelease
-#pragma warning(push)
+WARNING_PUSH
 #pragma warning(disable:26167)
 
 _When_(Exclusive, REQUIRES_EXCL_LOCK(*Spinlock) RELEASES_EXCL_AND_REENTRANT_LOCK(*Spinlock))
@@ -123,6 +123,6 @@ RecRwSpinlockRelease(
     }
 }
 
-#pragma warning(pop)
+WARNING_POP
 
 #endif // _COMMONLIB_NO_LOCKS_

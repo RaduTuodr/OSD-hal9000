@@ -1,14 +1,16 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 
 // warning C4214: nonstandard extension used: bit field types other than int
 #pragma warning(disable:4214)
@@ -53,12 +55,12 @@ typedef struct _IP6_ADDRESS
 
 typedef WORD        ETHERNET_FRAME_TYPE;
 
-#define ETHERNET_FRAME_TYPE_IP4         __pragma(warning(suppress: 4310)) ((WORD)0x0800ui16)
-#define ETHERNET_FRAME_TYPE_ARP         __pragma(warning(suppress: 4310)) ((WORD)0x0806ui16)
-#define ETHERNET_FRAME_TYPE_RARP        __pragma(warning(suppress: 4310)) ((WORD)0x8035ui16)
-#define ETHERNET_FRAME_TYPE_VLAN        __pragma(warning(suppress: 4310)) ((WORD)0x8100ui16)
-#define ETHERNET_FRAME_TYPE_IP6         __pragma(warning(suppress: 4310)) ((WORD)0x86DDui16)
-#define ETHERNET_FRAME_TYPE_LLDP        __pragma(warning(suppress: 4310)) ((WORD)0x88CCui16)
+#define ETHERNET_FRAME_TYPE_IP4         MSVC_WARNING_SUPPRESS(4310) ((WORD)0x0800)
+#define ETHERNET_FRAME_TYPE_ARP         MSVC_WARNING_SUPPRESS(4310) ((WORD)0x0806)
+#define ETHERNET_FRAME_TYPE_RARP        MSVC_WARNING_SUPPRESS(4310) ((WORD)0x8035)
+#define ETHERNET_FRAME_TYPE_VLAN        MSVC_WARNING_SUPPRESS(4310) ((WORD)0x8100)
+#define ETHERNET_FRAME_TYPE_IP6         MSVC_WARNING_SUPPRESS(4310) ((WORD)0x86DD)
+#define ETHERNET_FRAME_TYPE_LLDP        MSVC_WARNING_SUPPRESS(4310) ((WORD)0x88CC)
 
 typedef struct _ETHERNET_FRAME
 {
@@ -200,5 +202,5 @@ typedef struct _TCP_SEGMENT
 } TCP_SEGMENT, *PTCP_SEGMENT;
 STATIC_ASSERT(sizeof(TCP_SEGMENT) == TCP_SEGMENT_SIZE);
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 void
 DumpPreinit(
     void
@@ -10,7 +12,7 @@ RELEASES_EXCL_AND_REENTRANT_LOCK(m_dumpLock)
 INTR_STATE
 // Warning C28285 For function 'DumpTakeLock' 'return' syntax error
 // This is because SAL does not know who m_dumpLock is
-#pragma warning(suppress: 28285)
+MSVC_WARNING_SUPPRESS(28285)
 DumpTakeLock(
     void
     );
@@ -20,7 +22,7 @@ RELEASES_EXCL_AND_REENTRANT_LOCK(m_dumpLock)
 void
 // Warning C28285 For function 'DumpTakeLock' 'return' syntax error
 // This is because SAL does not know who m_dumpLock is
-#pragma warning(suppress: 28285)
+MSVC_WARNING_SUPPRESS(28285)
 DumpReleaseLock(
     IN INTR_STATE   OldIntrState
     );

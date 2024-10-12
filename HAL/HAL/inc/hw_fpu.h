@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define INCLUDE_FP_SUPPORT                  0
 
 typedef QWORD XCR0_SAVED_STATE;
@@ -17,7 +19,7 @@ typedef QWORD XCR0_SAVED_STATE;
 #pragma pack(push)
 #pragma pack(1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -80,7 +82,7 @@ typedef union _XSAVE_AREA
 } XSAVE_AREA, *PXSAVE_AREA;
 STATIC_ASSERT(sizeof(XSAVE_AREA) == HAL_XSAVE_AREA_RESERVED_SIZE);
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 // This function is expected to be called very, very early, it does not

@@ -30,10 +30,10 @@ extern void LowGdtTableEnd();
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 
 typedef struct _SYSTEM_CONFIG
 {
@@ -60,7 +60,7 @@ typedef struct _LOW_MEMORY_CONFIG
     SYSTEM_CONFIG       SystemConfig;
     AP_CONFIG_ENTRY     ApConfig[0];
 } LOW_MEMORY_CONFIG, *PLOW_MEMORY_CONFIG;
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 STATUS
@@ -114,14 +114,14 @@ ApTrampSetupLowerMemory(
     ASSERT(initialCodeSize <= LOW_MEMORY_CODE_SIZE);
 
     // warning C4152: nonstandard extension, function/data pointer conversion in expression
-#pragma warning(suppress:4152)
+MSVC_WARNING_SUPPRESS(4152)
     memcpy(pLowMemoryCode, TrampolineStart, initialCodeSize);
 
     placeholderCodeSize = (QWORD)PM32_to_PM64End - (QWORD)PM32_to_PM64;
     ASSERT(initialCodeSize + placeholderCodeSize <= LOW_MEMORY_CODE_SIZE);
 
     // warning C4152: nonstandard extension, function/data pointer conversion in expression
-#pragma warning(suppress:4152)
+MSVC_WARNING_SUPPRESS(4152)
     memcpy(pLowMemoryCode + initialCodeSize, PM32_to_PM64, placeholderCodeSize);
 
     __try
@@ -141,7 +141,7 @@ ApTrampSetupLowerMemory(
         ASSERT(initialCodeSize + placeholderCodeSize + lowGdtSize <= LOW_MEMORY_CODE_SIZE);
 
         memcpy(&pConfig->SystemConfig.HighGdt, &highGdt, sizeof(GDT));
-#pragma warning(suppress:4152)
+MSVC_WARNING_SUPPRESS(4152)
         memcpy(pLowMemoryCode + initialCodeSize + placeholderCodeSize, pConfig->SystemConfig.HighGdt.Base, min(lowGdtSize, pConfig->SystemConfig.HighGdt.Limit + 1));
 
         pConfig->SystemConfig.LowGdt.Base = (DWORD)((QWORD)pLowMemoryCode + initialCodeSize + placeholderCodeSize);
@@ -150,7 +150,7 @@ ApTrampSetupLowerMemory(
         ASSERT((QWORD)cr3 <= MAX_DWORD);
 
         // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'
-#pragma warning(suppress:4311)
+MSVC_WARNING_SUPPRESS(4311)
         pConfig->SystemConfig.Pml4PhysicalAddress = (DWORD)cr3;
 
         LOGL("CR3: 0x%X\n", cr3);
@@ -179,7 +179,7 @@ ApTrampSetupLowerMemory(
                 pConfig->ApConfig[apicId].StackPhysicalAddress = LOW_MEMORY_STACK_START + LOW_MEMORY_STACK_SIZE * apicId;
 
                 // warning C4312: 'type cast': conversion from 'DWORD' to 'PHYSICAL_ADDRESS' of greater size
-#pragma warning(suppress:4312)
+MSVC_WARNING_SUPPRESS(4312)
                 MmuMapMemoryInternal((PHYSICAL_ADDRESS)(pConfig->ApConfig[apicId].StackPhysicalAddress - LOW_MEMORY_STACK_SIZE),
                                      LOW_MEMORY_STACK_SIZE,
                                      PAGE_RIGHTS_READWRITE,

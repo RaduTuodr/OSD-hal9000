@@ -22,7 +22,7 @@ __report_rangecheckfailure(
 )
 {
     // warning C4127: conditional expression is constant
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     ASSERT_INFO(FALSE, "RA is 0x%X\n", GET_RETURN_ADDRESS);
 }
 

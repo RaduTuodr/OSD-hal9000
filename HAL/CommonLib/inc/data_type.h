@@ -2,10 +2,12 @@
 
 C_HEADER_START
 
-#pragma warning(push)
+#include "cal_warning.h"
+
+WARNING_PUSH
 
 // warning C4142: 'DWORD': benign redefinition of type
-#pragma warning(disable:4142)
+MSVC_WARNING_DISABLE(4142)
 
 #ifndef TRUE
 #define TRUE                        ( 1 == 1 )
@@ -71,6 +73,6 @@ typedef unsigned short WCHAR;
 #define _WCHAR_T_DEFINED
 #endif  /* _WCHAR_T_DEFINED */
 
-#pragma warning(pop)
+WARNING_POP
 
 C_HEADER_END

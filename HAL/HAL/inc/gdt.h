@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define PREDEFINED_GDT_SIZE                     10
 #define PREDEFINED_GDT32_SIZE                   6
 #define PREDEFINED_TSS_DESC_SIZE                16
@@ -51,7 +53,7 @@ typedef enum _NON_SYSTEM_SEGMENT_TYPES
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 //warning C4214: nonstandard extension used : bit field types other than int
 #pragma warning(disable:4214)
@@ -118,7 +120,7 @@ typedef struct _GDT
     SEGMENT_DESCRIPTOR*     Base;
 } GDT, *PGDT;
 STATIC_ASSERT(sizeof(GDT) == PREDEFINED_GDT_SIZE);
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 typedef enum _SEGMENT_DESCRIPTOR_FLAGS

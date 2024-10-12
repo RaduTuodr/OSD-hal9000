@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_warning.h"
 #include "register.h"
 #include "hw_fpu.h"
 #include "cpuid_leaf.h"
@@ -20,7 +21,7 @@ extern FUNC_ReadFsQword                     __HALreadfsqword;
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used : nameless struct/union
 #pragma warning(disable:4201)
@@ -40,7 +41,7 @@ typedef struct _COMPLETE_PROCESSOR_STATE
 
     REGISTER_AREA                                   RegisterArea;
 } COMPLETE_PROCESSOR_STATE, *PCOMPLETE_PROCESSOR_STATE;
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 #include "cpu_utils.h"

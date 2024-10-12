@@ -107,7 +107,7 @@ _AtaSelectDevice(
     )
 {
     // Warning C6323 Use of arithmetic operator on Boolean type(s)
-#pragma warning(suppress:6323)
+MSVC_WARNING_SUPPRESS(6323)
     _AtaWriteRegister(Device, AtaRegisterDevice, ATA_DEV_REG_LBA | ( ATA_DEV_REG_DEV * Slave ) );
 }
 
@@ -394,7 +394,7 @@ _AtaPrepareDmaTransfer(
                 byteCountForAlignment = (WORD)(ATA_DMA_PHYSICAL_BOUNDARY - AddressOffset(pCurPair->Address, ATA_DMA_PHYSICAL_BOUNDARY));
 
                 // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'
-#pragma warning(suppress:4311)
+MSVC_WARNING_SUPPRESS(4311)
                 prdTable[indexInPrdEntries].PhysicalAddress = (DWORD)pCurPair->Address;
                 prdTable[indexInPrdEntries].ByteCount = byteCountForAlignment;
                 prdTable[indexInPrdEntries].LastEntry = 0;
@@ -403,7 +403,7 @@ _AtaPrepareDmaTransfer(
             }
 
             // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'
-#pragma warning(suppress:4311)
+MSVC_WARNING_SUPPRESS(4311)
             prdTable[indexInPrdEntries].PhysicalAddress = (DWORD)pCurPair->Address + byteCountForAlignment;
             prdTable[indexInPrdEntries].ByteCount = byteCountForPrd - byteCountForAlignment;
             prdTable[indexInPrdEntries].LastEntry = 0;
@@ -441,7 +441,7 @@ _AtaPrepareDmaTransfer(
         // setup DMA registers
 
     // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'
-#pragma warning(suppress:4311)
+MSVC_WARNING_SUPPRESS(4311)
         _AtaWriteDmaRegisters(AtaDevice, (DWORD)prdtPa, WriteOperation);
 
         CurrentTransfer->Prdt = prdTable;
@@ -625,7 +625,7 @@ AtaInitialize(
     LOG_TRACE_STORAGE("Device does exist\n");
 
     // wait for device to be ready
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         data = _AtaReadRegister(&pDeviceExtension->DeviceRegisters, AtaRegisterStatus);

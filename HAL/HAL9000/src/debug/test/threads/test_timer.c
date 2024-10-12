@@ -4,13 +4,13 @@
 #include "ex_timer.h"
 #include "iomu.h"
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable:4200)
+MSVC_WARNING_DISABLE(4200)
 
 #pragma pack(push, 1)
 typedef struct _TIMER_TEST_CTX
@@ -60,7 +60,7 @@ typedef struct _TIMER_TEST_MULTIPLE_CTX
     };
 } TIMER_TEST_MULTIPLE_CTX, *PTIMER_TEST_MULTIPLE_CTX;
 
-#pragma warning(pop)
+WARNING_POP
 
 static
 void
@@ -176,7 +176,7 @@ void
     ASSERT(Context != NULL);
 
     // warning C4305: 'type cast': truncation from 'const PVOID' to 'BOOLEAN'
-#pragma warning(suppress:4305)
+MSVC_WARNING_SUPPRESS(4305)
     bPrepareArray = (BOOLEAN) PrepareContext;
 
     if (bPrepareArray)

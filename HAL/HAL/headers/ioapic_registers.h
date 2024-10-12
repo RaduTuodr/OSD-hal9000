@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define IO_APIC_IDENTIFICATION_REGISTER_OFFSET          0x0
 #define IO_APIC_VERSION_REGISTER_OFFSET                 0x1
 #define IO_APIC_REDIRECTION_TABLE_BASE_OFFSET           0x10
@@ -12,7 +14,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4214: nonstandard extension used: bit field types other than int
 #pragma warning(disable:4214)
@@ -69,11 +71,11 @@ typedef union _IO_APIC_REDIR_TABLE_ENTRY
 {
     struct
     {
-        // Interrupt Vector(INTVEC)—R / W: The vector field is an 8 bit field containing the interrupt
+        // Interrupt Vector(INTVEC)ï¿½R / W: The vector field is an 8 bit field containing the interrupt
         // vector for this interrupt.Vector values range from 10h to FEh.
         QWORD                   Vector                  :  8;
 
-        // Delivery Mode(DELMOD)—R / W.The Delivery Mode is a 3 bit field that specifies how the
+        // Delivery Mode(DELMOD)ï¿½R / W.The Delivery Mode is a 3 bit field that specifies how the
         // APICs listed in the destination field should act upon reception of this signal.Note that certain
         // Delivery Modes only operate as intended when used in conjunction with a specific trigger Mode.
         // These restrictions are indicated in the following table for each Delivery Mode.
@@ -95,12 +97,12 @@ typedef union _IO_APIC_REDIR_TABLE_ENTRY
         //              destination.Vector information is ignored.NMI is treated as an edge
         //              triggered interrupt, even if it is programmed as a level triggered interrupt.
         //              For proper operation, this redirection table entry must be programmed to
-        //              “edge” triggered interrupt.
+        //              ï¿½edgeï¿½ triggered interrupt.
         // 101 INIT     Deliver the signal to all processor cores listed in the destination by
         //              asserting the INIT signal.All addressed local APICs will assume their
         //              INIT state.INIT is always treated as an edge triggered interrupt, even if
         //              programmed otherwise.For proper operation, this redirection table entry
-        //              must be programmed to “edge” triggered interrupt.
+        //              must be programmed to ï¿½edgeï¿½ triggered interrupt.
         // 110 Reserved
         // 111 ExtINT   Deliver the signal to the INTR signal of all processor cores listed in the
         //              destination as an interrupt that originated in an externally connected
@@ -110,7 +112,7 @@ typedef union _IO_APIC_REDIR_TABLE_ENTRY
         //              trigger mode.
         QWORD                   DeliveryMode            :  3;
 
-        // Destination Mode(DESTMOD)—R / W.This field determines the interpretation of the
+        // Destination Mode(DESTMOD)ï¿½R / W.This field determines the interpretation of the
         // Destination field.When DESTMOD = 0 (physical mode), a destination APIC is identified by its ID.
         // Bits 56 through 59 of the Destination field specify the 4 bit APIC ID.When DESTMOD = 1 (logical
         // mode), destinations are identified by matching on the logical destination under the control of the
@@ -121,28 +123,28 @@ typedef union _IO_APIC_REDIR_TABLE_ENTRY
         // 1, Logical Mode IOREDTBLx[63:56] = Set of processors
         QWORD                   DestinationMode         :  1;
 
-        // Delivery Status(DELIVS)—RO.The Delivery Status bit contains the current status of the
+        // Delivery Status(DELIVS)ï¿½RO.The Delivery Status bit contains the current status of the
         // delivery of this interrupt.Delivery Status is read - only and writes to this bit(as part of a 32 bit
         // word) do not effect this bit. 0 = IDLE(there is currently no activity for this interrupt). 1 = Send
         // Pending(the interrupt has been injected but its delivery is temporarily held up due to the APIC
         // bus being busy or the inability of the receiving APIC unit to accept that interrupt at that time).
         QWORD                   DeliveryStatus          :  1;
 
-        // Interrupt Input Pin Polarity(INTPOL)—R / W.This bit specifies the polarity of the interrupt
+        // Interrupt Input Pin Polarity(INTPOL)ï¿½R / W.This bit specifies the polarity of the interrupt
         // signal. 0 = High active, 1 = Low active.
         QWORD                   PinPolarity             :  1;
 
-        // Remote IRR—RO. This bit is used for level triggered interrupts. Its meaning is undefined for
+        // Remote IRRï¿½RO. This bit is used for level triggered interrupts. Its meaning is undefined for
         // edge triggered interrupts. For level triggered interrupts, this bit is set to 1 when local APIC(s)
         // accept the level interrupt sent by the IOAPIC. The Remote IRR bit is set to 0 when an EOI
         // message with a matching interrupt vector is received from a local APIC.
         QWORD                   RemoteIRR               :  1;
 
-        // Trigger Mode—R / W.The trigger mode field indicates the type of signal on the interrupt pin that
+        // Trigger Modeï¿½R / W.The trigger mode field indicates the type of signal on the interrupt pin that
         // triggers an interrupt. 1 = Level sensitive, 0 = Edge sensitive.
         QWORD                   TriggerMode             :  1;
 
-        // Interrupt Mask—R / W.When this bit is 1, the interrupt signal is masked.Edge - sensitive
+        // Interrupt Maskï¿½R / W.When this bit is 1, the interrupt signal is masked.Edge - sensitive
         // interrupts signaled on a masked interrupt pin are ignored(i.e., not delivered or held pending).
         // Level - asserts or negates occurring on a masked level - sensitive pin are also ignored and have no
         // side effects.Changing the mask bit from unmasked to masked after the interrupt is accepted by
@@ -159,7 +161,7 @@ typedef union _IO_APIC_REDIR_TABLE_ENTRY
         QWORD                   __Reserved1             : 24;
 
 
-        // Destination Field—R/W. If the Destination Mode of this entry is Physical Mode(bit 11 = 0), bits
+        // Destination Fieldï¿½R/W. If the Destination Mode of this entry is Physical Mode(bit 11 = 0), bits
         // [59:56] contain an APIC ID.If Logical Mode is selected(bit 11 = 1), the Destination Field
         // potentially defines a set of processors.Bits[63:56] of the Destination Field specify the logical
         // destination address.
@@ -190,5 +192,5 @@ typedef struct _IO_APIC
     IO_APIC_REGISTER        IoRegEOI;
 } IO_APIC, *PIO_APIC;
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

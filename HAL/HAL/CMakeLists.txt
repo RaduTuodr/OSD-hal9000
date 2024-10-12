@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.30.2 FATAL_ERROR)
 
 set(HAL_INCLUDES 
+    ${CMAKE_SOURCE_DIR}/CompilerAbstraction/inc
     ${CMAKE_CURRENT_LIST_DIR}/headers
     ${PROJECT_SOURCE_DIR}/CommonLib/inc
 )

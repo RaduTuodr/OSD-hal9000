@@ -432,7 +432,7 @@ _VmChangeVaReservationState(
         // the lock is called
         // warning C26110: Caller failing to hold lock 'm_vmmData.ReservationLock' before calling function
         // '_VmInitializeReservation'
-#pragma warning(suppress: 26110)
+MSVC_WARNING_SUPPRESS(26110)
         _VmInitializeReservation(ReservationSpace,
                                 Address,
                                 Size,
@@ -461,7 +461,7 @@ _VmChangeVaReservationState(
         // the lock is called
         // warning C26110: Caller failing to hold lock 'm_vmmData.ReservationLock' before calling function
         // '_VmCommitReservation'
-#pragma warning(suppress: 26110)
+MSVC_WARNING_SUPPRESS(26110)
         _VmCommitReservation(Address,
                              Size,
                              pReservation
@@ -672,7 +672,7 @@ VmReservationCanAddressBeAccessed(
         // warning C26130: Missing annotation _Requires_lock_held_(m_vmmData.ReservationLock) or _No_competing_thread_
         // at function 'VmmSolvePageFault'.Otherwise it could be a race condition.Variable 'm_vmmData.ReservationList'
         // should be protected by lock 'm_vmmData.ReservationLock'
-#pragma warning(suppress: 26130)
+MSVC_WARNING_SUPPRESS(26130)
         if (CHECK_BOUNDS(FaultingAddress, 1, ReservationSpace->ReservationList, ReservationSpace->ReservedAreaSize))
         {
             LOG_TRACE_VMM("Faulting address 0x%X is in reservation area!\n", FaultingAddress);

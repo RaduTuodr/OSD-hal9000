@@ -14,7 +14,7 @@
 #include "cmd_basic.h"
 #include "boot_module.h"
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4029: declared formal parameter list different from definition
 #pragma warning(disable:4029)
@@ -26,7 +26,7 @@
 static FUNC_GenericCommand  _CmdPrintHelp;
 
 // warning C4212: nonstandard extension used: function declaration used ellipsis
-#pragma warning(push)
+WARNING_PUSH
 #pragma warning(disable:4212)
 
 typedef struct _COMMAND_DEFINITION
@@ -245,7 +245,7 @@ _CmdExecLine(
         }
 
         // warning C4127: conditional expression is constant
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
         while (TRUE)
         {
             pCurArg = (char*)strtok_s(&CommandLine[1], " ", &context);
@@ -328,4 +328,4 @@ _CmdExecuteModuleCommands(
     return bExit;
 }
 
-#pragma warning(pop)
+WARNING_POP

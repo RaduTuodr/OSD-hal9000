@@ -1,10 +1,12 @@
 #pragma once
 
+#include "cal_warning.h"
+
 #define ETH_INTERNAL_REG_SIZE                   4
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable:4201)
@@ -555,7 +557,7 @@ typedef union _RECEIVE_FILTER_CONTROL_REGISTER
         DWORD                   TcpAckAccelerateDisable         :  1;
 
         // 1b = The 82574L recognizes ACK packets according to the ACK bit in
-        // the TCP header + No –CP data
+        // the TCP header + No ï¿½CP data
         // 0b = The 82574L recognizes ACK packets according to the ACK bit
         // only.
         // This bit is relevant only if the ACKDIS bit is not set.
@@ -723,5 +725,5 @@ typedef union _TD_TAIL
 } TD_TAIL, *PTD_TAIL;
 STATIC_ASSERT(sizeof(TD_TAIL) == ETH_INTERNAL_REG_SIZE);
 
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)

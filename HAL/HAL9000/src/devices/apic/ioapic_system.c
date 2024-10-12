@@ -498,7 +498,7 @@ _IoApicSystemRetrieveIoApics(
     bRestartSearch = TRUE;
     pIoApic = NULL;
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         ASSERT(NULL == pIoApic);
@@ -582,7 +582,7 @@ _IoApicSystemRetrieveInterruptOverrides(
 
         noOfInterruptOverrides = 0;
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
         while (TRUE)
         {
             status = AcpiRetrieveNextInterruptOverride(bRestartSearch, &pEntry);
@@ -670,7 +670,7 @@ _IoApicSystemRetrievePrtEntries(
 
         noOfPrtEntries = 0;
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
         while (TRUE)
         {
             BYTE busNumber;
@@ -761,7 +761,7 @@ _IoApicSystemInitEntry(
     pIoApic->IrqBase = (BYTE) AcpiEntry->GlobalIrqBase;
 
     // warning C4312: 'type cast': conversion from 'const UINT32' to 'PHYSICAL_ADDRESS' of greater size
-#pragma warning(suppress:4312)
+MSVC_WARNING_SUPPRESS(4312)
     pIoApic->MappedAddress = IoMapMemory((PHYSICAL_ADDRESS)AcpiEntry->Address,
                                          PAGE_SIZE,
                                          PAGE_RIGHTS_READWRITE

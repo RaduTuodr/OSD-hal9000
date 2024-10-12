@@ -2,9 +2,9 @@
 
 #include "HAL9000.h"
 
-#pragma warning(push)
+WARNING_PUSH
 #include "acpi.h"
-#pragma warning(pop)
+WARNING_POP
 #include "mmu.h"
 #include "synch.h"
 #include "thread.h"
@@ -198,7 +198,7 @@ AcpiOsAcquireLock (
 
     // Warning C26165 Possibly failing to release lock
     // Because we can't modify the ACPICA headers we have nothing to do but suppress the warning
-#pragma warning(suppress: 26165)
+MSVC_WARNING_SUPPRESS(26165)
     return intrState;
 }
 #endif
@@ -213,12 +213,12 @@ AcpiOsReleaseLock (
 
     // Warning C26110 Caller failing to hold lock before calling function
     // Because we can't modify the ACPICA headers we have nothing to do but suppress the warning
-#pragma warning(suppress: 26110)
+MSVC_WARNING_SUPPRESS(26110)
     LockRelease(Handle, (INTR_STATE) Flags);
 
     // Warning C26167 Possibly releasing unheld lock
     // Because we can't modify the ACPICA headers we have nothing to do but suppress the warning
-#pragma warning(suppress: 26167)
+MSVC_WARNING_SUPPRESS(26167)
     return;
 }
 #endif

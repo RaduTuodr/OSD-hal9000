@@ -66,7 +66,7 @@ gets_s(
     // zero the buffer
     memzero(Buffer, BufferSize);
 
-#pragma warning(suppress:4127)
+MSVC_WARNING_SUPPRESS(4127)
     while (TRUE)
     {
         DispClearLine(LINES_PER_SCREEN - 1);
@@ -77,7 +77,7 @@ gets_s(
 
         // warning 6054: String 'Buffer' might not be zero-terminated
         // the memzero call outside the while loop zero-terminates the string
-#pragma warning(suppress: 6054)
+MSVC_WARNING_SUPPRESS(6054)
         DispPutBufferColor(Buffer, LINES_PER_SCREEN - 1, CMD_SHELL_SIZE, BRIGHT_CYAN_COLOR);
 
         key = getch();

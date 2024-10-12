@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_warning.h"
 #include "gdt.h"
 
 #define PREDEFINED_TSS_SIZE     104
@@ -8,7 +9,7 @@
 
 #pragma pack(push,1)
 
-#pragma warning(push)
+WARNING_PUSH
 
 //warning C4214: nonstandard extension used : bit field types other than int
 #pragma warning(disable:4214)
@@ -84,7 +85,7 @@ typedef struct _TSS_DESCRIPTOR
 
 } TSS_DESCRIPTOR, *PTSS_DESCRIPTOR;
 STATIC_ASSERT(sizeof(TSS_DESCRIPTOR) == PREDEFINED_TSS_DESC_SIZE);
-#pragma warning(pop)
+WARNING_POP
 #pragma pack(pop)
 
 //******************************************************************************
