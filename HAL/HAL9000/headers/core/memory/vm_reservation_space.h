@@ -2,6 +2,7 @@
 
 #include "mem_structures.h"
 #include "vmm.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 typedef struct _FILE_OBJECT *PFILE_OBJECT;
@@ -58,7 +59,7 @@ VmReservationSpaceFinishInit(
     INOUT                   PVMM_RESERVATION_SPACE  ReservationSpace
     );
 
-__forceinline
+ALWAYS_INLINE
 RET_NOT_NULL
 PVOID
 VmReservationSpaceDetermineNextFreeVirtualAddress(

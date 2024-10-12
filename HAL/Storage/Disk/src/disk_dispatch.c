@@ -1,8 +1,9 @@
 #include "disk_base.h"
 #include "disk_dispatch.h"
+#include "cal_annotate.h"
 
 STATUS
-(__cdecl DiskDispatchReadWrite)(
+(CDECL DiskDispatchReadWrite)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -42,7 +43,7 @@ STATUS
 }
 
 STATUS
-(__cdecl DiskDispatchDeviceControl)(
+(CDECL DiskDispatchDeviceControl)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )

@@ -1,5 +1,6 @@
 #include "um_lib_base.h"
 #include "um_lib_helper.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 #define LOG_BUF_MAX_SIZE                512
@@ -76,7 +77,7 @@ UmThreadCreate(
 
 static
 STATUS
-(__cdecl __start_thread)(
+(CDECL __start_thread)(
     IN_OPT      PVOID       Context
     )
 {

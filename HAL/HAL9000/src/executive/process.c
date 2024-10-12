@@ -8,6 +8,7 @@
 #include "um_application.h"
 #include "bitmap.h"
 #include "pte.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 typedef struct _PROCESS_SYSTEM_DATA
@@ -27,7 +28,7 @@ typedef struct _PROCESS_SYSTEM_DATA
 static PROCESS_SYSTEM_DATA m_processData;
 
 static
-__forceinline
+ALWAYS_INLINE
 PID
 _ProcessSystemRetrieveNextPid(
     void
@@ -45,7 +46,7 @@ _ProcessSystemRetrieveNextPid(
 }
 
 static
-__forceinline
+ALWAYS_INLINE
 void
 _ProcessSystemFreePid(
     IN      PID             ProcessId
@@ -60,7 +61,7 @@ _ProcessSystemFreePid(
     MutexRelease(&m_processData.PidBitmapLock);
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _ProcessReference(
@@ -72,7 +73,7 @@ _ProcessReference(
     RfcReference(&Process->RefCnt);
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _ProcessDereference(

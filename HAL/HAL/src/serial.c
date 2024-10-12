@@ -1,5 +1,6 @@
 #include "hal_base.h"
 #include "serial.h"
+#include "cal_annotate.h"
 
 // Serial Port Register Offsets
 #define     DATA_REG_OFFSET                 0x0     // Stores Data for both I&O
@@ -45,7 +46,7 @@
 // Returns:       void
 // Parameter:     IN BYTE Data - byte to output.
 //******************************************************************************
-__forceinline
+ALWAYS_INLINE
 static
 void 
 _SerialOut(

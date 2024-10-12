@@ -2,13 +2,14 @@
 #include "io.h"
 #include "filesystem.h"
 #include "iomu.h"
+#include "cal_annotate.h"
 
 #include "strutils.h"
 
 // X:\\ => minimum 3 letters to open root
 #define FILE_NAME_MIN_LEN               3
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _IoFreeFileObject(
@@ -20,7 +21,7 @@ _IoFreeFileObject(
     ExFreePoolWithTag(FileObject, HEAP_FILE_OBJECT_TAG);
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _IoAllocateFileObject(
@@ -50,7 +51,7 @@ _IoAllocateFileObject(
     StackLocation->FileObject = pFileObject;
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _IoIsFilePathValid(

@@ -7,6 +7,7 @@
 #include "dmp_process.h"
 #include "strutils.h"
 #include "test_process.h"
+#include "cal_annotate.h"
 
 typedef struct _PROC_STAT_CTX
 {
@@ -22,7 +23,7 @@ MSVC_WARNING_DISABLE(4212)
 // warning C4029: declared formal parameter list different from definition
 MSVC_WARNING_DISABLE(4029)
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _CmdHelperPrintProcessFunctions(
@@ -40,7 +41,7 @@ _CmdHelperPrintProcessFunctions(
 static FUNC_ListFunction _CmdProcessPrint;
 
 void
-(__cdecl CmdListProcesses)(
+(CDECL CmdListProcesses)(
     IN      QWORD       NumberOfParameters
     )
 {
@@ -59,7 +60,7 @@ void
 }
 
 void
-(__cdecl CmdProcessDump)(
+(CDECL CmdProcessDump)(
     IN      QWORD       NumberOfParameters,
     IN      char*       PidString
     )
@@ -83,7 +84,7 @@ void
 }
 
 void
-(__cdecl CmdStartProcess)(
+(CDECL CmdStartProcess)(
     IN          QWORD   NumberOfParameters,
     IN_Z        char*   ProcessPath
     )
@@ -109,7 +110,7 @@ void
 
 static
 STATUS
-(__cdecl _CmdProcessPrint) (
+(CDECL _CmdProcessPrint) (
     IN      PLIST_ENTRY     ListEntry,
     IN_OPT  PVOID           FunctionContext
     )
@@ -149,7 +150,7 @@ STATUS
 #include "test_common.h"
 
 void
-(__cdecl CmdTestProcess)(
+(CDECL CmdTestProcess)(
     IN          QWORD       NumberOfParameters,
     IN_Z        char*       TestName
     )

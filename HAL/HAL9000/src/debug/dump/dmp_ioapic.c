@@ -2,8 +2,9 @@
 #include "ioapic.h"
 #include "dmp_common.h"
 #include "../../HAL/headers/ioapic_registers.h"
+#include "cal_annotate.h"
 
-__forceinline
+ALWAYS_INLINE
 static
 const
 char*

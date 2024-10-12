@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "assert.h"
 #include "lock_common.h"
+#include "cal_annotate.h"
 
 #define ASSERT_BUFFER_SIZE              512
 
@@ -71,7 +72,7 @@ AssertSetFunction(
 }
 
 void
-(__cdecl _AssertDefaultFunction)(
+(CDECL _AssertDefaultFunction)(
     IN_Z            char*           Message
     )
 {

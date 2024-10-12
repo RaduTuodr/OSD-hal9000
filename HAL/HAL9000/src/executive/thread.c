@@ -10,6 +10,7 @@
 #include "isr.h"
 #include "gdtmu.h"
 #include "pe_exports.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 #define TID_INCREMENT               4
@@ -20,7 +21,7 @@ extern void ThreadStart();
 
 typedef
 void
-(__cdecl FUNC_ThreadSwitch)(
+(CDECL FUNC_ThreadSwitch)(
     OUT_PTR         PVOID*          OldStack,
     IN              PVOID           NewStack
     );
@@ -42,7 +43,7 @@ typedef struct _THREAD_SYSTEM_DATA
 
 static THREAD_SYSTEM_DATA m_threadSystemData;
 
-__forceinline
+ALWAYS_INLINE
 static
 TID
 _ThreadSystemGetNextTid(
@@ -901,7 +902,7 @@ _ThreadSetupInitialState(
 
     pStack = pStack - 1;
 
-    // warning C4054: 'type cast': from function pointer 'void (__cdecl *)(const PFUNC_ThreadStart,const PVOID)' to data pointer 'PVOID'
+    // warning C4054: 'type cast': from function pointer 'void (CDECL *)(const PFUNC_ThreadStart,const PVOID)' to data pointer 'PVOID'
 MSVC_WARNING_SUPPRESS(4054)
     *pStack = (PVOID) ThreadStart;
 
@@ -1077,7 +1078,7 @@ ThreadCleanupPostSchedule(
 
 static
 STATUS
-(__cdecl _IdleThread)(
+(CDECL _IdleThread)(
     IN_OPT      PVOID       Context
     )
 {

@@ -7,6 +7,7 @@
 #include "bitmap.h"
 #include "lapic_system.h"
 #include "synch.h"
+#include "cal_annotate.h"
 
 typedef struct _IO_APIC_INTERRUPT_OVERRIDE
 {
@@ -66,7 +67,7 @@ typedef struct _IO_APIC_SYSTEM_DATA
 
 static IO_APIC_SYSTEM_DATA m_ioApicData;
 
-__forceinline
+ALWAYS_INLINE
 static
 _Ret_maybenull_
 PIO_APIC_INTERRUPT_OVERRIDE

@@ -5,7 +5,7 @@ project(UefiBootloader LANGUAGES C)
 include(Flags)
 
 file(GLOB_RECURSE UEFI_APP_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.c ${CMAKE_CURRENT_LIST_DIR}/src/*.yasm)
-set(UEFI_APP_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/include/Uefi)
+set(UEFI_APP_INCLUDES ${CMAKE_SOURCE_DIR}/CompilerAbstraction/inc ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/include/Uefi)
 
 add_executable(BOOTX64.EFI ${UEFI_APP_SOURCES})
 target_include_directories(BOOTX64.EFI PRIVATE ${UEFI_APP_INCLUDES})

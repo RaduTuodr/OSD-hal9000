@@ -97,6 +97,7 @@
 C_HEADER_START
 #include "list.h"
 #include "ref_cnt.h"
+#include "cal_annotate.h"
 
 typedef struct _HASH_TABLE_DATA*    PHASH_TABLE_DATA;
 typedef struct _HASH_ITERATOR*      PHASH_ITERATOR;
@@ -106,7 +107,7 @@ typedef LIST_ENTRY                  HASH_ENTRY, *PHASH_ENTRY;
 
 typedef
 QWORD
-(__cdecl FUNC_HashFunction) (
+(CDECL FUNC_HashFunction) (
     IN_READS_BYTES(KeyLength)   PHASH_KEY   Key,
     IN                          DWORD       KeyLength,
     IN                          DWORD       MaxKeys

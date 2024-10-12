@@ -17,6 +17,7 @@
 #include "thread_internal.h"
 #include "io.h"
 #include "mdl.h"
+#include "cal_annotate.h"
 
 #define PAGING_STRUCTURES_BASE_MEMORY                           (128*KB_SIZE)
 
@@ -243,7 +244,7 @@ _MmuDestroyPagingTables(
 
 static FUNC_ThreadStart                 _MmuZeroWorkerThreadFunction;
 
-__forceinline
+ALWAYS_INLINE
 static
 DWORD
 _MmuCalculateReservedFrames(

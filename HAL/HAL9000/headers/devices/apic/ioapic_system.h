@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "apic_common.h"
 
 _No_competing_thread_
@@ -59,7 +60,7 @@ IoApicGetInterruptLineForPciDevice(
     IN      struct _PCI_DEVICE_DESCRIPTION* PciDevice
     );
 
-__declspec(deprecated)
+DEPRECATED
 void
 IoApicSystemSendEOI(
     IN      BYTE                Vector

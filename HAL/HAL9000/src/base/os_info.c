@@ -4,6 +4,7 @@
 #include "os_time.h"
 #include "rtc.h"
 #include "iomu.h"
+#include "cal_annotate.h"
 
 #define TIME_BUFFER_SIZE                    100
 
@@ -112,7 +113,7 @@ _OsInfoUpdateTime(
 }
 
 BOOLEAN
-(__cdecl OsInfoTimeUpdateIsr)(
+(CDECL OsInfoTimeUpdateIsr)(
     IN      PDEVICE_OBJECT  Device
     )
 {

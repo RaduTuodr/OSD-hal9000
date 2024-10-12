@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_annotate.h"
+
 typedef QWORD       TID, *PTID;
 
 typedef enum _THREAD_PRIORITY
@@ -14,7 +16,7 @@ typedef struct _THREAD* PTHREAD;
 
 typedef
 STATUS
-(__cdecl FUNC_ThreadStart)(
+(CDECL FUNC_ThreadStart)(
     IN_OPT      PVOID       Context
     );
 

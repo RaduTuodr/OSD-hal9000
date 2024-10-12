@@ -1,10 +1,11 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_annotate.h"
 
 static
 STATUS
-(__cdecl _ThreadFunc)(
+(CDECL _ThreadFunc)(
     IN_OPT      PVOID       Context
     )
 {
@@ -34,7 +35,7 @@ __main(
 
     __try
     {
-        //  warning C4054: 'type cast': from function pointer 'STATUS (__cdecl *)(const PVOID)' to data pointer 'PVOID'
+        //  warning C4054: 'type cast': from function pointer 'STATUS (CDECL *)(const PVOID)' to data pointer 'PVOID'
 MSVC_WARNING_SUPPRESS(4054)
         status = UmThreadCreate(_ThreadFunc, (PVOID)_ThreadFunc, &hThread);
         if (!SUCCEEDED(status))

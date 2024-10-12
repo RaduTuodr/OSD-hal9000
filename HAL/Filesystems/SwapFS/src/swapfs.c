@@ -1,5 +1,6 @@
 #include "swapfs_base.h"
 #include "swapfs.h"
+#include "cal_annotate.h"
 
 static FUNC_DriverDispatch     _SwapFsCreate;
 static FUNC_DriverDispatch     _SwapFsClose;
@@ -14,7 +15,7 @@ typedef struct _SWAPFS_DATA
 } SWAPFS_DATA, *PSWAPFS_DATA;
 
 STATUS
-(__cdecl SwapFsDriverEntry)(
+(CDECL SwapFsDriverEntry)(
     INOUT       PDRIVER_OBJECT      DriverObject
     )
 {
@@ -160,7 +161,7 @@ STATUS
 
 static
 STATUS
-(__cdecl _SwapFsCreate)(
+(CDECL _SwapFsCreate)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -212,7 +213,7 @@ STATUS
 
 static
 STATUS
-(__cdecl _SwapFsClose)(
+(CDECL _SwapFsClose)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -232,7 +233,7 @@ STATUS
 
 static
 STATUS
-(__cdecl _SwapFsRead)(
+(CDECL _SwapFsRead)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -295,7 +296,7 @@ STATUS
 
 static
 STATUS
-(__cdecl _SwapFsWrite)(
+(CDECL _SwapFsWrite)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )

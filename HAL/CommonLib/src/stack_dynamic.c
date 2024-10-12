@@ -1,5 +1,6 @@
 #include "common_lib.h"
 #include "stack_dynamic.h"
+#include "cal_annotate.h"
 
 typedef struct _STACK
 {
@@ -9,7 +10,7 @@ typedef struct _STACK
 } STACK, *PSTACK;
 
 BOOLEAN
-(__cdecl StackDynamicPush)(
+(CDECL StackDynamicPush)(
     INOUT   PSTACK          Stack,
     IN      PSTACK_ITEM     Item
     )
@@ -28,7 +29,7 @@ BOOLEAN
 _Must_inspect_result_
 _Success_(return != NULL)
 STACK_ITEM*
-(__cdecl StackDynamicPop)(
+(CDECL StackDynamicPop)(
     INOUT   PSTACK          Stack
     )
 {
@@ -47,7 +48,7 @@ STACK_ITEM*
 _Must_inspect_result_
 _Success_(return != NULL)
 STACK_ITEM*
-(__cdecl StackDynamicPeek)(
+(CDECL StackDynamicPeek)(
     IN      PSTACK          Stack,
     IN      DWORD           Index
     )
@@ -75,7 +76,7 @@ STACK_ITEM*
 }
 
 void
-(__cdecl StackDynamicClear)(
+(CDECL StackDynamicClear)(
     INOUT   PSTACK              Stack,
     IN_OPT  PFUNC_FreeFunction  FreeFunction,
     IN_OPT  PVOID               FreeContext
@@ -97,7 +98,7 @@ void
 
 
 BOOLEAN
-(__cdecl StackDynamicIsEmpty)(
+(CDECL StackDynamicIsEmpty)(
     INOUT   PSTACK          Stack
     )
 {
@@ -107,7 +108,7 @@ BOOLEAN
 }
 
 DWORD
-(__cdecl StackDynamicSize)(
+(CDECL StackDynamicSize)(
     INOUT   PSTACK          Stack
     )
 {

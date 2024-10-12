@@ -1,6 +1,7 @@
 #include "fat32_base.h"
 #include "fat32.h"
 #include "fat_operations.h"
+#include "cal_annotate.h"
 
 FUNC_DriverDispatch     _FatDispatchCreate;
 FUNC_DriverDispatch     _FatDispatchClose;
@@ -19,7 +20,7 @@ typedef struct _FCB
 } FCB, *PFCB;
 
 STATUS
-(__cdecl FatDriverEntry)(
+(CDECL FatDriverEntry)(
     INOUT       PDRIVER_OBJECT      DriverObject
     )
 {
@@ -172,7 +173,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _FatDispatchCreate)(
+(CDECL _FatDispatchCreate)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -270,7 +271,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _FatDispatchClose)(
+(CDECL _FatDispatchClose)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -311,7 +312,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _FatDispatchReadWrite)(
+(CDECL _FatDispatchReadWrite)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -392,7 +393,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _FatDispatchQueryInformation)(
+(CDECL _FatDispatchQueryInformation)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -445,7 +446,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _FatDispatchDirectoryControl)(
+(CDECL _FatDispatchDirectoryControl)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )

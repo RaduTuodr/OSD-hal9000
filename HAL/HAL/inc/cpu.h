@@ -5,10 +5,11 @@
 #include "hw_fpu.h"
 #include "cpuid_leaf.h"
 #include "cpu_if.h"
+#include "cal_annotate.h"
 
 typedef
 QWORD
-(__cdecl FUNC_ReadFsQword)(
+(CDECL FUNC_ReadFsQword)(
     IN              DWORD           Offset
     );
 

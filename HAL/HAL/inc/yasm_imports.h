@@ -1,10 +1,11 @@
 #pragma once
 
 #include "gdt.h"
+#include "cal_annotate.h"
 
 typedef
 void
-(__cdecl FUNC_Magic) (
+(CDECL FUNC_Magic) (
     void
     );
 
@@ -17,7 +18,7 @@ extern FUNC_Magic       __magic;
 
 typedef
 void
-(__cdecl FUNC_StiAndHlt) (
+(CDECL FUNC_StiAndHlt) (
    void
    );
 
@@ -30,7 +31,7 @@ extern FUNC_StiAndHlt   __sti_and_hlt;
 
 typedef 
 void
-(__cdecl FUNC_LoadTR ) (
+(CDECL FUNC_LoadTR ) (
     IN       WORD       GdtIndex               
     );
 
@@ -44,7 +45,7 @@ extern FUNC_LoadTR      __ltr;
 
 typedef
 void
-(__cdecl FUNC_StoreGDT) (
+(CDECL FUNC_StoreGDT) (
     OUT     PGDT        Gdt
     );
 
@@ -58,7 +59,7 @@ extern FUNC_StoreGDT    __sgdt;
 
 typedef
 void
-(__cdecl FUNC_ChangeStack)(
+(CDECL FUNC_ChangeStack)(
     IN  PVOID       InitialStackBase,
     IN  PVOID       NewStackBase
     );

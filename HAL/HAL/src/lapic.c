@@ -3,8 +3,9 @@
 #include "pit.h"
 #include "msr.h"
 #include "lapic_registers.h"
+#include "cal_annotate.h"
 
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _LapicIsCpuBsp(

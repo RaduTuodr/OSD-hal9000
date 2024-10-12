@@ -1,5 +1,6 @@
 #include "common_lib.h"
 #include "list.h"
+#include "cal_annotate.h"
 
 //  Valid list state:
 //  |---------| Flink |---------| Flink |---------|
@@ -8,7 +9,7 @@
 //  |         |<------|         |<------|         |
 //  |---------|       |---------|       |---------|
 static
-__forceinline
+ALWAYS_INLINE
 BOOLEAN
 _ValidateListEntry(
     IN  PLIST_ENTRY Entry

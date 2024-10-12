@@ -1,6 +1,7 @@
 #include "volume_base.h"
 #include "volume.h"
 #include "volume_dispatch.h"
+#include "cal_annotate.h"
 
 static
 STATUS
@@ -11,7 +12,7 @@ _VolInitialize(
     );
 
 STATUS
-(__cdecl VolDriverEntry)(
+(CDECL VolDriverEntry)(
     INOUT       PDRIVER_OBJECT      DriverObject
     )
 {

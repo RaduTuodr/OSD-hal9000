@@ -1,10 +1,11 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "display.h"
 
 typedef
 void
-(__cdecl FUNC_PrintFunction)(
+(CDECL FUNC_PrintFunction)(
     IN_Z    char*   Format,
     ...
     );

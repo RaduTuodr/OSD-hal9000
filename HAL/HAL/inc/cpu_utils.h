@@ -1,6 +1,8 @@
 #pragma once
 
-__forceinline
+#include "cal_annotate.h"
+
+ALWAYS_INLINE
 extern
 void
 CpuClearDirectionFlag(
@@ -10,7 +12,7 @@ CpuClearDirectionFlag(
     __writeeflags(__readeflags() & (~RFLAGS_DIRECTION_BIT));
 }
 
-__forceinline
+ALWAYS_INLINE
 extern
 INTR_STATE
 CpuIntrGetState(
@@ -20,7 +22,7 @@ CpuIntrGetState(
     return IsBooleanFlagOn(__readeflags(), RFLAGS_INTERRUPT_FLAG_BIT);
 }
 
-__forceinline
+ALWAYS_INLINE
 extern
 INTR_STATE
 CpuIntrSetState(
@@ -35,7 +37,7 @@ CpuIntrSetState(
     return IsBooleanFlagOn(rFlags, RFLAGS_INTERRUPT_FLAG_BIT);
 }
 
-__forceinline
+ALWAYS_INLINE
 extern
 INTR_STATE
 CpuIntrDisable(
@@ -45,7 +47,7 @@ CpuIntrDisable(
     return CpuIntrSetState(FALSE);
 }
 
-__forceinline
+ALWAYS_INLINE
 extern
 INTR_STATE
 CpuIntrEnable(
@@ -57,7 +59,7 @@ CpuIntrEnable(
 
 typedef BYTE APIC_ID;
 
-__forceinline
+ALWAYS_INLINE
 extern
 APIC_ID
 CpuGetApicId(
@@ -71,7 +73,7 @@ CpuGetApicId(
     return cpuId.FeatureInformation.ebx.ApicId;
 }
 
-__forceinline
+ALWAYS_INLINE
 extern
 BOOLEAN
 CpuIsIntel(

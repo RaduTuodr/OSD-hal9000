@@ -1,9 +1,10 @@
 #include "HAL9000.h"
 #include "io.h"
 #include "system_driver.h"
+#include "cal_annotate.h"
 
 STATUS
-(__cdecl SystemDriverEntry)(
+(CDECL SystemDriverEntry)(
     INOUT       PDRIVER_OBJECT      DriverObject
     )
 {

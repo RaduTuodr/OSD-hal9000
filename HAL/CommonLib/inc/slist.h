@@ -1,12 +1,15 @@
 #pragma once
 
 C_HEADER_START
+
+#include "cal_annotate.h"
+
 typedef struct _CL_SLIST_ENTRY
 {
     struct _CL_SLIST_ENTRY*    Next;
 } CL_SLIST_ENTRY, *PCL_SLIST_ENTRY;
 
-__forceinline
+ALWAYS_INLINE
 void
 ClInitializeSListHead(
     OUT     PCL_SLIST_ENTRY ListHead
@@ -15,7 +18,7 @@ ClInitializeSListHead(
     ListHead->Next = NULL;
 }
 
-__forceinline
+ALWAYS_INLINE
 PCL_SLIST_ENTRY
 ClPopEntryList(
     INOUT PCL_SLIST_ENTRY ListHead
@@ -32,7 +35,7 @@ ClPopEntryList(
     return FirstEntry;
 }
 
-__forceinline
+ALWAYS_INLINE
 void
 ClPushEntryList(
     INOUT PCL_SLIST_ENTRY ListHead,

@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_annotate.h"
 
 FUNC_ThreadStart _HelloWorldFromThread;
 
@@ -59,7 +60,7 @@ __main(
 }
 
 STATUS
-(__cdecl _HelloWorldFromThread)(
+(CDECL _HelloWorldFromThread)(
     IN_OPT      PVOID       Context
     )
 {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "apic_common.h"
 
 #define IO_APIC_VERSION_PCI_22_COMPLIANT        0x20
@@ -48,7 +49,7 @@ IoApicSetRedirectionTableEntryMask(
     IN      BOOLEAN                 Masked
     );
 
-__declspec(deprecated)
+DEPRECATED
 void
 IoApicSendEOI(
     IN      PVOID                   IoApic,

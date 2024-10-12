@@ -1,6 +1,7 @@
 #include "HAL9000.h"
 #include "cmd_fs_helper.h"
 
+#include "cal_annotate.h"
 #include "display.h"
 #include "print.h"
 #include "io.h"
@@ -35,7 +36,7 @@ _ListDirectory(
     );
 
 void
-(__cdecl CmdStatFile)(
+(CDECL CmdStatFile)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       File
     )
@@ -138,7 +139,7 @@ void
 }
 
 void
-(__cdecl CmdMakeDirectory)(
+(CDECL CmdMakeDirectory)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       File
     )
@@ -184,7 +185,7 @@ void
 }
 
 void
-(__cdecl CmdMakeFile)(
+(CDECL CmdMakeFile)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       File
     )
@@ -232,7 +233,7 @@ void
 }
 
 void
-(__cdecl CmdListDirectory)(
+(CDECL CmdListDirectory)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       File,
     IN_Z    char*       Recursive
@@ -245,7 +246,7 @@ void
 }
 
 void
-(__cdecl CmdReadFile)(
+(CDECL CmdReadFile)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       File,
     IN_Z    char*       Async
@@ -370,7 +371,7 @@ void
 }
 
 void
-(__cdecl CmdWriteFile)(
+(CDECL CmdWriteFile)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       File,
     IN_Z    char*       CharToWrite,
@@ -507,7 +508,7 @@ void
 }
 
 void
-(__cdecl CmdSwap)(
+(CDECL CmdSwap)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       Operation,
     IN_Z    char*       OffsetString

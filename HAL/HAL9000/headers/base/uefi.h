@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "data_type.h"
 
 // I could not include all of UEFI because of macro and type redefinitions
@@ -60,7 +61,7 @@
 
 
 
-#define EFIAPI __cdecl
+#define EFIAPI MS_ABI CDECL
 
 typedef VOID *EFI_HANDLE;
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "cal_warning.h"
 
 WARNING_PUSH
@@ -30,13 +31,13 @@ typedef struct _EXCEPTION_RECORD         // 7 elements, 0x98 bytes (sizeof)
     /*0x020*/     QWORD       ExceptionInformation[15];
 }EXCEPTION_RECORD, *PEXCEPTION_RECORD;
 
-typedef struct __declspec(align(16)) _M128A
+typedef struct ALIGN(16) _M128A
 {
     ULONGLONG Low;
     LONGLONG High;
 } M128A, *PM128A;
 
-typedef struct __declspec(align(16)) _XSAVE_FORMAT
+typedef struct ALIGN(16) _XSAVE_FORMAT
 {
     WORD   ControlWord;
     WORD   StatusWord;

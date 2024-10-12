@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_annotate.h"
+
 typedef struct _PERFORMANCE_STATS
 {
     QWORD               Mean;
@@ -9,7 +11,7 @@ typedef struct _PERFORMANCE_STATS
 
 typedef
 void
-(__cdecl FUNC_TestPerformance)(
+(CDECL FUNC_TestPerformance)(
     IN_OPT  PVOID       Context
     );
 

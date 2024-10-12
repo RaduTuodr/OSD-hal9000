@@ -1,11 +1,12 @@
 #include "ata_base.h"
 #include "ata_dispatch.h"
 #include "ata_operations.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 #define LBA48_MAX_VALUE                 0x0000'FFFF'FFFF'FFFFULL
 
-__forceinline
+ALWAYS_INLINE
 static
 STATUS
 _AtaCheckAlignment(
@@ -26,7 +27,7 @@ _AtaCheckAlignment(
     return STATUS_SUCCESS;
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 STATUS
 _AtaCheckIOParameters(
@@ -64,7 +65,7 @@ _AtaCheckIOParameters(
 }
 
 STATUS
-(__cdecl AtaDispatchReadWrite)(
+(CDECL AtaDispatchReadWrite)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -157,7 +158,7 @@ STATUS
 }
 
 STATUS
-(__cdecl AtaDispatchDeviceControl)(
+(CDECL AtaDispatchDeviceControl)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )

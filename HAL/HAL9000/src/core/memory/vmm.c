@@ -10,6 +10,7 @@
 #include "thread_internal.h"
 #include "process_internal.h"
 #include "mdl.h"
+#include "cal_annotate.h"
 
 #define VMM_SIZE_FOR_RESERVATION_METADATA            (5*TB_SIZE)
 
@@ -26,7 +27,7 @@ typedef struct _VMM_DATA
 
 typedef
 BOOLEAN
-(__cdecl FUNC_PageWalkCallback)(
+(CDECL FUNC_PageWalkCallback)(
     IN      PML4                    Cr3,
     IN      PVOID                   PageTable,
     IN      PVOID                   VirtualAddress,
@@ -97,7 +98,7 @@ static FUNC_PageWalkCallback            _VmMapPage;
 static FUNC_PageWalkCallback            _VmUnmapPage;
 static FUNC_PageWalkCallback            _VmRetrievePhyAccess;
 
-__forceinline
+ALWAYS_INLINE
 static
 PHYSICAL_ADDRESS
 _VmRetrieveNextPhysicalAddressForPagingStructure(
@@ -119,7 +120,7 @@ _VmRetrieveNextPhysicalAddressForPagingStructure(
     return (PHYSICAL_ADDRESS) nextAddress;
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _VmIsKernelAddress(
@@ -129,7 +130,7 @@ _VmIsKernelAddress(
     return IsBooleanFlagOn((QWORD)Address, (QWORD)1 << VA_HIGHEST_VALID_BIT);
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _VmIsKernelRange(
@@ -143,7 +144,7 @@ _VmIsKernelRange(
     return _VmIsKernelAddress(Address) || _VmIsKernelAddress(PtrOffset(Address, RangeSize - 1));
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 PTR_SUCCESS
 PVMM_RESERVATION_SPACE
@@ -1163,7 +1164,7 @@ _VmWalkPagingTables(
 
 static
 BOOLEAN
-(__cdecl _VmMapPage)(
+(CDECL _VmMapPage)(
     IN      PML4                    Cr3,
     IN      PVOID                   PageTable,
     IN      PVOID                   VirtualAddress,
@@ -1218,7 +1219,7 @@ BOOLEAN
 
 static
 BOOLEAN
-(__cdecl _VmUnmapPage)(
+(CDECL _VmUnmapPage)(
     IN      PML4                    Cr3,
     IN      PVOID                   PageTable,
     IN      PVOID                   VirtualAddress,
@@ -1264,7 +1265,7 @@ BOOLEAN
 
 static
 BOOLEAN
-(__cdecl _VmRetrievePhyAccess)(
+(CDECL _VmRetrievePhyAccess)(
     IN      PML4                    Cr3,
     IN      PVOID                   PageTable,
     IN      PVOID                   VirtualAddress,

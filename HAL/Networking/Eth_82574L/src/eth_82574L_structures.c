@@ -1,6 +1,7 @@
 #include "eth_82574L_base.h"
+#include "cal_annotate.h"
 
-__forceinline
+ALWAYS_INLINE
 WORD
 _EthTransformMicrosecondsTo1Dot024(
     IN      WORD                Microseconds
@@ -15,7 +16,7 @@ _EthTransformMicrosecondsTo1Dot024(
     return (WORD) result;
 }
 
-__forceinline
+ALWAYS_INLINE
 WORD
 _EthTransform1Dot024ToMicroseconds(
     IN      WORD                DotResult

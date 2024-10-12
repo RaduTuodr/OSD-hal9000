@@ -13,6 +13,7 @@
 #include "cmd_net_helper.h"
 #include "cmd_basic.h"
 #include "boot_module.h"
+#include "cal_annotate.h"
 
 WARNING_PUSH
 
@@ -274,7 +275,7 @@ MSVC_WARNING_SUPPRESS(4127)
 
 static
 void
-(__cdecl _CmdPrintHelp)(
+(CDECL _CmdPrintHelp)(
     IN      QWORD           NumberOfParameters
     )
 {

@@ -2,8 +2,9 @@
 #include "eth_82574L_operations.h"
 #include "eth_eeprom.h"
 #include "network_port.h"
+#include "cal_annotate.h"
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _EthChangeRxStatus(
@@ -20,7 +21,7 @@ _EthChangeRxStatus(
     EthSetRxControlRegister(Device, ctrlRegister);
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _EthChangeTxStatus(

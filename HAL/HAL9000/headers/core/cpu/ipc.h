@@ -1,10 +1,11 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "ref_cnt.h"
 
 typedef
 STATUS
-(__cdecl FUNC_IpcProcessEvent)(
+(CDECL FUNC_IpcProcessEvent)(
     IN_OPT  PVOID   Context
     );
 

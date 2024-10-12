@@ -1,6 +1,7 @@
 #include "network_port_base.h"
 #include "network_dispatch.h"
 #include "ex.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 static
@@ -134,7 +135,7 @@ NetPortDeviceControl(
 }
 
 STATUS
-(__cdecl NetPortTransmitFunction)(
+(CDECL NetPortTransmitFunction)(
     IN_OPT      PVOID       Context
     )
 {

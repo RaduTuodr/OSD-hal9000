@@ -1,8 +1,9 @@
 #include "network_port_base.h"
 #include "network_dispatch.h"
 #include "ex.h"
+#include "cal_annotate.h"
 
-__forceinline
+ALWAYS_INLINE
 void
 _NetworkPortPreinitBuffers(
     OUT         PPORT_BUFFERS           Buffers
@@ -14,7 +15,7 @@ _NetworkPortPreinitBuffers(
     InitializeListHead(&Buffers->FramesList);
 }
 
-__forceinline
+ALWAYS_INLINE
 void
 _NetworkPortDeviceInitBuffers(
     OUT         PPORT_BUFFERS           PortBuffers,

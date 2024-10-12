@@ -9,10 +9,11 @@
 #include "mmu.h"
 #include "vmm.h"
 #include "os_time.h"
+#include "cal_annotate.h"
 
 /// TODO: These function calls cross trust boundaries, validate parameters
 /// and do not ASSERT
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _IoIsValidDeviceType(

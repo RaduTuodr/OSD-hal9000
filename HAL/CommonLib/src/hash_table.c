@@ -1,5 +1,6 @@
 #include "common_lib.h"
 #include "hash_table.h"
+#include "cal_annotate.h"
 
 WARNING_PUSH
 
@@ -23,7 +24,7 @@ typedef struct _HASH_ELEM_SEARCH_CTX
 } HASH_ELEM_SEARCH_CTX, *PHASH_ELEM_SEARCH_CTX;
 
 static
-__forceinline
+ALWAYS_INLINE
 PHASH_KEY
 _HashTableObtainKeyAddress(
     IN      PHASH_TABLE         HashTable,
@@ -37,7 +38,7 @@ _HashTableObtainKeyAddress(
 }
 
 static
-__forceinline
+ALWAYS_INLINE
 BOOLEAN
 _HashTableSearchKeyInBucket(
     IN      PHASH_TABLE         HashTable,
@@ -294,7 +295,7 @@ HashTableIteratorNext(
 }
 
 QWORD
-(__cdecl HashFuncGenericIncremental) (
+(CDECL HashFuncGenericIncremental) (
     IN_READS_BYTES(KeyLength)   PHASH_KEY   Key,
     IN                          DWORD       KeyLength,
     IN                          DWORD       MaxKeys
@@ -319,7 +320,7 @@ STATIC_ASSERT_INFO(HASH_UNIVERSAL_P <= (MAX_QWORD / HASH_UNIVERSAL_A) - HASH_UNI
     "If hash HASH_UNIVERSAL_P is too big we may have an OF, see assert in HashFuncUniversal");
 
 QWORD
-(__cdecl HashFuncUniversal) (
+(CDECL HashFuncUniversal) (
     IN_READS_BYTES(KeyLength)   PHASH_KEY   Key,
     IN                          DWORD       KeyLength,
     IN                          DWORD       MaxKeys
@@ -349,7 +350,7 @@ QWORD
 
 static
 INT64
-(__cdecl _HashTableSearchElem) (
+(CDECL _HashTableSearchElem) (
     IN      PLIST_ENTRY     FirstElem,
     IN      PLIST_ENTRY     SecondElem,
     IN_OPT  PVOID           Context

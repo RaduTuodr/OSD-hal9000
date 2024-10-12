@@ -1,7 +1,8 @@
 #include "common_lib.h"
 #include "strutils.h"
+#include "cal_annotate.h"
 
-__forceinline
+ALWAYS_INLINE
 void
 swap(
     INOUT   BYTE* a,

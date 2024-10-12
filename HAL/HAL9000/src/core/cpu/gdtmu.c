@@ -2,6 +2,7 @@
 #include "tss.h"
 #include "gdtmu.h"
 #include "gdt.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 static volatile WORD m_selectorIndex = 0;
@@ -9,7 +10,7 @@ static volatile WORD m_selectorIndex = 0;
 #define FIRST_SELECTOR_INDEX                    0x8
 
 static
-__forceinline
+ALWAYS_INLINE
 WORD
 _GdtMuRetrieveNextSelectorIndex(
     IN      BOOLEAN         SystemDescriptor

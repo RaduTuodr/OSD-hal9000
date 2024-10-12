@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "cal_warning.h"
 
 #include "time.h"
@@ -114,7 +115,7 @@ typedef struct _DEVICE_OBJECT
 
 typedef
 BOOLEAN
-(__cdecl FUNC_InterruptFunction)(
+(CDECL FUNC_InterruptFunction)(
     IN      PDEVICE_OBJECT  Device
     );
 
@@ -233,7 +234,7 @@ struct _MDL
 
 typedef
 STATUS
-(__cdecl FUNC_DriverDispatch)(
+(CDECL FUNC_DriverDispatch)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     );
@@ -255,7 +256,7 @@ typedef struct _DRIVER_OBJECT
 
 typedef
 STATUS
-(__cdecl FUNC_DriverEntry)(
+(CDECL FUNC_DriverEntry)(
     INOUT       PDRIVER_OBJECT      DriverObject
     );
 

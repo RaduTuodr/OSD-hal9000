@@ -2,6 +2,7 @@
 #include "disk.h"
 #include "mbr.h"
 #include "disk_dispatch.h"
+#include "cal_annotate.h"
 
 static
 STATUS
@@ -28,7 +29,7 @@ _DiskRetrievePartitionsFromDiskStartingAtOffset(
     );
 
 STATUS
-(__cdecl DiskDriverEntry)(
+(CDECL DiskDriverEntry)(
     INOUT       PDRIVER_OBJECT      DriverObject
     )
 {

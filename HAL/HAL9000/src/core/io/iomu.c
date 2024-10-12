@@ -24,6 +24,7 @@
 #include "smp.h"
 #include "ex_system.h"
 #include "lock_common.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 #define PIC_MASTER_OFFSET                   0x20
@@ -37,7 +38,7 @@ WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
 MSVC_WARNING_DISABLE(4201)
-typedef union __declspec(align(8)) _UPTIME
+typedef union ALIGN(8) _UPTIME
 {
     struct
     {
@@ -127,7 +128,7 @@ static FUNC_CompareFunction     _VpbCompareFunction;
 static FUNC_IsrRoutine          _IomuGenericInterrupt;
 static FUNC_InterruptFunction   _IomuSystemTickInterrupt;
 
-__forceinline
+ALWAYS_INLINE
 char
 static
 _IomuGetNextVolumeLetter(
@@ -144,7 +145,7 @@ _IomuGetNextVolumeLetter(
 }
 
 static
-__forceinline
+ALWAYS_INLINE
 void
 _IomuUpdateSystemTime(
     void
@@ -1064,7 +1065,7 @@ IomuIsInterruptSpurious(
 
 static
 INT64
-(__cdecl _VpbCompareFunction) (
+(CDECL _VpbCompareFunction) (
     IN      PLIST_ENTRY     FirstElem,
     IN      PLIST_ENTRY     SecondElem,
     IN_OPT  PVOID           Context
@@ -1085,7 +1086,7 @@ INT64
 
 static
 BOOLEAN
-(__cdecl _IomuGenericInterrupt)(
+(CDECL _IomuGenericInterrupt)(
     IN_OPT      PVOID           Context
     )
 {
@@ -1127,7 +1128,7 @@ MSVC_WARNING_SUPPRESS(4305)
 
 static
 BOOLEAN
-(__cdecl _IomuSystemTickInterrupt)(
+(CDECL _IomuSystemTickInterrupt)(
     IN        PDEVICE_OBJECT           Device
     )
 {

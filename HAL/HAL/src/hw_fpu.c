@@ -1,12 +1,13 @@
 #include "hal_base.h"
 #include "hw_fpu.h"
 #include "cpu.h"
+#include "cal_annotate.h"
 
 // The pragma optimize off is required for all the functions which are called from
 // HalActivateFpu - this is because we don't want the compiler to generate any SSE
 // instructions before we actually enabled the FP unit :)
 #pragma optimize( "", off )
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _HalCheckBasicFpuFeatures(
@@ -31,7 +32,7 @@ _HalCheckBasicFpuFeatures(
             );
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _HalEnableFpu(
@@ -66,7 +67,7 @@ HalActivateFpu(
 }
 #pragma optimize( "", on )
 
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _HalCheckRequestedFpuFeatures(
@@ -91,7 +92,7 @@ _HalCheckRequestedFpuFeatures(
     );
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _HalSetRequestedFpuFeatures(
@@ -101,7 +102,7 @@ _HalSetRequestedFpuFeatures(
     _xsetbv(XCR0_INDEX, Features);
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _HalCheckEnabledFeaturesSaveSize(

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "cal_warning.h"
 
 #include "register.h"
@@ -125,7 +126,7 @@ CpuMuActivateFpuFeatures(
     void
     );
 
-__forceinline
+ALWAYS_INLINE
 IRQL
 CpuMuRaiseIrql(
     IN IRQL Irql
@@ -141,7 +142,7 @@ CpuMuRaiseIrql(
     return prevIrql;
 }
 
-__forceinline
+ALWAYS_INLINE
 IRQL
 CpuMuLowerIrql(
     IN IRQL Irql
@@ -159,7 +160,7 @@ CpuMuLowerIrql(
 
 #define CURRENT_CPU_MASK        0x8000'0000'0000'0000ULL
 
-__forceinline
+ALWAYS_INLINE
 extern
 PVOID
 CpuGetCurrent(void)

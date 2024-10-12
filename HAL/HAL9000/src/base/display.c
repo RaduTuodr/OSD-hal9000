@@ -1,6 +1,7 @@
 #include "HAL9000.h"
 #include "display.h"
 #include "display_internal.h"
+#include "cal_annotate.h"
 
 #pragma pack(push,1)
 typedef struct _SCREEN_CHARACTER
@@ -214,7 +215,7 @@ _DispClearFrameBuffer(
     }
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _DispPutCharFrameBuffer(

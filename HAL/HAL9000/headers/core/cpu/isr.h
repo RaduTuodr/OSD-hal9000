@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_annotate.h"
+
 #pragma pack(push)
 #pragma pack(1)
 typedef struct _INTERRUPT_STACK
@@ -20,7 +22,7 @@ typedef struct _INTERRUPT_STACK_COMPLETE
 
 typedef
 BOOLEAN
-(__cdecl FUNC_IsrRoutine)(
+(CDECL FUNC_IsrRoutine)(
     IN_OPT  PVOID               Context
     );
 

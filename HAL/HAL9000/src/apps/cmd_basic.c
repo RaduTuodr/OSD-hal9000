@@ -6,6 +6,7 @@
 #include "iomu.h"
 #include "test_common.h"
 #include "strutils.h"
+#include "cal_annotate.h"
 
 void
 CmdPrintVolumeInformation(
@@ -63,7 +64,7 @@ CmdRangeFail(
 }
 
 void
-(__cdecl CmdBiteCookie)(
+(CDECL CmdBiteCookie)(
     IN      QWORD           NumberOfParameters
     )
 {
@@ -75,7 +76,7 @@ void
 }
 
 void
-(__cdecl CmdLogSetState)(
+(CDECL CmdLogSetState)(
     IN      QWORD           NumberOfParameters,
     IN      char*           LogState
     )
@@ -86,7 +87,7 @@ void
 }
 
 void
-(__cdecl CmdSetLogLevel)(
+(CDECL CmdSetLogLevel)(
     IN      QWORD           NumberOfParameters,
     IN      char*           LogLevelString
     )
@@ -108,7 +109,7 @@ void
 }
 
 void
-(__cdecl CmdSetLogComponents)(
+(CDECL CmdSetLogComponents)(
     IN      QWORD           NumberOfParameters,
     IN      char*           LogComponentsString
     )
@@ -125,7 +126,7 @@ void
 }
 
 void
-(__cdecl CmdClearScreen)(
+(CDECL CmdClearScreen)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -135,7 +136,7 @@ void
 }
 
 void
-(__cdecl CmdRunAllFunctionalTests)(
+(CDECL CmdRunAllFunctionalTests)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -145,7 +146,7 @@ void
 }
 
 void
-(__cdecl CmdRunAllPerformanceTests)(
+(CDECL CmdRunAllPerformanceTests)(
     IN          QWORD       NumberOfParameters
     )
 {

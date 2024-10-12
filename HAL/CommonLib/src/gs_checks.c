@@ -1,3 +1,4 @@
+#include "cal_annotate.h"
 #include "cal_warning.h"
 
 #ifdef CL_NO_RUNTIME_CHECKS
@@ -17,7 +18,7 @@ const UINT64 __security_cookie = DEFAULT_SECURITY_COOKIE_VALUE;
 // From what I've seen in the disassembly no parameters
 // passed => we can only print the location where the
 // instruction occurred
-__declspec(noreturn)
+NO_RETURN
 void
 __report_rangecheckfailure(
     void
@@ -29,7 +30,7 @@ MSVC_WARNING_SUPPRESS(4127)
 }
 
 // NOT referenced anywhere in code
-__declspec(noreturn)
+NO_RETURN
 void
 __GSHandlerCheck_SEH(
     void
@@ -39,7 +40,7 @@ __GSHandlerCheck_SEH(
 }
 
 // NOT referenced anywhere in code
-__declspec(noreturn)
+NO_RETURN
 void
 __GSHandlerCheck(
     void
@@ -49,9 +50,9 @@ __GSHandlerCheck(
 }
 
 // Called for each function which uses a cookie
-__declspec(noreturn)
+NO_RETURN
 void
-__cdecl
+CDECL
 __report_cookie_corruption(
     IN UINT64 StackCookie
 )

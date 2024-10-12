@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_annotate.h"
+
 typedef struct _MINIPORT_DEVICE
 {
     // IN - completed by NetworkPortRegisterMiniportDriver
@@ -32,7 +34,7 @@ typedef struct _MINIPORT_DEVICE_INITIALIZATION
 
 typedef
 STATUS
-(__cdecl FUNC_NetworkMiniportInitializeDevice)(
+(CDECL FUNC_NetworkMiniportInitializeDevice)(
     INOUT                           PMINIPORT_DEVICE                    MiniportDevice,
     IN                              PMINIPORT_DEVICE_INITIALIZATION     MiniportInitialization
     );
@@ -41,7 +43,7 @@ typedef FUNC_NetworkMiniportInitializeDevice*   PFUNC_NetworkMiniportInitializeD
 
 typedef
 STATUS
-(__cdecl FUNC_NetworkMiniportUninitializeDevice)(
+(CDECL FUNC_NetworkMiniportUninitializeDevice)(
     INOUT                           PMINIPORT_DEVICE            MiniportDevice
     );
 
@@ -49,7 +51,7 @@ typedef FUNC_NetworkMiniportUninitializeDevice* PFUNC_NetworkMiniportUninitializ
 
 typedef
 STATUS
-(__cdecl FUNC_NetworkMiniportSendBuffer)(
+(CDECL FUNC_NetworkMiniportSendBuffer)(
     IN  PMINIPORT_DEVICE            MiniportDevice,
     IN  WORD                        DesccriptorIndex,
     IN  WORD                        Length
@@ -59,7 +61,7 @@ typedef FUNC_NetworkMiniportSendBuffer*         PFUNC_NetworkMiniportSendBuffer;
 
 typedef
 BOOLEAN
-(__cdecl FUNC_NetworkMiniportInterruptHandler)(
+(CDECL FUNC_NetworkMiniportInterruptHandler)(
     IN  PMINIPORT_DEVICE            MiniportDevice
     );
 
@@ -67,7 +69,7 @@ typedef FUNC_NetworkMiniportInterruptHandler*   PFUNC_NetworkMiniportInterruptHa
 
 typedef
 void
-(__cdecl FUNC_NetworkMiniportChangeDeviceStatus)(
+(CDECL FUNC_NetworkMiniportChangeDeviceStatus)(
     IN  PMINIPORT_DEVICE            MiniportDevice,
     IN  PNETWORK_DEVICE_STATUS      DeviceStatus
     );

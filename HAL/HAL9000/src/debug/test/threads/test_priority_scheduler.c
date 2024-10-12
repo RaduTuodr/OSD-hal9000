@@ -6,6 +6,7 @@
 #include "thread_internal.h"
 #include "checkin_queue.h"
 #include "pit.h"
+#include "cal_annotate.h"
 
 #define PRIORITY_SCHEDULER_NO_OF_ITERATIONS             16
 
@@ -40,7 +41,7 @@ typedef struct _TEST_PRIORITY_MUTEX_CTX
 } TEST_PRIORITY_MUTEX_CTX, *PTEST_PRIORITY_MUTEX_CTX;
 
 void
-(__cdecl TestPrepareMutex)(
+(CDECL TestPrepareMutex)(
     OUT_OPT_PTR     PVOID*              Context,
     IN              DWORD               NumberOfThreads,
     IN              PVOID               PrepareContext
@@ -83,7 +84,7 @@ MSVC_WARNING_SUPPRESS(4305)
 }
 
 void
-(__cdecl TestThreadPostCreateMutex)(
+(CDECL TestThreadPostCreateMutex)(
     IN              PVOID               Context
     )
 {
@@ -107,7 +108,7 @@ void
 }
 
 STATUS
-(__cdecl TestThreadPriorityMutex)(
+(CDECL TestThreadPriorityMutex)(
     IN_OPT      PVOID       Context
     )
 {
@@ -135,7 +136,7 @@ STATUS
 }
 
 void
-(__cdecl TestThreadPostFinishMutex)(
+(CDECL TestThreadPostFinishMutex)(
     IN              PVOID               Context,
     IN              DWORD               NumberOfThreads
     )
@@ -159,7 +160,7 @@ void
 }
 
 void
-(__cdecl TestThreadPrepareWakeupEvent)(
+(CDECL TestThreadPrepareWakeupEvent)(
     OUT_OPT_PTR     PVOID*              Context,
     IN              DWORD               NumberOfThreads,
     IN              PVOID               PrepareContext
@@ -194,7 +195,7 @@ void
 }
 
 void
-(__cdecl TestThreadPostCreateWakeup)(
+(CDECL TestThreadPostCreateWakeup)(
     IN              PVOID               Context
     )
 {
@@ -218,7 +219,7 @@ void
 }
 
 STATUS
-(__cdecl TestThreadPriorityWakeup)(
+(CDECL TestThreadPriorityWakeup)(
     IN_OPT      PVOID       Context
     )
 {
@@ -246,7 +247,7 @@ STATUS
 }
 
 void
-(__cdecl TestThreadPostFinishWakeup)(
+(CDECL TestThreadPostFinishWakeup)(
     IN              PVOID               Context,
     IN              DWORD               NumberOfThreads
     )
@@ -270,7 +271,7 @@ void
 }
 
 STATUS
-(__cdecl TestThreadPriorityExecution)(
+(CDECL TestThreadPriorityExecution)(
     IN_OPT      PVOID       Context
     )
 {
@@ -331,7 +332,7 @@ STATUS
 }
 
 void
-(__cdecl TestThreadPreparePriorityExecution)(
+(CDECL TestThreadPreparePriorityExecution)(
     OUT_OPT_PTR     PVOID*              Context,
     IN              DWORD               NumberOfThreads,
     IN              PVOID               PrepareContext
@@ -360,7 +361,7 @@ MSVC_WARNING_SUPPRESS(4305)
 }
 
 void
-(__cdecl TestThreadPostPriorityExecution)(
+(CDECL TestThreadPostPriorityExecution)(
     IN              PVOID               Context,
     IN              DWORD               NumberOfThreads
     )

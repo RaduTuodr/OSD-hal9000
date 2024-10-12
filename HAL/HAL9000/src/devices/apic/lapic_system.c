@@ -2,6 +2,7 @@
 #include "lapic_system.h"
 #include "io.h"
 #include "cpumu.h"
+#include "cal_annotate.h"
 
 #define APIC_TIMER_DIVIDE_VALUE                 64
 
@@ -39,7 +40,7 @@ _LapicInstallInterruptRoutines(
 static FUNC_InterruptFunction               _ApicSpuriousIsr;
 static FUNC_InterruptFunction               _ApicErrorIsr;
 
-__forceinline
+ALWAYS_INLINE
 STATUS
 _LapicInstallInterruptRoutine(
     IN      PFUNC_InterruptFunction     Function,
@@ -327,7 +328,7 @@ _LapicInstallInterruptRoutines(
 
 static
 BOOLEAN
-(__cdecl _ApicSpuriousIsr)(
+(CDECL _ApicSpuriousIsr)(
     IN      PDEVICE_OBJECT           Device
     )
 {
@@ -342,7 +343,7 @@ BOOLEAN
 
 static
 BOOLEAN
-(__cdecl _ApicErrorIsr)(
+(CDECL _ApicErrorIsr)(
     IN      PDEVICE_OBJECT           Device
     )
 {

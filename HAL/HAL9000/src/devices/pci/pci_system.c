@@ -4,6 +4,7 @@
 #include "acpi_interface.h"
 #include "io.h"
 #include "pcie.h"
+#include "cal_annotate.h"
 
 /// to remove
 #include "dmp_pci.h"
@@ -25,7 +26,7 @@ typedef struct _PCI_SYSTEM_DATA
 static PCI_SYSTEM_DATA  m_pciSystemData;
 
 static
-__forceinline
+ALWAYS_INLINE
 PTR_SUCCESS
 PPCI_ROOT_COMPLEX
 _PciSystemFindRootComplexForDevice(

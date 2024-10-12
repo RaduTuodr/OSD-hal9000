@@ -7,6 +7,7 @@
 #include "vmm.h"
 #include "gs_utils.h"
 #include "syscall.h"
+#include "cal_annotate.h"
 #include "cal_intrin.h"
 
 #define STACK_MINIMUM_SIZE          PAGE_SIZE
@@ -38,7 +39,7 @@ _CpuValidateCurrentCpu(
     );
 
 static
-__forceinline
+ALWAYS_INLINE
 void
 _CpuActivateAvailableFeatures(
     void
@@ -65,7 +66,7 @@ _CpuActivateAvailableFeatures(
     LOG("EFER is 0x%X\n", __readmsr(IA32_EFER));
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _CpuMuCollectBasicInformation(
@@ -95,7 +96,7 @@ _CpuMuCollectBasicInformation(
     }
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _CpuMuCollectExtendedInformation(

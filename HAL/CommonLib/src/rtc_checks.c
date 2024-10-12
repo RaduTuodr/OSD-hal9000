@@ -1,3 +1,4 @@
+#include "cal_annotate.h"
 #include "cal_warning.h"
 
 #ifdef CL_NO_RUNTIME_CHECKS
@@ -27,9 +28,9 @@ typedef struct _RTC_framedesc
 #pragma pack(pop)
 
 // NOT referenced anywhere in code
-__declspec(noreturn)
+NO_RETURN
 void
-__cdecl
+CDECL
 _RTC_Shutdown(
     void
 )
@@ -38,9 +39,9 @@ _RTC_Shutdown(
 }
 
 // NOT referenced anywhere in code
-__declspec(noreturn)
+NO_RETURN
 void
-__cdecl
+CDECL
 _RTC_InitBase(
     void
 )
@@ -51,7 +52,7 @@ _RTC_InitBase(
 // we are the ones responsible for checking if any buffer overflow occurred near
 // the protected variables
 void
-__fastcall
+FASTCALL
 _RTC_CheckStackVars(
     PVOID           Rsp,
     _RTC_framedesc *_Fd

@@ -11,6 +11,8 @@
 #include <Bootloader/runtime.h>
 #include <Bootloader/types.h>
 
+#include <cal_annotate.h>
+
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 #pragma pack(push, 1)
@@ -75,9 +77,9 @@ extern char __start_os[];
 extern char __start_os_bits32[];
 extern char __start_os_pm[];
 
-__declspec(align(8)) static _GDT gdt = { .Null = 0x0, .Code = 0x00CF9A000000FFFF, .Data = 0x00CF92000000FFFF }; 
-__declspec(align(8)) static _GDT_DESCRIPTOR gdtDescriptor;
-__declspec(align(8)) static _GDT_DESCRIPTOR_64 gdtDescriptor64;
+ALIGN(8) static _GDT gdt = { .Null = 0x0, .Code = 0x00CF9A000000FFFF, .Data = 0x00CF92000000FFFF }; 
+ALIGN(8) static _GDT_DESCRIPTOR gdtDescriptor;
+ALIGN(8) static _GDT_DESCRIPTOR_64 gdtDescriptor64;
 static _TRANSITION transition;
 
 static

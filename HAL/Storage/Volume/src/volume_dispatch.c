@@ -1,7 +1,8 @@
 #include "volume_base.h"
 #include "volume_dispatch.h"
+#include "cal_annotate.h"
 
-__forceinline
+ALWAYS_INLINE
 static
 STATUS
 _VolCheckIOParameters(
@@ -28,7 +29,7 @@ _VolCheckIOParameters(
 }
 
 STATUS
-(__cdecl VolDispatchReadWrite)(
+(CDECL VolDispatchReadWrite)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )
@@ -104,7 +105,7 @@ STATUS
 }
 
 STATUS
-(__cdecl VolDispatchDeviceControl)(
+(CDECL VolDispatchDeviceControl)(
     INOUT       PDEVICE_OBJECT      DeviceObject,
     INOUT       PIRP                Irp
     )

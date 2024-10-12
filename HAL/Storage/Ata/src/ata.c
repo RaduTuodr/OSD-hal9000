@@ -2,9 +2,10 @@
 #include "ata.h"
 #include "ata_dispatch.h"
 #include "ata_operations.h"
+#include "cal_annotate.h"
 
 STATUS
-(__cdecl AtaDriverEntry)(
+(CDECL AtaDriverEntry)(
     INOUT       PDRIVER_OBJECT      Driver
     )
 {

@@ -3,6 +3,7 @@
 #include "test_timer.h"
 #include "ex_timer.h"
 #include "iomu.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 WARNING_PUSH
@@ -96,7 +97,7 @@ _TestThreadSleepWaitTimer(
 }
 
 STATUS
-(__cdecl TestThreadTimerSleep)(
+(CDECL TestThreadTimerSleep)(
     IN_OPT      PVOID       Context
     )
 {
@@ -118,7 +119,7 @@ STATUS
 }
 
 STATUS
-(__cdecl TestThreadTimerMultiple)(
+(CDECL TestThreadTimerMultiple)(
     IN_OPT      PVOID       Context
     )
 {
@@ -166,7 +167,7 @@ STATUS
 }
 
 void
-(__cdecl TestThreadTimerPrepare)(
+(CDECL TestThreadTimerPrepare)(
     OUT_OPT_PTR     PVOID*              Context,
     IN              DWORD               NumberOfThreads,
     IN              PVOID               PrepareContext
@@ -235,7 +236,7 @@ MSVC_WARNING_SUPPRESS(4305)
 
 
 void
-(__cdecl TestThreadTimerMultipleThreadsPostFinish)(
+(CDECL TestThreadTimerMultipleThreadsPostFinish)(
     IN              PVOID               Context,
     IN              DWORD               NumberOfThreads
     )
@@ -253,7 +254,7 @@ void
 
 
 void
-(__cdecl TestThreadTimerMultipleTimersPostFinish)(
+(CDECL TestThreadTimerMultipleTimersPostFinish)(
     IN              PVOID               Context,
     IN              DWORD               NumberOfThreads
     )

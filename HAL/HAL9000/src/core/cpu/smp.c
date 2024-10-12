@@ -9,6 +9,7 @@
 #include "io.h"
 #include "ex_event.h"
 #include "hw_fpu.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 extern void ApAsmStub();
@@ -43,7 +44,7 @@ typedef struct _SMP_DATA
 
 static SMP_DATA m_smpData;
 
-__forceinline
+ALWAYS_INLINE
 STATUS
 _SmpInstallInterruptRoutine(
     IN      PFUNC_InterruptFunction     Function,
@@ -64,7 +65,7 @@ _SmpInstallInterruptRoutine(
     return IoRegisterInterruptEx(&ioInterrupt, NULL, Vector);
 }
 
-__forceinline
+ALWAYS_INLINE
 void
 static
 _SmpSendIpcIpi(
@@ -94,7 +95,7 @@ _SmpSendIpcIpi(
     LapicSystemSendIpi(apicId, ApicDeliveryModeFixed, apicShorthand, apicDestinationMode, &vector);
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 BOOLEAN
 _SmpDoesCpuMatchDestination(
@@ -780,7 +781,7 @@ _SmpSetupInitialApStack(
 
 static
 BOOLEAN
-(__cdecl _SmpApicTimerIsr)(
+(CDECL _SmpApicTimerIsr)(
     IN        PDEVICE_OBJECT           Device
     )
 {
@@ -793,7 +794,7 @@ BOOLEAN
 
 static
 BOOLEAN
-(__cdecl _SmpAssertIpiIsr)(
+(CDECL _SmpAssertIpiIsr)(
     IN        PDEVICE_OBJECT           Device
     )
 {
@@ -807,7 +808,7 @@ BOOLEAN
 
 static
 BOOLEAN
-(__cdecl _SmpIpcIpiIsr)(
+(CDECL _SmpIpcIpiIsr)(
     IN        PDEVICE_OBJECT           Device
     )
 {

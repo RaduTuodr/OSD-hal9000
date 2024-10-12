@@ -2,6 +2,7 @@
 
 C_HEADER_START
 
+#include "cal_annotate.h"
 #include "cal_warning.h"
 #include "native/string.h"
 
@@ -14,7 +15,7 @@ C_HEADER_START
 //******************************************************************************
 typedef
 void
-(__cdecl FUNC_AssertFunction)(
+(CDECL FUNC_AssertFunction)(
     IN_Z            char*           Message
     );
 

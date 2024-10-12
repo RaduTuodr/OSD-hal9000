@@ -1,8 +1,9 @@
 #include "hal_base.h"
 #include "ioapic.h"
 #include "ioapic_registers.h"
+#include "cal_annotate.h"
 
-__forceinline
+ALWAYS_INLINE
 static
 DWORD
 _IoApicReadOffset(
@@ -23,7 +24,7 @@ _IoApicReadOffset(
     return IoApic->IoRegData.Value;
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _IoApicWriteOffset(
@@ -43,7 +44,7 @@ _IoApicWriteOffset(
     IoApic->IoRegData.Value = Data;
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _IoApicWriteRedirectionEntry(

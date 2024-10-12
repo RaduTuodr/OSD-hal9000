@@ -1,5 +1,6 @@
 #include "hal_base.h"
 #include "vmx.h"
+#include "cal_annotate.h"
 
 WARNING_PUSH
 
@@ -50,7 +51,7 @@ typedef enum _VM_INSTR_ERROR
 
 
 static
-__forceinline
+ALWAYS_INLINE
 VM_INSTR_ERROR
 _VmxGetInstrError(
     IN _Strict_type_match_

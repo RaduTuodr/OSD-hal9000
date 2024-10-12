@@ -2,10 +2,11 @@
 #include "network_port.h"
 #include "network_dispatch.h"
 #include "ex.h"
+#include "cal_annotate.h"
 
 static FUNC_InterruptFunction   _NetworkPortGenericInterrupt;
 
-__forceinline
+ALWAYS_INLINE
 BOOLEAN
 _NetworkPortValidateMiniportFunctions(
     IN      PMINIPORT_FUNCTIONS     MiniportFunctions
@@ -25,7 +26,7 @@ _NetworkPortValidateMiniportFunctions(
     return TRUE;
 }
 
-__forceinline
+ALWAYS_INLINE
 BOOLEAN
 _NetworkPortValidateBufferDescription(
     IN      PMINIPORT_BUFFER_DESCRIPTION    BufferDescription
@@ -572,7 +573,7 @@ _NetworkPortInitializeMiniportBuffers(
 
 static
 BOOLEAN
-(__cdecl _NetworkPortGenericInterrupt)(
+(CDECL _NetworkPortGenericInterrupt)(
     IN      PDEVICE_OBJECT  Device
     )
 {

@@ -7,6 +7,7 @@
 #include "keyboard.h"
 #include "keyboard_utils.h"
 #include "cpu.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 #define RECEIVE_THREAD_INITIAL_BUFFER_SIZE                  sizeof(NET_RECEIVE_FRAME_OUTPUT)//64*KB_SIZE
@@ -170,7 +171,7 @@ MSVC_WARNING_SUPPRESS(28113)
 }
 
 STATUS
-(__cdecl _TestReceivePacketsForAdapter)(
+(CDECL _TestReceivePacketsForAdapter)(
     IN_OPT      PVOID       Context
     )
 {
@@ -265,7 +266,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _TestTransmitPacketsForAdapter)(
+(CDECL _TestTransmitPacketsForAdapter)(
     IN_OPT      PVOID       Context
     )
 {

@@ -3,6 +3,7 @@
 #include "io.h"
 #include "strutils.h"
 #include "ex_event.h"
+#include "cal_annotate.h"
 
 #define KBD_ENCODER_INPUT_PORT         0x60
 #define KBD_ENCODER_COMMAND_PORT       0x60
@@ -274,7 +275,7 @@ _KeyboardUpdateLEDs(
 );
 
 static
-__forceinline
+ALWAYS_INLINE
 BYTE
 _KeyboardCtrlReadStatus(
     void
@@ -284,7 +285,7 @@ _KeyboardCtrlReadStatus(
 }
 
 static
-__forceinline
+ALWAYS_INLINE
 BYTE
 _KeyboardEncReadBuffer(
     void
@@ -294,7 +295,7 @@ _KeyboardEncReadBuffer(
 }
 
 static
-__forceinline
+ALWAYS_INLINE
 void
 _KeyboardEnableKbd(
     void
@@ -567,7 +568,7 @@ _KeyboardUpdateLEDs(
 
 static
 BOOLEAN
-(__cdecl _KeyboardIsr)(
+(CDECL _KeyboardIsr)(
     IN      PDEVICE_OBJECT           Device
     )
 {

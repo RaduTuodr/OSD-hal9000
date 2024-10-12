@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_annotate.h"
+
 void
 RtcInit(
     OUT_OPT     QWORD*          TscFrequency
@@ -10,7 +12,7 @@ RtcAcknowledgeTimerInterrupt(
     void
     );
 
-__forceinline
+ALWAYS_INLINE
 QWORD
 RtcGetTickCount(
     void

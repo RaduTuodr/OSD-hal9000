@@ -5,6 +5,7 @@
 #include "thread_internal.h"
 #include "pit.h"
 #include "checkin_queue.h"
+#include "cal_annotate.h"
 
 // warning C26165: Possibly failing to release lock '* pCtx->FirstMutex' in function '_ThreadChainer'.
 // Noone cares about these mutexes, noone uses them besides the tests => no deadlock
@@ -32,7 +33,7 @@ static FUNC_ThreadStart _ThreadChainer;
 // Parameter:    IN THREAD_PRIORITY ExpectedPriority
 //******************************************************************************
 static
-__forceinline
+ALWAYS_INLINE
 BOOLEAN
 _ThreadValidatePriority(
     IN          THREAD_PRIORITY     ExpectedPriority
@@ -127,7 +128,7 @@ _SpawnThreadAndCheckPriority(
 }
 
 STATUS
-(__cdecl TestThreadPriorityDonationBasic)(
+(CDECL TestThreadPriorityDonationBasic)(
     IN_OPT      PVOID       Context
     )
 {
@@ -216,7 +217,7 @@ WARNING_PUSH
 MSVC_WARNING_DISABLE(28199)
 
 STATUS
-(__cdecl TestThreadPriorityDonationMultiple)(
+(CDECL TestThreadPriorityDonationMultiple)(
     IN_OPT      PVOID       Context
     )
 {
@@ -393,7 +394,7 @@ typedef struct _DONATION_CHAIN_THREAD_DATA
 } DONATION_CHAIN_THREAD_DATA, *PDONATION_CHAIN_THREAD_DATA;
 
 STATUS
-(__cdecl TestThreadPriorityDonationChain)(
+(CDECL TestThreadPriorityDonationChain)(
     IN_OPT      PVOID       Context
     )
 {
@@ -514,7 +515,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _ThreadTakeMutex)(
+(CDECL _ThreadTakeMutex)(
     IN_OPT      PVOID       Context
     )
 {
@@ -545,7 +546,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _ThreadChainer)(
+(CDECL _ThreadChainer)(
     IN_OPT      PVOID       Context
     )
 {

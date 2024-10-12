@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_annotate.h"
+
 WORD
 PitSetTimer(
     IN      DWORD       Microseconds,
@@ -21,7 +23,7 @@ PitSleep(
     IN      DWORD       Microseconds
     );
 
-__declspec(deprecated)
+DEPRECATED
 WORD
 PitGetTimerCount(
     IN      BOOLEAN     Periodic

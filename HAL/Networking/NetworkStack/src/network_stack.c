@@ -2,13 +2,14 @@
 #include "network_stack.h"
 #include "network_internal.h"
 #include "network_operations.h"
+#include "cal_annotate.h"
 
 NETWORK_STACK_DATA m_netStackData;
 
 const MAC_ADDRESS MAC_BROADCAST = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 _No_competing_thread_
-__forceinline
+ALWAYS_INLINE
 static
 DEVICE_ID
 _NetworkStackGetNextDeviceId(

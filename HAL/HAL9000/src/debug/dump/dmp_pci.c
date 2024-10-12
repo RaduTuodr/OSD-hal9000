@@ -1,8 +1,9 @@
 #include "HAL9000.h"
 #include "dmp_pci.h"
+#include "cal_annotate.h"
 
 static
-__forceinline
+ALWAYS_INLINE
 char*
 _PciCapabilityIdToString(
     IN PCI_CAPABILITY_ID    Id

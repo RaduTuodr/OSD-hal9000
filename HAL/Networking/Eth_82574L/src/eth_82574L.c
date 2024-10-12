@@ -2,13 +2,14 @@
 #include "eth_82574L.h"
 #include "eth_82574L_operations.h"
 #include "network_port.h"
+#include "cal_annotate.h"
 
 static FUNC_NetworkMiniportInitializeDevice     _Eth82574LInitializeMiniport;
 static FUNC_NetworkMiniportSendBuffer           _Eth82574LSendBuffer;
 static FUNC_NetworkMiniportInterruptHandler     _Eth82574LReceiveInterrupt;
 static FUNC_NetworkMiniportChangeDeviceStatus   _Eth82574LChangeDeviceStatus;
 
-__forceinline
+ALWAYS_INLINE
 void
 _EthInitializeBuffers(
     IN          PMINIPORT_BUFFER_INITIALIZATION     BufferInit,
@@ -51,7 +52,7 @@ _EthInitializeBuffers(
 }
 
 STATUS
-(__cdecl Eth82574LDriverEntry)(
+(CDECL Eth82574LDriverEntry)(
     INOUT       PDRIVER_OBJECT      DriverObject
     )
 {
@@ -106,7 +107,7 @@ STATUS
 
 static
 STATUS
-(__cdecl _Eth82574LInitializeMiniport)(
+(CDECL _Eth82574LInitializeMiniport)(
     INOUT                           PMINIPORT_DEVICE                    MiniportDevice,
     IN                              PMINIPORT_DEVICE_INITIALIZATION     MiniportInitialization
     )
@@ -158,7 +159,7 @@ STATUS
 
 static
 STATUS
-(__cdecl _Eth82574LSendBuffer)(
+(CDECL _Eth82574LSendBuffer)(
     IN  PMINIPORT_DEVICE            MiniportDevice,
     IN  WORD                        DescriptorIndex,
     IN  WORD                        Length
@@ -176,7 +177,7 @@ STATUS
 
 static
 BOOLEAN
-(__cdecl _Eth82574LReceiveInterrupt)(
+(CDECL _Eth82574LReceiveInterrupt)(
     IN  PMINIPORT_DEVICE            MiniportDevice
     )
 {
@@ -192,7 +193,7 @@ BOOLEAN
 
 static
 void
-(__cdecl _Eth82574LChangeDeviceStatus)(
+(CDECL _Eth82574LChangeDeviceStatus)(
     IN  PMINIPORT_DEVICE            MiniportDevice,
     IN  PNETWORK_DEVICE_STATUS      DeviceStatus
     )

@@ -3,6 +3,7 @@
 C_HEADER_START
 #include "slist.h"
 #include "ref_cnt.h"
+#include "cal_annotate.h"
 
 typedef struct _STACK* PSTACK;
 
@@ -13,7 +14,7 @@ typedef struct _STACK_ITEM
 
 typedef
 BOOLEAN
-(__cdecl FUNC_StackPush)(
+(CDECL FUNC_StackPush)(
     INOUT   PSTACK          Stack,
     IN      PSTACK_ITEM     Item
     );
@@ -24,7 +25,7 @@ typedef
 _Must_inspect_result_
 _Success_(return != NULL)
 STACK_ITEM*
-(__cdecl FUNC_StackPop)(
+(CDECL FUNC_StackPop)(
     INOUT   PSTACK          Stack
     );
 
@@ -34,7 +35,7 @@ typedef
 _Must_inspect_result_
 _Success_(return != NULL)
 STACK_ITEM*
-(__cdecl FUNC_StackPeek)(
+(CDECL FUNC_StackPeek)(
     IN      PSTACK          Stack,
     IN      DWORD           Index
     );
@@ -43,7 +44,7 @@ typedef FUNC_StackPeek*         PFUNC_StackPeek;
 
 typedef
 void
-(__cdecl FUNC_StackClear)(
+(CDECL FUNC_StackClear)(
     INOUT   PSTACK              Stack,
     IN_OPT  PFUNC_FreeFunction  FreeFunction,
     IN_OPT  PVOID               FreeContext
@@ -53,7 +54,7 @@ typedef FUNC_StackClear*        PFUNC_StackClear;
 
 typedef
 BOOLEAN
-(__cdecl FUNC_StackIsEmpty)(
+(CDECL FUNC_StackIsEmpty)(
         INOUT   PSTACK          Stack
         );
 
@@ -61,7 +62,7 @@ typedef FUNC_StackIsEmpty*      PFUNC_StackIsEmpty;
 
 typedef
 DWORD
-(__cdecl FUNC_StackSize)(
+(CDECL FUNC_StackSize)(
     INOUT   PSTACK          Stack
     );
 

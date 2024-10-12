@@ -7,34 +7,35 @@ C_HEADER_START
 #include "monlock.h"
 #include "rw_spinlock.h"
 #include "rec_rw_spinlock.h"
+#include "cal_annotate.h"
 
 typedef
 INTR_STATE
-(__cdecl FUNC_IntrDisable)(
+(CDECL FUNC_IntrDisable)(
     void
     );
 
 typedef
 INTR_STATE
-(__cdecl FUNC_IntrEnable)(
+(CDECL FUNC_IntrEnable)(
     void
     );
 
 typedef
 INTR_STATE
-(__cdecl FUNC_IntrGetState)(
+(CDECL FUNC_IntrGetState)(
     void
     );
 
 typedef
 INTR_STATE
-(__cdecl FUNC_IntrSetState)(
+(CDECL FUNC_IntrSetState)(
     IN      INTR_STATE      State
     );
 
 typedef
 PVOID
-(__cdecl FUNC_CpuGetCurrent)(
+(CDECL FUNC_CpuGetCurrent)(
     void
     );
 
@@ -55,7 +56,7 @@ typedef union _LOCK
 
 typedef
 void
-(__cdecl FUNC_LockInit)(
+(CDECL FUNC_LockInit)(
     OUT         PLOCK           Lock
     );
 
@@ -65,7 +66,7 @@ typedef
 void
 REQUIRES_NOT_HELD_LOCK(*Lock)
 ACQUIRES_EXCL_AND_NON_REENTRANT_LOCK(*Lock)
-(__cdecl FUNC_LockAcquire)(
+(CDECL FUNC_LockAcquire)(
     INOUT       PLOCK           Lock,
     OUT         INTR_STATE*     IntrState
     );
@@ -74,7 +75,7 @@ typedef FUNC_LockAcquire*       PFUNC_LockAcquire;
 
 typedef
 BOOLEAN
-(__cdecl FUNC_LockTryAcquire)(
+(CDECL FUNC_LockTryAcquire)(
     INOUT       PLOCK           Lock,
     OUT         INTR_STATE*     IntrState
     );
@@ -83,7 +84,7 @@ typedef FUNC_LockTryAcquire*    PFUNC_LockTryAcquire;
 
 typedef
 BOOLEAN
-(__cdecl FUNC_LockIsOwner)(
+(CDECL FUNC_LockIsOwner)(
     IN          PLOCK           Lock
     );
 
@@ -93,7 +94,7 @@ typedef
 void
 REQUIRES_EXCL_LOCK(*Lock)
 RELEASES_EXCL_AND_NON_REENTRANT_LOCK(*Lock)
-(__cdecl FUNC_LockRelease)(
+(CDECL FUNC_LockRelease)(
     INOUT       PLOCK           Lock,
     IN          INTR_STATE      OldIntrState
     );

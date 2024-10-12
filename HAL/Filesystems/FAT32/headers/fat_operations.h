@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cal_annotate.h"
+
 // Structure containing information about the
 // FAT32 partition
 typedef struct _FAT_DATA
@@ -23,7 +25,7 @@ typedef struct _FAT_DATA
 
  typedef
 STATUS
-(__cdecl FUNC_FatReadWriteFile)(
+(CDECL FUNC_FatReadWriteFile)(
     IN      PFAT_DATA   FatData,
     IN      QWORD       BaseFileSector,
     IN      QWORD       SectorOffset,

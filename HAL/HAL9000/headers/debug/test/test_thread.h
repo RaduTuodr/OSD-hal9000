@@ -1,10 +1,11 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "thread.h"
 
 typedef
 void
-(__cdecl FUNC_ThreadPrepareTest)(
+(CDECL FUNC_ThreadPrepareTest)(
     OUT_OPT_PTR     PVOID*              Context,
     IN              DWORD               NumberOfThreads,
     IN              PVOID               PrepareContext
@@ -14,7 +15,7 @@ typedef     FUNC_ThreadPrepareTest*             PFUNC_ThreadPrepareTest;
 
 typedef
 void
-(__cdecl FUNC_ThreadPostCreate)(
+(CDECL FUNC_ThreadPostCreate)(
     IN              PVOID               Context
     );
 
@@ -22,7 +23,7 @@ typedef     FUNC_ThreadPostCreate*              PFUNC_ThreadPostCreate;
 
 typedef
 void
-(__cdecl FUNC_ThreadPostFinish)(
+(CDECL FUNC_ThreadPostFinish)(
     IN              PVOID               Context,
     IN              DWORD               NumberOfThreads
     );

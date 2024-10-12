@@ -2,6 +2,7 @@
 #include "ata_operations.h"
 #include "ata_commands.h"
 #include "ata_registers.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 /// to remove
@@ -69,7 +70,7 @@ _AtaWriteDmaRegisters(
     IN          BOOLEAN                                     WriteOperation
     );
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _AtaWaitIdle(
@@ -79,7 +80,7 @@ _AtaWaitIdle(
     while (IsBooleanFlagOn(__inbyte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_BUSY));
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _AtaWaitDataRequest(
@@ -89,7 +90,7 @@ _AtaWaitDataRequest(
     while (!IsBooleanFlagOn(__inbyte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_DRQ));
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _AtaWaitDeviceReady(
@@ -99,7 +100,7 @@ _AtaWaitDeviceReady(
     while (!IsBooleanFlagOn(__inbyte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_DRDY));
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 void
 _AtaSelectDevice(
@@ -854,7 +855,7 @@ AtaReadWriteSectors(
 }
 
 BOOLEAN
-(__cdecl _AtaDmaInterrupt)(
+(CDECL _AtaDmaInterrupt)(
     IN      PDEVICE_OBJECT  Device
     )
 {

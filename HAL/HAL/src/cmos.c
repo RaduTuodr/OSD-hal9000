@@ -1,5 +1,6 @@
 #include "hal_base.h"
 #include "cmos.h"
+#include "cal_annotate.h"
 
 #define CMOS_ADDRESS_PORT               0x70
 #define CMOS_DATA_PORT                  0x71
@@ -32,7 +33,7 @@ CmosWriteValue(
 }
 
 static
-__forceinline
+ALWAYS_INLINE
 BOOLEAN
 _CmosIsUpdateInProgress(
     void

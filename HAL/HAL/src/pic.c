@@ -1,5 +1,6 @@
 #include "hal_base.h"
 #include "pic.h"
+#include "cal_annotate.h"
 
 // COMMAND on write | STATUS on read
 // DATA on write | IMR on read
@@ -40,7 +41,7 @@
 #define     PIC_OCW3_READ_IRR   0x0A        // OCW3 irq ready next CMD read
 #define     PIC_OCW3_READ_ISR   0x0B        // OCW3 irq service next CMD read    
 
-__forceinline
+ALWAYS_INLINE
 static
 WORD
 _PicGetIrqRegister(

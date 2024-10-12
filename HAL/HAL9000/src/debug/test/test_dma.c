@@ -4,6 +4,7 @@
 #include "io.h"
 #include "mmu.h"
 #include "cpumu.h"
+#include "cal_annotate.h"
 
 #define DMA_TEST_ITERATION_COUNT            10
 
@@ -100,7 +101,7 @@ TestDmaPerformance(
 
 
 void
-(__cdecl _TestRawReadPerformance)(
+(CDECL _TestRawReadPerformance)(
     IN_OPT  PVOID       Context
     )
 {

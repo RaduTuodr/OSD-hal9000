@@ -4,6 +4,7 @@
 #include "dmp_disk.h"
 #include "dmp_volume.h"
 #include "dmp_common.h"
+#include "cal_annotate.h"
 
 static FUNC_ListFunction        _DumpDiskVolume;
 
@@ -42,7 +43,7 @@ DumpPartition(
 }
 
 STATUS
-(__cdecl _DumpDiskVolume) (
+(CDECL _DumpDiskVolume) (
     IN      PLIST_ENTRY ListEntry,
     IN_OPT  PVOID       FunctionContext
     )

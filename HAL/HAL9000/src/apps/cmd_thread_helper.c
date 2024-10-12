@@ -16,6 +16,7 @@
 #include "ex_timer.h"
 #include "vmm.h"
 #include "pit.h"
+#include "cal_annotate.h"
 
 
 WARNING_PUSH
@@ -50,7 +51,7 @@ _CmdHelperPrintThreadFunctions(
     void
     );
 
-__forceinline
+ALWAYS_INLINE
 static
 const char*
 _CmdThreadStateToName(
@@ -74,7 +75,7 @@ _CmdReadAndDumpCpuid(
 static FUNC_ListFunction _CmdThreadPrint;
 
 void
-(__cdecl CmdListCpus)(
+(CDECL CmdListCpus)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -121,7 +122,7 @@ void
 }
 
 void
-(__cdecl CmdListThreads)(
+(CDECL CmdListThreads)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -144,7 +145,7 @@ void
 }
 
 void
-(__cdecl CmdYield)(
+(CDECL CmdYield)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -156,7 +157,7 @@ void
 }
 
 void
-(__cdecl CmdRunTest)(
+(CDECL CmdRunTest)(
     IN          QWORD       NumberOfParameters,
     IN_Z        char*       TestName,
     IN_Z        char*       NumberOfThreadsString
@@ -200,7 +201,7 @@ void
 }
 
 void
-(__cdecl CmdSendIpi)(
+(CDECL CmdSendIpi)(
     IN          QWORD               NumberOfParameters,
     IN_Z        char*               SendModeString,
     IN_Z        char*               DestinationString,
@@ -247,7 +248,7 @@ void
 }
 
 void
-(__cdecl CmdListCpuInterrupts)(
+(CDECL CmdListCpuInterrupts)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -296,7 +297,7 @@ void
 }
 
 void
-(__cdecl CmdTestTimer)(
+(CDECL CmdTestTimer)(
     IN          QWORD               NumberOfParameters,
     IN_Z        char*               TimerTypeString,
     IN_Z        char*               RelativeTimeString,
@@ -371,7 +372,7 @@ void
 }
 
 void
-(__cdecl CmdCpuid)(
+(CDECL CmdCpuid)(
     IN          QWORD               NumberOfParameters,
     IN_Z        char*               IndexString,
     IN_Z        char*               SubIndexString
@@ -427,7 +428,7 @@ void
 }
 
 void
-(__cdecl CmdRdmsr)(
+(CDECL CmdRdmsr)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       IndexString
     )
@@ -444,7 +445,7 @@ void
 }
 
 void
-(__cdecl CmdWrmsr)(
+(CDECL CmdWrmsr)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       IndexString,
     IN_Z    char*       ValueString
@@ -464,7 +465,7 @@ void
 }
 
 void
-(__cdecl CmdCheckAd)(
+(CDECL CmdCheckAd)(
     IN      QWORD       NumberOfParameters
     )
 {
@@ -515,7 +516,7 @@ void
 }
 
 void
-(__cdecl CmdSpawnThreads)(
+(CDECL CmdSpawnThreads)(
     IN      QWORD       NumberOfParameters,
     IN_Z    char*       CpuBoundString,
     IN_Z    char*       IoBoundString
@@ -673,7 +674,7 @@ _CmdHelperPrintThreadFunctions(
 
 static
 STATUS
-(__cdecl _CmdThreadPrint) (
+(CDECL _CmdThreadPrint) (
     IN      PLIST_ENTRY     ListEntry,
     IN_OPT  PVOID           FunctionContext
     )
@@ -714,7 +715,7 @@ _CmdReadAndDumpCpuid(
 
 static
 STATUS
-(__cdecl _CmdIpiCmd)(
+(CDECL _CmdIpiCmd)(
     IN_OPT  PVOID   Context
     )
 {
@@ -731,7 +732,7 @@ STATUS
 }
 
 static
-__forceinline
+ALWAYS_INLINE
 void
 _ThreadBusyWait(
     IN      QWORD       Microseconds
@@ -743,7 +744,7 @@ _ThreadBusyWait(
 }
 
 STATUS
-(__cdecl _ThreadCpuBound)(
+(CDECL _ThreadCpuBound)(
     IN_OPT      PVOID       Context
     )
 {
@@ -757,7 +758,7 @@ STATUS
 }
 
 STATUS
-(__cdecl _ThreadIoBound)(
+(CDECL _ThreadIoBound)(
     IN_OPT      PVOID       Context
     )
 {

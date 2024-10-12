@@ -47,6 +47,8 @@
 
 C_HEADER_START
 
+#include "cal_annotate.h"
+
 #define INVALID_LIST_SIZE       MAX_DWORD
 
 #pragma pack(push,16)
@@ -66,7 +68,7 @@ typedef struct _LIST_ITERATOR
 
 typedef
 STATUS
-(__cdecl FUNC_ListFunction) (
+(CDECL FUNC_ListFunction) (
     IN      PLIST_ENTRY     ListEntry,
     IN_OPT  PVOID           FunctionContext
     );
@@ -84,7 +86,7 @@ typedef FUNC_ListFunction*      PFUNC_ListFunction;
 //******************************************************************************
 typedef
 INT64
-(__cdecl FUNC_CompareFunction) (
+(CDECL FUNC_CompareFunction) (
     IN      PLIST_ENTRY     FirstElem,
     IN      PLIST_ENTRY     SecondElem,
     IN_OPT  PVOID           Context
@@ -125,7 +127,7 @@ IsListEmpty(
 // Returns:      BOOLEAN
 // Parameter:    IN PLIST_ENTRY ListHead
 //******************************************************************************
-__forceinline
+ALWAYS_INLINE
 BOOLEAN
 IsListEmptyDirty(
     IN      PLIST_ENTRY ListHead

@@ -1,4 +1,5 @@
 #include "um_lib_base.h"
+#include "cal_annotate.h"
 
 #define RFLAGS_DIRECTION_BIT            ((QWORD)1<<10)
 
@@ -70,7 +71,7 @@ __start(
 }
 
 void
-(__cdecl _UmLibAssert)(
+(CDECL _UmLibAssert)(
     IN_Z            char*           Message
     )
 {
@@ -91,7 +92,7 @@ void
     NOT_REACHED;
 }
 
-__forceinline
+ALWAYS_INLINE
 extern
 void
 CpuClearDirectionFlag(

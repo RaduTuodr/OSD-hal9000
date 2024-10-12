@@ -1,5 +1,6 @@
 #include "HAL9000.h"
 #include "dmp_io.h"
+#include "cal_annotate.h"
 
 #include "../../Volume/headers/volume_structures.h"
 #include "filesystem.h"
@@ -15,7 +16,7 @@ static const char DEVICE_TYPE_NAMES[][DEVICE_TYPE_MAX_NAME_LEN] = {
     "Physical Netcard",
 };
 
-__forceinline
+ALWAYS_INLINE
 static
 const
 char*
@@ -46,7 +47,7 @@ _PartitionTypeToString(
     }
 }
 
-__forceinline
+ALWAYS_INLINE
 static
 const
 char*
@@ -58,7 +59,7 @@ _DeviceTypeToString(
 }
 
 STATUS
-(__cdecl DumpVpb) (
+(CDECL DumpVpb) (
     IN      PLIST_ENTRY ListEntry,
     IN_OPT  PVOID       FunctionContext
     )

@@ -1,10 +1,11 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_annotate.h"
 
 static
 STATUS
-(__cdecl _ThreadFunc)(
+(CDECL _ThreadFunc)(
     IN_OPT      PVOID       Context
     )
 {
@@ -17,7 +18,7 @@ STATUS
 
 static
 STATUS
-(__cdecl _ThreadFailFunc)(
+(CDECL _ThreadFailFunc)(
     IN_OPT      PVOID       Context
     )
 {

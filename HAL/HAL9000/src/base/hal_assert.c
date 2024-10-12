@@ -3,12 +3,13 @@
 #include "cpumu.h"
 #include "smp.h"
 #include "thread.h"
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 
 static volatile DWORD m_osAsserted = 0;
 
 void
-(__cdecl Hal9000Assert)(
+(CDECL Hal9000Assert)(
     IN_Z            char*       Message
     )
 {

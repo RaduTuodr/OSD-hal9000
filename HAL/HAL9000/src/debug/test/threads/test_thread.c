@@ -3,6 +3,7 @@
 #include "test_timer.h"
 #include "test_priority_scheduler.h"
 #include "test_priority_donation.h"
+#include "cal_annotate.h"
 
 #include "mutex.h"
 
@@ -316,7 +317,7 @@ TestAllThreadFunctionalities(
 }
 
 STATUS
-(__cdecl TestThreadYield)(
+(CDECL TestThreadYield)(
     IN_OPT      PVOID       Context
     )
 {
@@ -341,7 +342,7 @@ STATUS
 }
 
 STATUS
-(__cdecl TestMutexes)(
+(CDECL TestMutexes)(
     IN_OPT      PVOID       Context
     )
 {
@@ -366,7 +367,7 @@ STATUS
 }
 
 STATUS
-(__cdecl TestCpuIntense)(
+(CDECL TestCpuIntense)(
     IN_OPT      PVOID       Context
     )
 {
@@ -391,7 +392,7 @@ STATUS
 
 static
 void
-(__cdecl _ThreadTestPassContext)(
+(CDECL _ThreadTestPassContext)(
     OUT_OPT_PTR     PVOID*              Context,
     IN              DWORD               NumberOfThreads,
     IN              PVOID               PrepareContext

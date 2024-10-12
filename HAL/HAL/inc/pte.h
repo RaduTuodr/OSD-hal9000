@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_annotate.h"
 #include "cal_atomic.h"
 #include "cal_warning.h"
 
@@ -373,7 +374,7 @@ PteIsPresent(
     IN          PVOID           PageTable
     );
 
-__forceinline
+ALWAYS_INLINE
 void
 PageInvalidateTlb(
     IN          PVOID           Page

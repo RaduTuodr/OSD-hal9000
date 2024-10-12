@@ -1,12 +1,13 @@
 #include "hal_base.h"
 #include "gdt.h"
 #include "tss.h"
+#include "cal_annotate.h"
 
 #define GDT_MAXIMUM_DESCRIPTORS                   512
 
 typedef
 void
-(__cdecl FUNC_ReloadGDT) (
+(CDECL FUNC_ReloadGDT) (
     IN      PGDT        NewGdt,
     IN      WORD        CsSelector,
     IN      WORD        DsSelector
@@ -16,7 +17,7 @@ extern FUNC_ReloadGDT           __reloadGDT;
 
 
 // the size of the GDT is 4K
-__declspec(align(NATURAL_ALIGNMENT))
+ALIGN(NATURAL_ALIGNMENT)
 static SEGMENT_DESCRIPTOR       m_gdtDescriptors[GDT_MAXIMUM_DESCRIPTORS];
 static GDT                      m_gdt;
 

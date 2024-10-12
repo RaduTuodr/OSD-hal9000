@@ -6,6 +6,7 @@
 #include "strutils.h"
 #include "keyboard.h"
 #include "acpi_interface.h"
+#include "cal_annotate.h"
 
 WARNING_PUSH
 
@@ -16,7 +17,7 @@ MSVC_WARNING_DISABLE(4212)
 MSVC_WARNING_DISABLE(4029)
 
 void
-(__cdecl CmdDisplaySysInfo)(
+(CDECL CmdDisplaySysInfo)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -40,7 +41,7 @@ void
 }
 
 void
-(__cdecl CmdSetIdle)(
+(CDECL CmdSetIdle)(
     IN          QWORD       NumberOfParameters,
     IN_Z        char*       SecondsString
     )
@@ -62,7 +63,7 @@ void
 }
 
 void
-(__cdecl CmdGetIdle)(
+(CDECL CmdGetIdle)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -75,7 +76,7 @@ void
 }
 
 void
-(__cdecl CmdResetSystem)(
+(CDECL CmdResetSystem)(
     IN          QWORD       NumberOfParameters
     )
 {
@@ -85,7 +86,7 @@ void
 }
 
 void
-(__cdecl CmdShutdownSystem)(
+(CDECL CmdShutdownSystem)(
     IN          QWORD       NumberOfParameters
     )
 {

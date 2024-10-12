@@ -2,6 +2,7 @@
 #include "cpu.h"
 #include "idt.h"
 #include "tss.h"
+#include "cal_annotate.h"
 
 #define PREDEFINED_IDT_SIZE                     10
 #define PREDEFINED_IDT_ENTRY_SIZE               16
@@ -48,7 +49,7 @@ typedef struct _IDT
 STATIC_ASSERT( sizeof( IDT ) == PREDEFINED_IDT_SIZE );
 #pragma pack(pop)
 
-__declspec(align(NATURAL_ALIGNMENT))
+ALIGN(NATURAL_ALIGNMENT)
 static IDT_ENTRY    m_idtDescriptors[NO_OF_TOTAL_INTERRUPTS];
 static IDT          m_idt;
 

@@ -1,6 +1,7 @@
 #include "hal_base.h"
 #include "pci.h"
 #include "pci_common.h"
+#include "cal_annotate.h"
 
 #define PCI_CONFIG_ADDRESS                              0xCF8
 #define PCI_CONFIG_DATA                                 0xCFC
@@ -47,7 +48,7 @@ WARNING_POP
             (X).RegisterNumber = (Reg);
 
 static
-__forceinline
+ALWAYS_INLINE
 DWORD
 _PciReadRegister(
     IN      PCI_CONFIG_REGISTER ConfigRegister
@@ -58,7 +59,7 @@ _PciReadRegister(
 }
 
 static
-__forceinline
+ALWAYS_INLINE
 void
 _PciWriteRegister(
     IN      PCI_CONFIG_REGISTER ConfigRegister,
