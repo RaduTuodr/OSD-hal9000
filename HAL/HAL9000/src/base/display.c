@@ -2,6 +2,7 @@
 #include "display.h"
 #include "display_internal.h"
 #include "cal_annotate.h"
+#include "cal_assert.h"
 
 #pragma pack(push,1)
 typedef struct _SCREEN_CHARACTER

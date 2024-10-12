@@ -8,6 +8,7 @@
 #include "gs_utils.h"
 #include "syscall.h"
 #include "cal_annotate.h"
+#include "cal_assert.h"
 #include "cal_intrin.h"
 
 #define STACK_MINIMUM_SIZE          PAGE_SIZE
