@@ -7,7 +7,7 @@
 WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(disable:4201)
+MSVC_WARNING_DISABLE(4201)
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
 MSVC_WARNING_DISABLE(4200)

@@ -6,7 +6,10 @@
 // warning C28250: Inconsistent annotation for Function: the prior instance has trailing unannotated parameters
 // warning C28251: Inconsistent annotation for Function: this instance has trailing unannotated parameters.
 // warning C28253: Inconsistent annotation for Function
-#pragma warning(disable:28208 28250 28251 28253)
+MSVC_WARNING_DISABLE(28208)
+MSVC_WARNING_DISABLE(28250)
+MSVC_WARNING_DISABLE(28251)
+MSVC_WARNING_DISABLE(28253)
 
 typedef
 void

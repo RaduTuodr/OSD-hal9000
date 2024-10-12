@@ -7,13 +7,13 @@
 WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(disable:4201)
+MSVC_WARNING_DISABLE(4201)
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
 MSVC_WARNING_DISABLE(4200)
 
 // warning C4214: nonstandard extension used: bit field types other than int
-#pragma warning(disable:4214)
+MSVC_WARNING_DISABLE(4214)
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////                               Address Types                             ///////

@@ -28,7 +28,7 @@ CmdPrintVolumeInformation(
 WARNING_PUSH
 
 // warning C4717: '_CmdInfiniteRecursion': recursive on all control paths, function will cause runtime stack overflow
-#pragma warning(disable:4717)
+MSVC_WARNING_DISABLE(4717)
 void
 CmdInfiniteRecursion(
     IN      QWORD           NumberOfParameters

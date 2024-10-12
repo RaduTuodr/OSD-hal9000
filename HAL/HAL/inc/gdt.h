@@ -56,7 +56,7 @@ typedef enum _NON_SYSTEM_SEGMENT_TYPES
 WARNING_PUSH
 
 //warning C4214: nonstandard extension used : bit field types other than int
-#pragma warning(disable:4214)
+MSVC_WARNING_DISABLE(4214)
 
 // 3.4.5, Vol 3, No. 56
 typedef struct _SEGMENT_DESCRIPTOR

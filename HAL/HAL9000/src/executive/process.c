@@ -192,7 +192,7 @@ ProcessExecuteForEachProcessEntry(
 // Otherwise it could be a race condition. Variable 'Process->PagingData->Data' should be protected by lock 'Process->PagingData->Lock'.
 // I do remember having a look at this function a lot of times, it's OK (I don't remember what the problem is though :( )
 WARNING_PUSH
-#pragma warning(disable:26130)
+MSVC_WARNING_DISABLE(26130)
 
 void
 ProcessActivatePagingTables(

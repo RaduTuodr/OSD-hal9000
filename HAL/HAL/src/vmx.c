@@ -4,7 +4,7 @@
 WARNING_PUSH
 
 // warning C28039: The type of actual parameter '24576|2048|((0<<1))|0' should exactly match the type 'VMCS_FIELD':
-#pragma warning(disable: 28039)
+MSVC_WARNING_DISABLE(28039)
 
 #define VMX_RESULT_SUCCESS                  (VMX_RESULT)0
 #define VMX_RESULT_FAIL_WITH_ERROR          (VMX_RESULT)1

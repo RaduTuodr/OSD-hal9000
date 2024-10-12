@@ -115,7 +115,7 @@ typedef     DWORD   FAT32_ENTRY;
 WARNING_PUSH
 
 //warning C4214: nonstandard extension used: bit field types other than int
-#pragma warning(disable:4214)
+MSVC_WARNING_DISABLE(4214)
 typedef struct _FATDATE
 {
     // 1 -> 31

@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_intrin.h"
 
 STATUS
 __main(
@@ -13,7 +14,7 @@ __main(
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
-    status = SyscallVirtualFree(_AddressOfReturnAddress(),
+    status = SyscallVirtualFree(IntrinAddressOfReturnAddress(),
                                 0,
                                 VMM_FREE_TYPE_DECOMMIT | VMM_FREE_TYPE_RELEASE);
     if (SUCCEEDED(status))
@@ -22,7 +23,7 @@ __main(
         return status;
     }
 
-    status = SyscallVirtualFree(_AddressOfReturnAddress(),
+    status = SyscallVirtualFree(IntrinAddressOfReturnAddress(),
                                 0,
                                 VMM_FREE_TYPE_DECOMMIT);
     if (SUCCEEDED(status))
@@ -31,7 +32,7 @@ __main(
         return status;
     }
 
-    status = SyscallVirtualFree(_AddressOfReturnAddress(),
+    status = SyscallVirtualFree(IntrinAddressOfReturnAddress(),
                                 0,
                                 VMM_FREE_TYPE_RELEASE);
     if (SUCCEEDED(status))
@@ -40,7 +41,7 @@ __main(
         return status;
     }
 
-    status = SyscallVirtualFree(_AddressOfReturnAddress(),
+    status = SyscallVirtualFree(IntrinAddressOfReturnAddress(),
                                 0,
                                 0);
     if (SUCCEEDED(status))

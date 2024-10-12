@@ -28,7 +28,7 @@ RecRwSpinlockInit(
 // warning C26165 : Possibly failing to release lock '* Spinlock' in function 'RecRwSpinlockAcquire'.
 // well we're not actually attempting to release a lock in this function...
 WARNING_PUSH
-#pragma warning(disable:26165)
+MSVC_WARNING_DISABLE(26165)
 
 REQUIRES_NOT_HELD_LOCK(*Spinlock)
 _When_(Exclusive, ACQUIRES_EXCL_AND_REENTRANT_LOCK(*Spinlock))
@@ -85,7 +85,7 @@ WARNING_POP
 // there's a situation in which he thinks we release the lock twice, one on the first branch
 // and second on the RwSpinlockRelease
 WARNING_PUSH
-#pragma warning(disable:26167)
+MSVC_WARNING_DISABLE(26167)
 
 _When_(Exclusive, REQUIRES_EXCL_LOCK(*Spinlock) RELEASES_EXCL_AND_REENTRANT_LOCK(*Spinlock))
 _When_(!Exclusive, REQUIRES_SHARED_LOCK(*Spinlock) RELEASES_SHARED_AND_NON_REENTRANT_LOCK(*Spinlock))

@@ -20,7 +20,7 @@
 #pragma pack(push,1)
 
 // warning C4214: nonstandard extension used: bit field types other than int
-#pragma warning(disable:4214)
+MSVC_WARNING_DISABLE(4214)
 
 #define ATA_SERIAL_NO_CHARS             20
 #define ATA_MODEL_NO_CHARS              40

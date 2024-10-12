@@ -1,6 +1,8 @@
 #include "common_lib.h"
 #include "lock_common.h"
 
+#include "cal_intrin.h"
+
 #ifndef _COMMONLIB_NO_LOCKS_
 
 void
@@ -33,7 +35,7 @@ MonitorLockAcquire(
     ASSERT_INFO(pCurrentCpu != Lock->Lock.Holder,
                 "Lock initial taken by function 0x%X, now called by 0x%X\n",
                 Lock->Lock.FunctionWhichTookLock,
-                *((PVOID*)_AddressOfReturnAddress())
+                *((PVOID*)IntrinAddressOfReturnAddress())
                 );
 
 // warning C4127: conditional expression is constant
@@ -54,7 +56,7 @@ MSVC_WARNING_SUPPRESS(4127)
     ASSERT(NULL == Lock->Lock.Holder);
 
     Lock->Lock.Holder = pCurrentCpu;
-    Lock->Lock.FunctionWhichTookLock = *((PVOID*)_AddressOfReturnAddress());
+    Lock->Lock.FunctionWhichTookLock = *((PVOID*)IntrinAddressOfReturnAddress());
 
     ASSERT(LOCK_TAKEN == Lock->Lock.State);
 }
@@ -88,7 +90,7 @@ MonitorLockTryAcquire(
         ASSERT(NULL == Lock->Lock.Holder);
 
         Lock->Lock.Holder = pCurrentCpu;
-        Lock->Lock.FunctionWhichTookLock = *((PVOID*)_AddressOfReturnAddress());
+        Lock->Lock.FunctionWhichTookLock = *((PVOID*)IntrinAddressOfReturnAddress());
 
         ASSERT(LOCK_TAKEN == Lock->Lock.State);
     }

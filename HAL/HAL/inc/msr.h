@@ -296,7 +296,7 @@
 WARNING_PUSH
 
 // warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(disable:4201)
+MSVC_WARNING_DISABLE(4201)
 
 typedef union _IA32_STAR_MSR_DATA
 {

@@ -17,7 +17,7 @@
 WARNING_PUSH
 
 // warning C4029: declared formal parameter list different from definition
-#pragma warning(disable:4029)
+MSVC_WARNING_DISABLE(4029)
 
 #define CMD_MAX_ARGS        10
 
@@ -27,7 +27,7 @@ static FUNC_GenericCommand  _CmdPrintHelp;
 
 // warning C4212: nonstandard extension used: function declaration used ellipsis
 WARNING_PUSH
-#pragma warning(disable:4212)
+MSVC_WARNING_DISABLE(4212)
 
 typedef struct _COMMAND_DEFINITION
 {

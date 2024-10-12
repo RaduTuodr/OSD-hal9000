@@ -13,7 +13,7 @@
 WARNING_PUSH
 
 // warning C4212: nonstandard extension used: function declaration used ellipsis
-#pragma warning(disable:4212)
+MSVC_WARNING_DISABLE(4212)
 
 #define CMD_READFILE_BYTES_TO_READ_AT_A_TIME            (32*KB_SIZE)
 

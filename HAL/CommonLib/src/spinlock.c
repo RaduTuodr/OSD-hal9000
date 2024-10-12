@@ -1,5 +1,6 @@
 #include "common_lib.h"
 #include "lock_common.h"
+#include "cal_intrin.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
 
@@ -33,7 +34,7 @@ SpinlockAcquire(
     ASSERT_INFO(pCurrentCpu != Lock->Holder,
                 "Lock initial taken by function 0x%X, now called by 0x%X\n",
                 Lock->FunctionWhichTookLock,
-                *((PVOID*)_AddressOfReturnAddress())
+                *((PVOID*)IntrinAddressOfReturnAddress())
                 );
 
     while (LOCK_TAKEN == _InterlockedCompareExchange8(&Lock->State, LOCK_TAKEN, LOCK_FREE))
@@ -45,7 +46,7 @@ SpinlockAcquire(
     ASSERT(NULL == Lock->Holder);
 
     Lock->Holder = pCurrentCpu;
-    Lock->FunctionWhichTookLock = *( (PVOID*) _AddressOfReturnAddress() );
+    Lock->FunctionWhichTookLock = *( (PVOID*) IntrinAddressOfReturnAddress() );
 
     ASSERT(LOCK_TAKEN == Lock->State);
 }
@@ -79,7 +80,7 @@ SpinlockTryAcquire(
         ASSERT(NULL == Lock->Holder);
 
         Lock->Holder = pCurrentCpu;
-        Lock->FunctionWhichTookLock = *((PVOID*)_AddressOfReturnAddress());
+        Lock->FunctionWhichTookLock = *((PVOID*)IntrinAddressOfReturnAddress());
 
         ASSERT(LOCK_TAKEN == Lock->State);
     }
@@ -107,7 +108,7 @@ SpinlockRelease(
     ASSERT_INFO(pCurrentCpu == Lock->Holder,
                 "LockTaken by CPU: 0x%X in function: 0x%X\nNow release by CPU: 0x%X in function: 0x%X\n",
                 Lock->Holder, Lock->FunctionWhichTookLock,
-                pCurrentCpu, *( (PVOID*) _AddressOfReturnAddress() ) );
+                pCurrentCpu, *( (PVOID*) IntrinAddressOfReturnAddress() ) );
     ASSERT(INTR_OFF == CpuIntrGetState());
 
     Lock->Holder = NULL;

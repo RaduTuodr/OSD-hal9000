@@ -17,10 +17,10 @@
 WARNING_PUSH
 
 // warning C4214: nonstandard extension used: bit field types other than int
-#pragma warning(disable:4214)
+MSVC_WARNING_DISABLE(4214)
 
 // warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(disable:4201)
+MSVC_WARNING_DISABLE(4201)
 typedef struct _IO_APIC_REGISTER
 {
     volatile DWORD          Value;

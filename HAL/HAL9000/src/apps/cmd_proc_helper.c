@@ -17,10 +17,10 @@ typedef struct _PROC_STAT_CTX
 WARNING_PUSH
 
 // warning C4212: nonstandard extension used: function declaration used ellipsis
-#pragma warning(disable:4212)
+MSVC_WARNING_DISABLE(4212)
 
 // warning C4029: declared formal parameter list different from definition
-#pragma warning(disable:4029)
+MSVC_WARNING_DISABLE(4029)
 
 __forceinline
 static

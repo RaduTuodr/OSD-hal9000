@@ -7,6 +7,7 @@
 #include "vmm.h"
 #include "gs_utils.h"
 #include "syscall.h"
+#include "cal_intrin.h"
 
 #define STACK_MINIMUM_SIZE          PAGE_SIZE
 #define STACK_MAXIMUM_SIZE          (16*PAGE_SIZE)
@@ -385,7 +386,7 @@ CpuMuChangeStack(
     IN          PVOID       NewStack
     )
 {
-    PVOID oldStackBase = (PVOID)AlignAddressUpper(_AddressOfReturnAddress(), PAGE_SIZE);
+    PVOID oldStackBase = (PVOID)AlignAddressUpper(IntrinAddressOfReturnAddress(), PAGE_SIZE);
 
     ASSERT( NULL != NewStack );
 

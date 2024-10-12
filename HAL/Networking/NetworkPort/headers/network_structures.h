@@ -8,7 +8,7 @@
 WARNING_PUSH
 
 // warning C4200: nonstandard extension used: zero-sized array in struct/union
-#pragma warning(disable: 4200)
+MSVC_WARNING_DISABLE(4200)
 typedef struct _NETWORK_PORT_DRIVER_DATA
 {
     MINIPORT_FUNCTIONS              MiniportFunctions;

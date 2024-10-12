@@ -1,6 +1,7 @@
 #pragma once
 
 C_HEADER_START
+#include "cal_intrin.h"
 #include "data_type.h"
 
 #ifndef UNREFERENCED_PARAMETER
@@ -82,9 +83,9 @@ C_HEADER_START
 
 // func:
 // mov  edi, edi  <- rsp is 0x8 aligned
-#define IS_STACK_ALIGNED                    IsAddressAligned((PBYTE)_AddressOfReturnAddress()+sizeof(PVOID),NATURAL_ALIGNMENT)
-#define CHECK_STACK_ALIGNMENT               ASSERT_INFO(IS_STACK_ALIGNED, "RSP at 0x%X\n", _AddressOfReturnAddress())
-#define GET_RETURN_ADDRESS                  *((PVOID*)_AddressOfReturnAddress())
+#define IS_STACK_ALIGNED                    IsAddressAligned((PBYTE)IntrinAddressOfReturnAddress()+sizeof(PVOID),NATURAL_ALIGNMENT)
+#define CHECK_STACK_ALIGNMENT               ASSERT_INFO(IS_STACK_ALIGNED, "RSP at 0x%X\n", IntrinAddressOfReturnAddress())
+#define GET_RETURN_ADDRESS                  *((PVOID*)IntrinAddressOfReturnAddress())
 
 #ifndef CONTAINING_RECORD
 #define CONTAINING_RECORD(address, type, field) ((type *)( \

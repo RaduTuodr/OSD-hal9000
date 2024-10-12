@@ -12,7 +12,7 @@
 WARNING_PUSH
 
 //warning C4214: nonstandard extension used : bit field types other than int
-#pragma warning(disable:4214)
+MSVC_WARNING_DISABLE(4214)
 
 // 7.7, Vol 3, No. 56
 typedef struct _TSS

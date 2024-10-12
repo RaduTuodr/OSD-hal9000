@@ -8,13 +8,9 @@ C_HEADER_START
 WARNING_PUSH
 
 // warning C4391: incorrect return type for intrinsic function
-#pragma warning(disable:4391)
+MSVC_WARNING_DISABLE(4391)
 
 // annotations for some intrinsics
-PVOID
-_AddressOfReturnAddress(
-    void
-    );
 
 void
 __cpuid(
@@ -82,63 +78,6 @@ __readcr8(
 void
 __writecr8(
     IN_RANGE_UPPER(0xF) BYTE    Irql
-    );
-
-BYTE
-_InterlockedExchange8(
-    INOUT _Interlocked_operand_
-        BYTE volatile * _Target,
-    IN  BYTE _Value
-    );
-
-DWORD
-_InterlockedIncrement(
-    INOUT _Interlocked_operand_ DWORD volatile * _Addend
-    );
-
-BYTE
-_InterlockedCompareExchange8(
-    INOUT _Interlocked_operand_
-        BYTE volatile * _Destination,
-    IN  BYTE _Exchange,
-    IN  BYTE _Comparand
-    );
-
-WORD
-_InterlockedDecrement16(
-    INOUT _Interlocked_operand_ WORD volatile *Destination
-    );
-
-DWORD _InterlockedCompareExchange(
-    INOUT _Interlocked_operand_
-        DWORD volatile * _Destination,
-    IN  DWORD _Exchange,
-    IN  DWORD _Comparand
-    );
-
-WORD
-_InterlockedCompareExchange16(
-    INOUT _Interlocked_operand_
-        WORD volatile *Destination,
-    IN  WORD ExChange,
-    IN  WORD Comperand
-    );
-
-WORD
-_InterlockedOr16(
-    INOUT _Interlocked_operand_
-        WORD volatile *Destination,
-    IN  WORD Value
-    );
-
-WORD
-_InterlockedIncrement16(
-    INOUT _Interlocked_operand_ WORD volatile *Destination
-    );
-
-DWORD
-_InterlockedDecrement(
-    INOUT _Interlocked_operand_ DWORD volatile * _Addend
     );
 
 _Success_(return == TRUE)
