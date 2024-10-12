@@ -18,6 +18,7 @@ typedef struct
 typedef struct
 {
     PVOID Image;
+    PVOID VirtualImage;
     DWORD ImageSize;
     EXE_FORMAT Format; 
     _EXE_HEADER Header;
@@ -65,10 +66,12 @@ ExecutableLoaderInit(
     STATUS status;
     EXE_FORMAT format;
     _EXE_LOADER_CONTEXT *context;
+    PVOID virtualImage;
     
     status = STATUS_SUCCESS;
     format = ExecutableFormatUnknown;
     context = (_EXE_LOADER_CONTEXT *) Context;
+    virtualImage = NULL;
 
     if (NULL == Context)
     {
@@ -94,10 +97,12 @@ ExecutableLoaderInit(
     if (format == ExecutableFormatELF)
     {
         status = ElfRetrieveFileHeader(Image, ImageSize, &(context->Header.ElfFileHeader));
+        virtualImage = (PVOID) ((Elf64_Phdr *) PtrOffset(Image, context->Header.ElfFileHeader.e_phoff))->p_vaddr;
     }
     else
     {
         status = PeRetrieveNtHeader(Image, ImageSize, &(context->Header.PeHeaderInfo));
+        virtualImage = (PVOID) context->Header.PeHeaderInfo.Preferred.ImageBase; 
     }
 
     if (!SUCCEEDED(status))
@@ -106,6 +111,7 @@ ExecutableLoaderInit(
     }
 
     context->Image = Image;
+    context->VirtualImage = virtualImage;
     context->ImageSize = ImageSize;
     context->Format = format;
     
@@ -143,6 +149,7 @@ ExectuableLoaderInitFromPEHeader(
     context = (_EXE_LOADER_CONTEXT *) *Context;
     context->Format = ExecutableFormatPE;
     context->Image = HeaderInfo->ImageBase;
+    context->VirtualImage = HeaderInfo->Preferred.ImageBase;
     context->ImageSize = HeaderInfo->Size;
     memcpy(&(context->Header.PeHeaderInfo), HeaderInfo, sizeof(PE_NT_HEADER_INFO));
   
@@ -208,7 +215,6 @@ ExecutableLoaderGetVirtualImageBase(
 {
     _EXE_LOADER_CONTEXT *context;
     PVOID virtualBase;
-    Elf64_Phdr firstEntry = { 0 };
 
     context = (_EXE_LOADER_CONTEXT *) Context;
     virtualBase = NULL;
@@ -228,21 +234,7 @@ ExecutableLoaderGetVirtualImageBase(
         return STATUS_UNSUPPORTED;
     }
 
-    if (context->Format == ExecutableFormatELF)
-    {
-        if (!SUCCEEDED(ElfGetSegment(context->Image, context->ImageSize, 
-                                     &(context->Header.ElfFileHeader), 0, &firstEntry)))
-        {
-            return STATUS_UNSUCCESSFUL;
-        }
-        virtualBase = (PVOID) firstEntry.p_vaddr; 
-    }
-    else
-    {
-        virtualBase = context->Header.PeHeaderInfo.Preferred.ImageBase;
-    }
-
-    *ImageBase = virtualBase;
+    *ImageBase = context->VirtualImage;
 
     return STATUS_SUCCESS; 
 }
