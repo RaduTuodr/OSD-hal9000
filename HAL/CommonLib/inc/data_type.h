@@ -2,6 +2,7 @@
 
 C_HEADER_START
 
+#include "cal_types.h"
 #include "cal_warning.h"
 
 WARNING_PUSH
@@ -27,34 +28,6 @@ MSVC_WARNING_DISABLE(4142)
 #define MAX_DWORD                   0xFFFFFFFFUL
 #define MAX_QWORD                   0xFFFFFFFFFFFFFFFFULL
 
-//
-// standard types - define them with explicit length
-//
-typedef unsigned __int8     BYTE, *PBYTE;
-typedef unsigned __int16    WORD, *PWORD;
-typedef unsigned __int32    DWORD, *PDWORD;
-typedef unsigned __int64    QWORD, *PQWORD;
-
-typedef unsigned __int8     UINT8, *PUINT8;
-typedef unsigned __int16    UINT16, *PUINT16;
-typedef unsigned __int32    UINT32, *PUINT32;
-typedef unsigned __int64    UINT64, *PUINT64, UINTN, *PUINTN;
-
-typedef signed __int8       INT8;
-typedef signed __int16      INT16;
-typedef signed __int32      INT32;
-typedef signed __int64      INT64, INTN;
-
-typedef char                CHAR8;
-typedef unsigned short      CHAR16;
-
-// pointer
-typedef void                VOID;
-typedef void*               PVOID;
-
-// bool
-typedef BYTE                BOOLEAN;
-
 // VMX operation
 typedef BYTE                VMX_RESULT;
 
@@ -67,11 +40,6 @@ typedef volatile BYTE       VOL_BYTE;
 typedef volatile WORD       VOL_WORD;
 typedef volatile DWORD      VOL_DWORD;
 typedef volatile QWORD      VOL_QWORD;
-
-#ifndef _WCHAR_T_DEFINED
-typedef unsigned short WCHAR;
-#define _WCHAR_T_DEFINED
-#endif  /* _WCHAR_T_DEFINED */
 
 WARNING_POP
 
