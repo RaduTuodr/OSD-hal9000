@@ -1680,6 +1680,11 @@ _MmuMapElfInMemory(
             return status;
         }
 
+        if (currentSegment.p_type != PT_LOAD)
+        {
+            continue;
+        }
+
         // This is simple because the linker script will align
         // everything at page boundary, so no segments share pages
         // We do not get here if this is not satisfied
