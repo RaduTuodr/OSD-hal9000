@@ -3,6 +3,7 @@
 #include "log.h"
 #include "serial_comm.h"
 #include "synch.h"
+#include "cal_atomic.h"
 
 #define INFO_LEVEL_MODIFIER         ""
 #define WARNING_LEVEL_MODIFIER      "[WARNING]"
@@ -141,7 +142,7 @@ LogSetState(
     IN          BOOLEAN         Enable
     )
 {
-    return _InterlockedExchange8(&m_logData.Enabled, Enable );
+    return AtomicExchange8(&m_logData.Enabled, Enable );
 }
 
 LOG_LEVEL
@@ -157,7 +158,7 @@ LogSetLevel(
     IN          LOG_LEVEL   NewLogLevel
     )
 {
-    return _InterlockedExchange(&m_logData.LoggingLevel, (DWORD) NewLogLevel);
+    return AtomicExchange32(&m_logData.LoggingLevel, (DWORD) NewLogLevel);
 }
 
 LOG_COMPONENT
@@ -173,7 +174,7 @@ LogSetTracedComponents(
     IN          LOG_COMPONENT   Components
     )
 {
-    return _InterlockedExchange(&m_logData.LoggingComponents, (DWORD) Components);
+    return AtomicExchange32(&m_logData.LoggingComponents, (DWORD) Components);
 }
 
 static

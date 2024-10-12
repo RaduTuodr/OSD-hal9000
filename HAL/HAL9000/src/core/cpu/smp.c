@@ -9,6 +9,7 @@
 #include "io.h"
 #include "ex_event.h"
 #include "hw_fpu.h"
+#include "cal_atomic.h"
 
 extern void ApAsmStub();
 
@@ -602,7 +603,7 @@ SmpNotifyCpuWakeup(
 
     LOG_FUNC_START_CPU;
 
-    noOfActiveCpus = _InterlockedIncrement(&m_smpData.NoOfActiveCpus);
+    noOfActiveCpus = AtomicIncrement32(&m_smpData.NoOfActiveCpus);
 
     LOGPL("Number of active CPUs: %u/%u\n", noOfActiveCpus, m_smpData.NoOfCpus );
 

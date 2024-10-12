@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "ref_cnt.h"
 #include "cl_memory.h"
+#include "cal_atomic.h"
 
 void
 RfcPreInit(
@@ -45,7 +46,7 @@ RfcReference(
 
     ASSERT(NULL != Object);
 
-    newRefCount = (DWORD)_InterlockedIncrement(&Object->ReferenceCount);
+    newRefCount = (DWORD)AtomicIncrement32(&Object->ReferenceCount);
     ASSERT_INFO(MAX_DWORD > newRefCount, "Reached max reference count");
     ASSERT_INFO( 1 <= newRefCount,
                 "Inexistent object with %u references referenced",
@@ -65,7 +66,7 @@ RfcDereference(
 
     ASSERT(NULL != Object);
 
-    newRefCount = (DWORD)_InterlockedDecrement(&Object->ReferenceCount);
+    newRefCount = (DWORD)AtomicDecrement32(&Object->ReferenceCount);
     ASSERT_INFO(MAX_DWORD != newRefCount, "Object reference count reached -1");
 
     if (0 == newRefCount)

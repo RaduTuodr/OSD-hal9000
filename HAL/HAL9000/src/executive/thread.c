@@ -10,6 +10,7 @@
 #include "isr.h"
 #include "gdtmu.h"
 #include "pe_exports.h"
+#include "cal_atomic.h"
 
 #define TID_INCREMENT               4
 
@@ -50,7 +51,7 @@ _ThreadSystemGetNextTid(
 {
     static volatile TID __currentTid = 0;
 
-    return _InterlockedExchangeAdd64(&__currentTid, TID_INCREMENT);
+    return AtomicExchangeAdd64(&__currentTid, TID_INCREMENT);
 }
 
 static
@@ -473,7 +474,7 @@ ThreadYield(
     bForcedYield = pCpu->ThreadData.YieldOnInterruptReturn;
     pCpu->ThreadData.YieldOnInterruptReturn = FALSE;
 
-    if (THREAD_FLAG_FORCE_TERMINATE_PENDING == _InterlockedAnd(&pThread->Flags, MAX_DWORD))
+    if (THREAD_FLAG_FORCE_TERMINATE_PENDING == AtomicAnd32(&pThread->Flags, MAX_DWORD))
     {
         _ThreadForcedExit();
         NOT_REACHED;
@@ -509,7 +510,7 @@ ThreadBlock(
     ASSERT( INTR_OFF == CpuIntrGetState());
     ASSERT(LockIsOwner(&pCurrentThread->BlockLock));
 
-    if (THREAD_FLAG_FORCE_TERMINATE_PENDING == _InterlockedAnd(&pCurrentThread->Flags, MAX_DWORD))
+    if (THREAD_FLAG_FORCE_TERMINATE_PENDING == AtomicAnd32(&pCurrentThread->Flags, MAX_DWORD))
     {
         _ThreadForcedExit();
         NOT_REACHED;
@@ -623,7 +624,7 @@ ThreadTerminate(
     ASSERT( NULL != Thread );
 
     // it's not a problem if the thread already finished
-    _InterlockedOr(&Thread->Flags, THREAD_FLAG_FORCE_TERMINATE_PENDING );
+    AtomicOr32(&Thread->Flags, THREAD_FLAG_FORCE_TERMINATE_PENDING );
 }
 
 const
@@ -1150,7 +1151,7 @@ _ThreadForcedExit(
 {
     PTHREAD pCurrentThread = GetCurrentThread();
 
-    _InterlockedOr( &pCurrentThread->Flags, THREAD_FLAG_FORCE_TERMINATED );
+    AtomicOr32( &pCurrentThread->Flags, THREAD_FLAG_FORCE_TERMINATED );
 
     ThreadExit(STATUS_JOB_INTERRUPTED);
     NOT_REACHED;

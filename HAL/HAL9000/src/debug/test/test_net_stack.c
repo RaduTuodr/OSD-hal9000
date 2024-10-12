@@ -7,6 +7,7 @@
 #include "keyboard.h"
 #include "keyboard_utils.h"
 #include "cpu.h"
+#include "cal_atomic.h"
 
 #define RECEIVE_THREAD_INITIAL_BUFFER_SIZE                  sizeof(NET_RECEIVE_FRAME_OUTPUT)//64*KB_SIZE
 #define TRANSMIT_THREAD_BUFFER_SIZE                         1*KB_SIZE
@@ -54,7 +55,7 @@ TestNetwork(
     pNetDevices = NULL;
     // C28113: Accessing a local variable via an Interlocked function : This is an unusual usage which could be reconsidered
 MSVC_WARNING_SUPPRESS(28113)
-    _InterlockedExchange8(&bStopRequests, FALSE);
+    AtomicExchange8(&bStopRequests, FALSE);
 
     status = NetGetNetworkDevices(NULL, &noOfDevices);
     if (!SUCCEEDED(status))
@@ -121,7 +122,7 @@ MSVC_WARNING_SUPPRESS(28112)
 
         // C28113: Accessing a local variable via an Interlocked function : This is an unusual usage which could be reconsidered
 MSVC_WARNING_SUPPRESS(28113)
-        _InterlockedExchange8(&bStopRequests, 1);
+        AtomicExchange8(&bStopRequests, 1);
 
         for (i = 0; i < noOfDevices; ++i)
         {

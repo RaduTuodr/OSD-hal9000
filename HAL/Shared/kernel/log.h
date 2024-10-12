@@ -106,7 +106,7 @@ typedef enum _LOG_LEVEL
     LogLevelWarning,
     LogLevelError
 } LOG_LEVEL;
-STATIC_ASSERT_INFO(sizeof(LOG_LEVEL) == sizeof(DWORD), "We are using _InterlockedExchange for levels!");
+STATIC_ASSERT_INFO(sizeof(LOG_LEVEL) == sizeof(DWORD), "We are using AtomicExchange32 for levels!");
 
 typedef enum _LOG_COMPONENT
 {
@@ -129,7 +129,7 @@ typedef enum _LOG_COMPONENT
 
     LogComponentAll         = 0b1111'1111'1111'1111'1111'1111'1111'1111
 } _Enum_is_bitflag_ LOG_COMPONENT;
-STATIC_ASSERT_INFO(sizeof(LOG_COMPONENT) == sizeof(DWORD), "We are using _InterlockedExchange for components!");
+STATIC_ASSERT_INFO(sizeof(LOG_COMPONENT) == sizeof(DWORD), "We are using AtomicExchange32 for components!");
 
 _No_competing_thread_
 void

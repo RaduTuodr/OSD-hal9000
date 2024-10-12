@@ -3,6 +3,7 @@
 #include "cpumu.h"
 #include "smp.h"
 #include "thread.h"
+#include "cal_atomic.h"
 
 static volatile DWORD m_osAsserted = 0;
 
@@ -17,7 +18,7 @@ void
 
     if (SmpGetNumberOfActiveCpus() > 1)
     {
-        assertValue = _InterlockedExchange(&m_osAsserted, 1);
+        assertValue = AtomicExchange32(&m_osAsserted, 1);
         if (0 == assertValue)
         {
             // we are the first to assert

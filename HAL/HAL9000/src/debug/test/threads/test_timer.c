@@ -3,6 +3,7 @@
 #include "test_timer.h"
 #include "ex_timer.h"
 #include "iomu.h"
+#include "cal_atomic.h"
 
 WARNING_PUSH
 
@@ -151,7 +152,7 @@ STATUS
             ExTimerWait(&timer);
 
             // Record the time each thread wakes up
-            DWORD curIdx = _InterlockedIncrement(&pTimer->Different.WakeupArray->CurrentIndex) - 1;
+            DWORD curIdx = AtomicIncrement32(&pTimer->Different.WakeupArray->CurrentIndex) - 1;
 
             // Store the system time in which the current thread has woken up in an array
             pTimer->Different.WakeupArray->SystemWakeTimeUs[curIdx] = IomuGetSystemTimeUs();

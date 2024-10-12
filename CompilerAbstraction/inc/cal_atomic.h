@@ -48,7 +48,6 @@
 
 #define AtomicReadWriteBarrier _ReadWriteBarrier
 
-
 #else
 
 #define AtomicAnd8(value, mask) __atomic_fetch_and((__int8_t volatile *) (value), (__int8_t) (mask), __ATOMIC_SEQ_CST)

@@ -1,6 +1,6 @@
 #include "common_lib.h"
 #include "lock_common.h"
-
+#include "cal_atomic.h"
 #include "cal_intrin.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
@@ -14,7 +14,7 @@ MonitorLockInit(
 
     memzero(Lock, sizeof(MONITOR_LOCK));
 
-    _InterlockedExchange8(&Lock->Lock.State, LOCK_FREE);
+    AtomicExchange8(&Lock->Lock.State, LOCK_FREE);
 }
 
 void
@@ -44,7 +44,7 @@ MSVC_WARNING_SUPPRESS(4127)
     {
         _mm_monitor(Lock, 0, 0);
 
-        if (LOCK_FREE == _InterlockedCompareExchange8(&Lock->Lock.State, LOCK_TAKEN, LOCK_FREE))
+        if (LOCK_FREE == AtomicCompareExchange8(&Lock->Lock.State, LOCK_TAKEN, LOCK_FREE))
         {
             break;
         }
@@ -79,7 +79,7 @@ MonitorLockTryAcquire(
 
     pCurrentCpu = CpuGetCurrent();
 
-    acquired = (LOCK_FREE == _InterlockedCompareExchange8(&Lock->Lock.State, LOCK_TAKEN, LOCK_FREE));
+    acquired = (LOCK_FREE == AtomicCompareExchange8(&Lock->Lock.State, LOCK_TAKEN, LOCK_FREE));
     if (!acquired)
     {
         CpuIntrSetState(*IntrState);
@@ -121,7 +121,7 @@ MonitorLockRelease(
     Lock->Lock.Holder = NULL;
     Lock->Lock.FunctionWhichTookLock = NULL;
 
-    _InterlockedExchange8(&Lock->Lock.State, LOCK_FREE);
+    AtomicExchange8(&Lock->Lock.State, LOCK_FREE);
 
     CpuIntrSetState(OldIntrState);
 }

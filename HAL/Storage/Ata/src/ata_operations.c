@@ -2,6 +2,7 @@
 #include "ata_operations.h"
 #include "ata_commands.h"
 #include "ata_registers.h"
+#include "cal_atomic.h"
 
 /// to remove
 #include "dmp_ata.h"
@@ -664,7 +665,7 @@ MSVC_WARNING_SUPPRESS(4127)
     pDeviceExtension->TotalSectors = identify.Address48Bit;
 
     // initialize current transfer structure
-    _InterlockedExchange(&pDeviceExtension->CurrentTransfer.State, AtaTransferStateFree);
+    AtomicExchange32(&pDeviceExtension->CurrentTransfer.State, AtaTransferStateFree);
     status = ExEventInit(&pDeviceExtension->CurrentTransfer.TransferReady, ExEventTypeSynchronization, FALSE );
     if (!SUCCEEDED(status))
     {
@@ -819,7 +820,7 @@ AtaReadWriteSectors(
         ExEventWaitForSignal(&Device->CurrentTransfer.TransferReady);
 
         // check if transfer actually finished
-        ASSERT( AtaTransferStateFinished == _InterlockedAnd( &Device->CurrentTransfer.State, MAX_DWORD ) );
+        ASSERT( AtaTransferStateFinished == AtomicAnd32( &Device->CurrentTransfer.State, MAX_DWORD ) );
         ASSERT( NULL != Device->CurrentTransfer.Prdt );
 
         LOG_TRACE_STORAGE("About to free PRDT\n");
@@ -893,7 +894,7 @@ BOOLEAN
     // must set Stop bit in command register
     _AtaWriteRegister(pDevRegisters, AtaRegisterBusCommand, 0 );
 
-    ASSERT( AtaTransferStateInProgress == _InterlockedCompareExchange( &pAtaDev->CurrentTransfer.State, AtaTransferStateFinished, AtaTransferStateInProgress ) );
+    ASSERT( AtaTransferStateInProgress == AtomicCompareExchange32( &pAtaDev->CurrentTransfer.State, AtaTransferStateFinished, AtaTransferStateInProgress ) );
 
     ExEventSignal(&pAtaDev->CurrentTransfer.TransferReady);
 

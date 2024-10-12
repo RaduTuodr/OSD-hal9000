@@ -1,6 +1,7 @@
 #include "HAL9000.h"
 #include "ex_event.h"
 #include "thread_internal.h"
+#include "cal_atomic.h"
 
 #include "cpumu.h"
 
@@ -25,7 +26,7 @@ ExEventInit(
     InitializeListHead(&Event->WaitingList);
 
     Event->EventType = EventType;
-    _InterlockedExchange8(&Event->Signaled, Signaled );
+    AtomicExchange8(&Event->Signaled, Signaled );
 
     return STATUS_SUCCESS;
 }
@@ -43,7 +44,7 @@ ExEventSignal(
     pEntry = NULL;
 
     LockAcquire(&Event->EventLock, &oldState);
-    _InterlockedExchange8(&Event->Signaled, TRUE);
+    AtomicExchange8(&Event->Signaled, TRUE);
     
     for(pEntry = RemoveHeadList(&Event->WaitingList);
         pEntry != &Event->WaitingList;
@@ -72,7 +73,7 @@ ExEventClearSignal(
 {
     ASSERT( NULL != Event );
 
-    _InterlockedExchange8(&Event->Signaled, FALSE);
+    AtomicExchange8(&Event->Signaled, FALSE);
 }
 
 void
@@ -94,7 +95,7 @@ ExEventWaitForSignal(
     newState = ExEventTypeNotification == Event->EventType;
 
     oldState = CpuIntrDisable();
-    while (TRUE != _InterlockedCompareExchange8(&Event->Signaled, newState, TRUE))
+    while (TRUE != AtomicCompareExchange8(&Event->Signaled, newState, TRUE))
     {
         LockAcquire(&Event->EventLock, &dummyState);
         InsertTailList(&Event->WaitingList, &pCurrentThread->ReadyList);

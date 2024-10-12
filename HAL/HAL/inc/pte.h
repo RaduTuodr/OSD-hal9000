@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cal_atomic.h"
 #include "cal_warning.h"
 
 #define MAXPHYADDR                                  52
@@ -381,6 +382,6 @@ PageInvalidateTlb(
     // This is a HACK done to prevent a Visual C compiler bug which sometimes (if 2 __invlpg are one after another)
     // causes the __invlpg to generate a swapgs instruction :|
     // Yeah, good job Microsoft...
-    _ReadWriteBarrier();
+    AtomicReadWriteBarrier();
     __invlpg(Page);
 }

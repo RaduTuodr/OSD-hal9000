@@ -3,6 +3,7 @@
 #include "iomu.h"
 #include "display.h"
 #include "cpumu.h"
+#include "cal_atomic.h"
 
 #define DEFAULT_SECONDS_TO_IDLE_STATE           60
 
@@ -90,7 +91,7 @@ CoreUpdateIdleTime(
 
             if (systemTimeUs - lastActivityUs >= m_coreData.MicrosecondsToIdle)
             {
-                if (FALSE == _InterlockedCompareExchange8(&m_coreData.SystemIdle, TRUE, FALSE))
+                if (FALSE == AtomicCompareExchange8(&m_coreData.SystemIdle, TRUE, FALSE))
                 {
                     _CoreSystemIdle();
                 }
@@ -111,8 +112,8 @@ CoreUpdateIdleTime(
             return;
         }
 
-        _InterlockedExchange64(&m_coreData.ReadyThreadUs, systemTimeUs);
-        if (TRUE == _InterlockedExchange8(&m_coreData.SystemIdle, FALSE))
+        AtomicExchange64(&m_coreData.ReadyThreadUs, systemTimeUs);
+        if (TRUE == AtomicExchange8(&m_coreData.SystemIdle, FALSE))
         {
             _CoreSystemRevertFromIdle(systemTimeUs - lastActivityUs);
         }

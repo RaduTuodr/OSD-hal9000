@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "lock_common.h"
 #include "checkin_queue.h"
+#include "cal_atomic.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
 
@@ -59,7 +60,7 @@ CheckinQueueMarkPresence(
     // little busy wait here, it should be basically nothing or minimum waiting time (atomic operation)
     for (DWORD i = 0; i < Queue->NumberOfThreads; i++)
     {
-        if (!_InterlockedCompareExchange8(&Queue->Array[i], TRUE, FALSE))
+        if (!AtomicCompareExchange8(&Queue->Array[i], TRUE, FALSE))
         {
             // marked my slot, the index of the slot is not an issue
             break;
@@ -92,7 +93,7 @@ CheckinQueueWaitOn(
         BOOLEAN semaphoreGreen = TRUE;
         for (DWORD i = 0; i < numberOfThreads; i++)
         {
-            if (!_InterlockedCompareExchange8(&Queue->Array[i], TRUE, TRUE))
+            if (!AtomicCompareExchange8(&Queue->Array[i], TRUE, TRUE))
             {
                 semaphoreGreen = FALSE;
             }

@@ -24,6 +24,7 @@
 #include "smp.h"
 #include "ex_system.h"
 #include "lock_common.h"
+#include "cal_atomic.h"
 
 #define PIC_MASTER_OFFSET                   0x20
 #define PIC_SLAVE_OFFSET                    0x28
@@ -149,7 +150,7 @@ _IomuUpdateSystemTime(
     void
     )
 {
-    _InterlockedExchangeAdd( &m_iomuData.SystemUptime.UptimeMicroseconds, m_iomuData.TimeUpdatePerCpuUs );
+    AtomicExchangeAdd32( &m_iomuData.SystemUptime.UptimeMicroseconds, m_iomuData.TimeUpdatePerCpuUs );
 }
 
 static
@@ -1041,7 +1042,7 @@ IomuCmosUpdateOccurred(
     ASSERT( newSecCount <= MAX_DWORD );
 
     // this will also set UptimeMicroseconds to zero
-    _InterlockedExchange64(&m_iomuData.SystemUptime.Raw, newSecCount );
+    AtomicExchange64(&m_iomuData.SystemUptime.Raw, newSecCount );
 }
 
 DWORD

@@ -1,5 +1,6 @@
 #include "um_lib_base.h"
 #include "um_lib_helper.h"
+#include "cal_atomic.h"
 
 #define LOG_BUF_MAX_SIZE                512
 
@@ -57,7 +58,7 @@ UmThreadCreate(
     OUT     UM_HANDLE*              ThreadHandle
     )
 {
-    DWORD thCtxIdx = _InterlockedIncrement(&m_freeStartCtxIdx) - 1;
+    DWORD thCtxIdx = AtomicIncrement32(&m_freeStartCtxIdx) - 1;
     PUM_START_THREAD_CTX pCtx;
 
     if (thCtxIdx >= UM_MAX_NO_OF_THREADS)

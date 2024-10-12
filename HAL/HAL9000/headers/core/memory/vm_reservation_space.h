@@ -2,6 +2,7 @@
 
 #include "mem_structures.h"
 #include "vmm.h"
+#include "cal_atomic.h"
 
 typedef struct _FILE_OBJECT *PFILE_OBJECT;
 
@@ -67,7 +68,7 @@ VmReservationSpaceDetermineNextFreeVirtualAddress(
 {
     ASSERT(ReservationSpace != NULL);
 
-    return (PVOID) _InterlockedExchangeAdd64(&ReservationSpace->FreeVirtualAddressPointer, Size);
+    return (PVOID) AtomicExchangeAdd64(&ReservationSpace->FreeVirtualAddressPointer, Size);
 }
 
 //******************************************************************************

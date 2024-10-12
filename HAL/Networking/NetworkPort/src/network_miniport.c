@@ -1,5 +1,6 @@
 #include "network_port_base.h"
 #include "ex.h"
+#include "cal_atomic.h"
 
 STATUS
 NetworkPortNotifyReceiveBuffer(
@@ -70,7 +71,7 @@ NetworkPortNotifyReceiveBuffer(
         ExEventSignal(&pPortDevice->RxData.Buffers.FramesListNotEmptyEvent);
     }
 
-    _InterlockedIncrement64(&pPortDevice->RxData.Buffers.NumberOfFramesTransferred);
+    AtomicIncrement64(&pPortDevice->RxData.Buffers.NumberOfFramesTransferred);
 
     return status;
 }
@@ -131,7 +132,7 @@ NetworkPortNotifyLinkStatusChange(
 
     LOG_FUNC_START;
 
-    _InterlockedExchange8(&Device->LinkUp, LinkUp);
+    AtomicExchange8(&Device->LinkUp, LinkUp);
 
     LOG_FUNC_END;
 }

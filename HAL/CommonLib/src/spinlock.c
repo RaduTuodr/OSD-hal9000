@@ -1,5 +1,6 @@
 #include "common_lib.h"
 #include "lock_common.h"
+#include "cal_atomic.h"
 #include "cal_intrin.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
@@ -13,7 +14,7 @@ SpinlockInit(
 
     memzero(Lock, sizeof(SPINLOCK));
 
-    _InterlockedExchange8(&Lock->State, LOCK_FREE);
+    AtomicExchange8(&Lock->State, LOCK_FREE);
 }
 
 void
@@ -37,7 +38,7 @@ SpinlockAcquire(
                 *((PVOID*)IntrinAddressOfReturnAddress())
                 );
 
-    while (LOCK_TAKEN == _InterlockedCompareExchange8(&Lock->State, LOCK_TAKEN, LOCK_FREE))
+    while (LOCK_TAKEN == AtomicCompareExchange8(&Lock->State, LOCK_TAKEN, LOCK_FREE))
     {
         _mm_pause();
     }
@@ -69,7 +70,7 @@ SpinlockTryAcquire(
 
     pCurrentCpu = CpuGetCurrent();
 
-    acquired = (LOCK_FREE == _InterlockedCompareExchange8(&Lock->State, LOCK_TAKEN, LOCK_FREE));
+    acquired = (LOCK_FREE == AtomicCompareExchange8(&Lock->State, LOCK_TAKEN, LOCK_FREE));
     if (!acquired)
     {
         CpuIntrSetState(*IntrState);
@@ -114,7 +115,7 @@ SpinlockRelease(
     Lock->Holder = NULL;
     Lock->FunctionWhichTookLock = NULL;
 
-    _InterlockedExchange8(&Lock->State, LOCK_FREE);
+    AtomicExchange8(&Lock->State, LOCK_FREE);
 
     CpuIntrSetState(OldIntrState);
 }

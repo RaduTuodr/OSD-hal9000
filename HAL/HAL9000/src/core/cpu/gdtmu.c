@@ -2,6 +2,7 @@
 #include "tss.h"
 #include "gdtmu.h"
 #include "gdt.h"
+#include "cal_atomic.h"
 
 static volatile WORD m_selectorIndex = 0;
 
@@ -14,8 +15,8 @@ _GdtMuRetrieveNextSelectorIndex(
     IN      BOOLEAN         SystemDescriptor
     )
 {
-    return _InterlockedExchangeAdd16(&m_selectorIndex,
-                                     SystemDescriptor ? sizeof(TSS_DESCRIPTOR) : sizeof(SEGMENT_DESCRIPTOR));
+    return AtomicExchangeAdd16(&m_selectorIndex,
+                               SystemDescriptor ? sizeof(TSS_DESCRIPTOR) : sizeof(SEGMENT_DESCRIPTOR));
 }
 
 STATUS

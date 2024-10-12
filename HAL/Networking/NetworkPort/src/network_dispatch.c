@@ -1,6 +1,7 @@
 #include "network_port_base.h"
 #include "network_dispatch.h"
 #include "ex.h"
+#include "cal_atomic.h"
 
 static
 STATUS
@@ -196,7 +197,7 @@ MSVC_WARNING_SUPPRESS(4127)
         ASSERT(SUCCEEDED(status));
 
         curTxIndex = ( curTxIndex + 1 ) % pPortDevice->TxData.Buffers.NumberOfBuffers;
-        _InterlockedIncrement64(&pPortDevice->TxData.Buffers.NumberOfFramesTransferred);
+        AtomicIncrement64(&pPortDevice->TxData.Buffers.NumberOfFramesTransferred);
         pPortDevice->TxData.CurrentTxIndex = curTxIndex;
 
         NetworkPortFreeFrameDescriptor(pDescriptorEntry);

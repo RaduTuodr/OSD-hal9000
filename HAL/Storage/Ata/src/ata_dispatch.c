@@ -1,6 +1,7 @@
 #include "ata_base.h"
 #include "ata_dispatch.h"
 #include "ata_operations.h"
+#include "cal_atomic.h"
 
 #define LBA48_MAX_VALUE                 0x0000'FFFF'FFFF'FFFFULL
 
@@ -136,11 +137,11 @@ STATUS
         LOG_TRACE_STORAGE("Sector index: 0x%X\n", sectorIndex);
         LOG_TRACE_STORAGE("Sector count: 0x%X\n", sectorCount);
 
-        ASSERT(AtaTransferStateFree == _InterlockedCompareExchange(&pAtaDevice->CurrentTransfer.State, AtaTransferStateInProgress, AtaTransferStateFree));
+        ASSERT(AtaTransferStateFree == AtomicCompareExchange32(&pAtaDevice->CurrentTransfer.State, AtaTransferStateInProgress, AtaTransferStateFree));
 
         status = AtaReadWriteSectors(pAtaDevice, sectorIndex, (WORD)sectorCount, Irp->Buffer, &sectorsRead, (BOOLEAN)Irp->Flags.Asynchronous, writeOperation);
 
-        _InterlockedExchange(&pAtaDevice->CurrentTransfer.State, AtaTransferStateFree);
+        AtomicExchange32(&pAtaDevice->CurrentTransfer.State, AtaTransferStateFree);
     }
     __finally
     {

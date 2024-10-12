@@ -8,6 +8,7 @@
 #include "um_application.h"
 #include "bitmap.h"
 #include "pte.h"
+#include "cal_atomic.h"
 
 typedef struct _PROCESS_SYSTEM_DATA
 {
@@ -631,7 +632,7 @@ ProcessInsertThreadInList(
     ASSERT(Process->NumberOfThreads < MAX_DWORD);
     Process->NumberOfThreads++;
 
-    activeThreads = _InterlockedIncrement(&Process->ActiveThreads);
+    activeThreads = AtomicIncrement32(&Process->ActiveThreads);
     ASSERT(activeThreads <= Process->NumberOfThreads);
 
     InsertTailList(&Process->ThreadList, &Thread->ProcessList);
@@ -656,7 +657,7 @@ ProcessNotifyThreadTermination(
     pProcess = Thread->Process;
     ASSERT(pProcess != NULL);
 
-    activeThreads = _InterlockedDecrement(&pProcess->ActiveThreads);
+    activeThreads = AtomicDecrement32(&pProcess->ActiveThreads);
 
     // Once there are no more active threads in the process we need set the process exit
     // status and signal the process termination event
@@ -686,7 +687,7 @@ ProcessRemoveThreadFromList(
 
     LockAcquire(&pProcess->ThreadListLock, &oldState);
 
-    remainingThreads = _InterlockedDecrement(&pProcess->NumberOfThreads);
+    remainingThreads = AtomicDecrement32(&pProcess->NumberOfThreads);
     ASSERT_INFO(remainingThreads != MAX_DWORD,
                 "If the process already had ZERO threads what thread can we remove??");
 
