@@ -19,6 +19,7 @@
 
 #pragma pack(push,1)
 
+WARNING_PUSH
 // warning C4214: nonstandard extension used: bit field types other than int
 MSVC_WARNING_DISABLE(4214)
 
@@ -76,5 +77,7 @@ typedef struct _ATA_IDENTIFY_RESPONSE
     WORD        Reserved8[152];                             // 208
 } ATA_IDENTIFY_RESPONSE, *PATA_IDENTIFY_RESPONSE;
 STATIC_ASSERT(sizeof(ATA_IDENTIFY_RESPONSE) == SECTOR_SIZE);
-#pragma warning(default:4124)
+
+WARNING_POP
+
 #pragma pack(pop)

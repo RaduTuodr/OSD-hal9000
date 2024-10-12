@@ -1,9 +1,11 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_optimize.h"
 
 // we turn all compiler optimizations off so we don't have any surprises
-#pragma optimize("", off)
+PUSH_OPTIONS
+NO_OPTIMIZE
 
 #define NO_OF_TIMES_TO_ALLOCATE_ALMOST_A_PAGE_OF_LOCAL_VARIABLES     10
 
@@ -69,4 +71,6 @@ __main(
 
     return STATUS_SUCCESS;
 }
-#pragma optimize("", on)
+
+OPTIMIZE
+POP_OPTIONS

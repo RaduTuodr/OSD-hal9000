@@ -1,11 +1,14 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_optimize.h"
 
 #define NO_OF_TIMES_TO_CALL_RECURSIVE_FUNCTIONS     10000
 
 // we turn all compiler optimizations off so we don't have any surprises
-#pragma optimize("", off)
+PUSH_OPTIONS
+NO_OPTIMIZE
+
 static void _RecursiveFunction(DWORD TimesToCall)
 {
     if (TimesToCall == 0) return;
@@ -26,4 +29,6 @@ __main(
 
     return STATUS_SUCCESS;
 }
-#pragma optimize("", on)
+
+OPTIMIZE
+POP_OPTIONS
