@@ -128,7 +128,7 @@ UmApplicationRun(
 
         PVOID entryPoint;
         ExecutableLoaderGetEntryPoint(Process->LoaderContext, &entryPoint);
-        LOG_TRACE_USERMODE("Will create thread with entry point at 0x%X\n", entryPoint);
+        LOGL("Will create thread with entry point at 0x%X\n", entryPoint);
 
         status = ThreadCreateEx("Test",
                                 ThreadPriorityDefault,
@@ -144,7 +144,7 @@ UmApplicationRun(
             __leave;
         }
 
-        LOG_TRACE_USERMODE("Successfully created thread!\n");
+        LOGL("Successfully created thread!\n");
     }
     __finally
     {

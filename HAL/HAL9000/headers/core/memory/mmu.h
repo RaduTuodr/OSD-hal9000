@@ -284,6 +284,20 @@ MmuSolvePageFault(
     );
 
 //******************************************************************************
+// Function:     MmuLoadElf
+// Description:  Maps a ELF eagerly to a VA using the paging structures specified
+//               as a parameter. Currently the file alignment and the section
+//               alignment need to be equal for this to be possible.
+//******************************************************************************
+STATUS
+MmuLoadElf(
+    PVOID                   Image,
+    DWORD                   ImageSize,
+    PVOID                   FileHeader,
+    PPAGING_LOCK_DATA       PagingData
+    );
+
+//******************************************************************************
 // Function:     MmuLoadPe
 // Description:  Maps a PE eagerly to a VA using the paging structures specified
 //               as a parameter. Currently the file alignment and the section

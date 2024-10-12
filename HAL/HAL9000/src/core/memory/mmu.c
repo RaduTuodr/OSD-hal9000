@@ -1,6 +1,5 @@
 #include "HAL9000.h"
 #include "bootinfo.h"
-#include "mmu.h"
 #include "pmm.h"
 #include "vmm.h"
 #include "pte.h"
@@ -9,7 +8,9 @@
 #include "cl_heap.h"
 #include "cpumu.h"
 #include "thread.h"
+#include "elf_parser.h"
 #include "pe_parser.h"
+#include "mmu.h"
 #include "ex_event.h"
 #include "exe_loader.h"
 #include "process_internal.h"
@@ -152,6 +153,15 @@ _MmuMapKernelMemory(
     IN          PPAGING_DATA            PagingData,
     IN          PHYSICAL_ADDRESS        PhysicalAddress,
     IN          PPE_NT_HEADER_INFO      KernelInfo
+    );
+
+static
+STATUS
+_MmuMapElfInMemory(
+    PVOID                   Image,
+    DWORD                   ImageSize,
+    Elf64_Ehdr*             FileHeader,
+    PPAGING_DATA            PagingData
     );
 
 static
@@ -892,6 +902,46 @@ MmuSolvePageFault(
 }
 
 STATUS
+MmuLoadElf(
+    PVOID                   Image,
+    DWORD                   ImageSize,
+    PVOID                   FileHeader,
+    PPAGING_LOCK_DATA       PagingData
+    )
+{
+    STATUS status;
+    INTR_STATE oldState;
+
+    if (NULL == Image)
+    {
+        return STATUS_INVALID_PARAMETER1;
+    }
+
+    if (0 == ImageSize)
+    {
+        return STATUS_INVALID_PARAMETER2;
+    }
+
+    if (NULL == FileHeader)
+    {
+        return STATUS_INVALID_PARAMETER3;
+    }
+
+    if (NULL == PagingData)
+    {
+        return STATUS_INVALID_PARAMETER4;
+    }
+
+    status = STATUS_SUCCESS;
+
+    RecRwSpinlockAcquireExclusive(&PagingData->Lock, &oldState);
+    status = _MmuMapElfInMemory(Image, ImageSize, (Elf64_Ehdr *) FileHeader, &PagingData->Data);
+    RecRwSpinlockReleaseExclusive(&PagingData->Lock, oldState);
+
+    return status;
+}
+
+STATUS
 MmuLoadPe(
     IN      PPE_NT_HEADER_INFO      NtHeader,
     IN      PPAGING_LOCK_DATA       PagingData
@@ -1596,6 +1646,77 @@ _MmuRemapStack(
     }
 
     return status;
+}
+
+
+static
+STATUS
+_MmuMapElfInMemory(
+    PVOID                   Image,
+    DWORD                   ImageSize,
+    Elf64_Ehdr*             FileHeader,
+    PPAGING_DATA            PagingData
+    )
+{
+    STATUS status;
+    Elf64_Phdr currentSegment = { 0 };
+    QWORD size;
+    PAGE_RIGHTS rights;
+
+    status = STATUS_SUCCESS;
+    size = 0;
+    rights = 0;
+
+    // LOGL("Mapping ELF starting at %X with size\n", Image, ImageSize);
+
+    // LOGL("Number of program headers is %d\n", FileHeader->e_phnum);
+
+    for (DWORD i = 0; i < FileHeader->e_phnum; i++)
+    {
+        status = ElfGetSegment(Image, ImageSize, FileHeader, i, &currentSegment);
+        if (!SUCCEEDED(status))
+        {
+            LOG_FUNC_ERROR("ElfGetSegment", status);
+            return status;
+        }
+
+        // This is simple because the linker script will align
+        // everything at page boundary, so no segments share pages
+        // We do not get here if this is not satisfied
+
+        rights = 0;
+        if (currentSegment.p_flags & PF_R)
+        {
+            rights |= PAGE_RIGHTS_READ;
+        }
+        
+        if (currentSegment.p_flags & PF_W)
+        {
+            rights |= PAGE_RIGHTS_WRITE;
+        }
+
+        if (currentSegment.p_flags & PF_X)
+        {
+            rights |= PAGE_RIGHTS_EXECUTE;
+        }
+
+        size = AlignAddressUpper(currentSegment.p_memsz, PAGE_SIZE);
+
+        // LOGL("Mapping %X -> %X, size %x with rights %X\n",
+        //                              MmuGetPhysicalAddress(PtrOffset(Image, currentSegment.p_off)),
+        //                              currentSegment.p_vaddr,
+        //                              size,
+        //                              rights);
+        VmmMapMemoryInternal(PagingData,
+                             MmuGetPhysicalAddress(PtrOffset(Image, currentSegment.p_off)),
+                             size,
+                             (PVOID) currentSegment.p_vaddr,
+                             rights,
+                             TRUE,
+                             FALSE);
+    }
+
+    return STATUS_SUCCESS;
 }
 
 static

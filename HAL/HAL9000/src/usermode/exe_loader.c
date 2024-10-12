@@ -1,15 +1,18 @@
 #include "HAL9000.h"
 #include "ex.h"
 #include "log.h"
-#include "mmu.h"
 #include "pe_exports.h"
 #include "pe_parser.h"
+#include "elf_exports.h"
+#include "elf_parser.h"
+#include "mmu.h"
 #include "status.h"
 #include "exe_loader.h"
 
-typedef union
+typedef struct
 {
     PE_NT_HEADER_INFO PeHeaderInfo;
+    Elf64_Ehdr ElfFileHeader;
 } _EXE_HEADER;
 
 typedef struct
@@ -83,12 +86,20 @@ ExecutableLoaderInit(
     }
     
     format = _ExecutableLoaderDetermineFormat(Image);
-    if (format == ExecutableFormatUnknown || format == ExecutableFormatELF)
+    if (format == ExecutableFormatUnknown)
     {
         return STATUS_UNSUPPORTED;
     }
 
-    status = PeRetrieveNtHeader(Image, ImageSize, &(context->Header.PeHeaderInfo));
+    if (format == ExecutableFormatELF)
+    {
+        status = ElfRetrieveFileHeader(Image, ImageSize, &(context->Header.ElfFileHeader));
+    }
+    else
+    {
+        status = PeRetrieveNtHeader(Image, ImageSize, &(context->Header.PeHeaderInfo));
+    }
+
     if (!SUCCEEDED(status))
     {
         return status;
@@ -179,7 +190,7 @@ ExecutableLoaderGetPhysicalImageBase(
         return STATUS_INVALID_PARAMETER2;
     }
 
-    if (context->Format == ExecutableFormatUnknown || context->Format == ExecutableFormatELF)
+    if (context->Format == ExecutableFormatUnknown)
     {
         return STATUS_UNSUPPORTED;
     }
@@ -196,8 +207,11 @@ ExecutableLoaderGetVirtualImageBase(
     )
 {
     _EXE_LOADER_CONTEXT *context;
+    PVOID virtualBase;
+    Elf64_Phdr firstEntry = { 0 };
 
     context = (_EXE_LOADER_CONTEXT *) Context;
+    virtualBase = NULL;
 
     if (NULL == Context)
     {
@@ -209,12 +223,26 @@ ExecutableLoaderGetVirtualImageBase(
         return STATUS_INVALID_PARAMETER2;
     }
 
-    if (context->Format == ExecutableFormatUnknown || context->Format == ExecutableFormatELF)
+    if (context->Format == ExecutableFormatUnknown)
     {
         return STATUS_UNSUPPORTED;
     }
 
-    *ImageBase = context->Header.PeHeaderInfo.Preferred.ImageBase;
+    if (context->Format == ExecutableFormatELF)
+    {
+        if (!SUCCEEDED(ElfGetSegment(context->Image, context->ImageSize, 
+                                     &(context->Header.ElfFileHeader), 0, &firstEntry)))
+        {
+            return STATUS_UNSUCCESSFUL;
+        }
+        virtualBase = (PVOID) firstEntry.p_vaddr; 
+    }
+    else
+    {
+        virtualBase = context->Header.PeHeaderInfo.Preferred.ImageBase;
+    }
+
+    *ImageBase = virtualBase;
 
     return STATUS_SUCCESS; 
 }
@@ -239,7 +267,7 @@ ExecutableLoaderGetImageSize(
         return STATUS_INVALID_PARAMETER2;
     }
 
-    if (context->Format == ExecutableFormatUnknown || context->Format == ExecutableFormatELF)
+    if (context->Format == ExecutableFormatUnknown)
     {
         return STATUS_UNSUPPORTED;
     }
@@ -256,8 +284,10 @@ ExecutableLoaderGetEntryPoint(
     )
 {
     _EXE_LOADER_CONTEXT *context;
+    PVOID entryPoint;
 
     context = (_EXE_LOADER_CONTEXT *) Context;
+    entryPoint = NULL;
 
     if (NULL == Context)
     {
@@ -269,12 +299,21 @@ ExecutableLoaderGetEntryPoint(
         return STATUS_INVALID_PARAMETER2;
     }
 
-    if (context->Format == ExecutableFormatUnknown || context->Format == ExecutableFormatELF)
+    if (context->Format == ExecutableFormatUnknown)
     {
         return STATUS_UNSUPPORTED;
     }
 
-    *EntryPoint = context->Header.PeHeaderInfo.Preferred.AddressOfEntryPoint;
+    if (context->Format == ExecutableFormatELF)
+    {
+        entryPoint = (PVOID) context->Header.ElfFileHeader.e_entry;
+    }
+    else
+    {
+        entryPoint = context->Header.PeHeaderInfo.Preferred.AddressOfEntryPoint;
+    }
+
+    *EntryPoint = entryPoint;
 
     return STATUS_SUCCESS; 
 }
@@ -285,8 +324,10 @@ ExecutableLoaderMemoryMap(
     PPAGING_LOCK_DATA PagingData
     )
 {
+    STATUS status;
     _EXE_LOADER_CONTEXT *context;
 
+    status = STATUS_SUCCESS;
     context = (_EXE_LOADER_CONTEXT *) Context;
 
     if (NULL == Context)
@@ -299,12 +340,24 @@ ExecutableLoaderMemoryMap(
         return STATUS_INVALID_PARAMETER2;
     }
 
-    if (context->Format == ExecutableFormatUnknown || context->Format == ExecutableFormatELF)
+    if (context->Format == ExecutableFormatUnknown)
     {
         return STATUS_UNSUPPORTED;
     }
 
-    return MmuLoadPe(&(context->Header.PeHeaderInfo), PagingData);
+    if (context->Format == ExecutableFormatELF)
+    {
+        status = MmuLoadElf(context->Image,
+                            context->ImageSize,
+                            &(context->Header.ElfFileHeader),
+                            PagingData);
+    }
+    else
+    {
+        status = MmuLoadPe(&(context->Header.PeHeaderInfo), PagingData);
+    }
+
+    return status;
 }
 
 STATUS

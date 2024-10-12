@@ -108,6 +108,7 @@ target_link_libraries(HAL9000.bin PRIVATE
     CommonLib
     FAT32
     SwapFS
+    ELF_Parser
     PE_Parser
     Eth_82574L
     NetworkStack

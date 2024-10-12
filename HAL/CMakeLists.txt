@@ -7,6 +7,7 @@ add_subdirectory(CommonLib)
 add_subdirectory(Filesystems/FAT32)
 add_subdirectory(Filesystems/SwapFS)
 
+add_subdirectory(Misc/ELF_Parser)
 add_subdirectory(Misc/PE_Parser)
 
 add_subdirectory(Networking/Eth_82574L)
