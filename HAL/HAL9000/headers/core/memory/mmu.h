@@ -30,7 +30,7 @@ typedef struct _PAGING_LOCK_DATA
 } PAGING_LOCK_DATA, *PPAGING_LOCK_DATA;
 
 // These map/unmap memory only in the context of the system process
-#define MmuMapSystemMemory(Pa,Sz)   MmuMapMemoryEx((Pa),(Sz),PAGE_RIGHTS_READWRITE, FALSE, FALSE, NULL)
+#define MmuMapSystemMemory(Pa,Sz)   MmuMapMemoryEx((Pa),(Sz),PAGE_RIGHTS_READWRITE, FALSE, FALSE, NULL, FALSE)
 #define MmuUnmapSystemMemory(Va,Sz) MmuUnmapMemoryEx((Va),(Sz),FALSE, NULL)
 
 _No_competing_thread_
@@ -116,6 +116,7 @@ MmuGetHighestPhysicalMemoryAddressPresent(
 // Parameter:    IN BOOLEAN Uncacheable
 // Parameter:    IN_OPT PPAGING_LOCK_DATA PagingData - Paging structures to use,
 //               if NULL maps only to kernel space.
+// Parameter:    IN BOOLEAN Address is known to be valid, no check required
 //******************************************************************************
 PTR_SUCCESS
 PVOID
@@ -125,7 +126,8 @@ MmuMapMemoryEx(
     IN      PAGE_RIGHTS             PageRights,
     IN      BOOLEAN                 Invalidate,
     IN      BOOLEAN                 Uncacheable,
-    IN_OPT  PPAGING_LOCK_DATA       PagingData
+    IN_OPT  PPAGING_LOCK_DATA       PagingData,
+    IN      BOOLEAN                 TrustedAddress
     );
 
 //******************************************************************************

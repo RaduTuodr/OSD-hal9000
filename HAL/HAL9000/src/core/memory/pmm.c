@@ -269,11 +269,16 @@ _PmmDetermineMemoryLimits(
         // LOG("\n");
         // LOG("Entry %d at %X\n", i, mmap);
         // LOG("Type %d\n", memoryDescriptor->Type);
-        // LOG("PhysicalStart %d\n", memoryDescriptor->PhysicalStart);
-        // LOG("NumberOfpages %d\n", memoryDescriptor->NumberOfPages);
+        // LOG("PhysicalStart %X\n", memoryDescriptor->PhysicalStart);
+        // LOG("NumberOfpages %X\n", memoryDescriptor->NumberOfPages);
         // LOG("\n");
         memoryType = memoryDescriptor->Type;
         length = memoryDescriptor->NumberOfPages * PAGE_SIZE;
+
+        if (memoryDescriptor->Type == EfiReservedMemoryType)
+        {
+            continue;
+        }
 
         if (memoryDescriptor->PhysicalStart + length > highestMemoryAddressPresent)
         {

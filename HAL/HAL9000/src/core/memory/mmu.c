@@ -594,7 +594,8 @@ MmuMapMemoryEx(
     IN      PAGE_RIGHTS             PageRights,
     IN      BOOLEAN                 Invalidate,
     IN      BOOLEAN                 Uncacheable,
-    IN_OPT  PPAGING_LOCK_DATA       PagingData
+    IN_OPT  PPAGING_LOCK_DATA       PagingData,
+    IN      BOOLEAN                 TrustedAddress
     )
 {
     QWORD alignedSize;
@@ -619,7 +620,10 @@ MmuMapMemoryEx(
     alignmentDifferences = (DWORD) AddressOffset(PhysicalAddress, PAGE_SIZE);
 
     alignedSize = AlignAddressUpper(Size + alignmentDifferences, PAGE_SIZE);
-    ASSERT(alignedPhysicalAddress < (PHYSICAL_ADDRESS) PtrDiff(MmuGetHighestPhysicalMemoryAddressPresent(),alignedSize));
+    if (!TrustedAddress)
+    {
+        ASSERT(alignedPhysicalAddress < (PHYSICAL_ADDRESS) PtrDiff(MmuGetHighestPhysicalMemoryAddressPresent(),alignedSize));
+    }
 
     pPagingData = (PagingData == NULL) ? &m_mmuData.PagingData : PagingData;
 
@@ -2120,7 +2124,8 @@ _MmuZeroWorkerThreadFunction(
                                PAGE_RIGHTS_READWRITE,
                                FALSE,
                                FALSE,
-                               NULL
+                               NULL,
+                               FALSE
                                );
         ASSERT( NULL != pAddr );
 

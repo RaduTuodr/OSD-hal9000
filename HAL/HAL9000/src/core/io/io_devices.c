@@ -944,7 +944,7 @@ IoMapMemory(
         return NULL;
     }
 
-    return MmuMapMemoryEx(PhysicalAddress, Size, PageRights, TRUE, TRUE, NULL );
+    return MmuMapMemoryEx(PhysicalAddress, Size, PageRights, TRUE, TRUE, NULL, TRUE );
 }
 
 void
