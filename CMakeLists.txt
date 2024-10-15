@@ -28,6 +28,8 @@ set(HAL9000_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/HAL/HAL9000/headers/usermode
 )
 
+add_subdirectory(CompilerAbstraction)
+
 add_subdirectory(UefiBootloader)
 
 add_subdirectory(HAL)
