@@ -1,5 +1,6 @@
 #include "common_lib.h"
 #include "cl_memory.h"
+#include "cal_assembly.h"
 
 extern void CpuClearDirectionFlag();
 
@@ -81,7 +82,7 @@ cl_memcpy(
 
         CpuClearDirectionFlag();
 
-        __movsq(dst, src, alignedCount / sizeof(QWORD));
+        AsmMovsq(dst, src, alignedCount / sizeof(QWORD));
     }
 }
 
