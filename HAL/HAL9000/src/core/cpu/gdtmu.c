@@ -4,6 +4,7 @@
 #include "gdt.h"
 #include "cal_annotate.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 
 static volatile WORD m_selectorIndex = 0;
 
@@ -128,11 +129,11 @@ GdtMuReload(
     QWORD oldGsBase = 0;
     QWORD oldFsBase = 0;
 
-    if (PreserveGsBase) oldGsBase = __readmsr(IA32_GS_BASE_MSR);
-    if (PreserveFsBase) oldFsBase = __readmsr(IA32_FS_BASE_MSR);
+    if (PreserveGsBase) oldGsBase = AsmReadMsr(IA32_GS_BASE_MSR);
+    if (PreserveFsBase) oldFsBase = AsmReadMsr(IA32_FS_BASE_MSR);
 
     GdtReload(CodeSelector, DataSelector);
 
-    if (PreserveGsBase) __writemsr(IA32_GS_BASE_MSR, oldGsBase);
-    if (PreserveFsBase) __writemsr(IA32_FS_BASE_MSR, oldFsBase);
+    if (PreserveGsBase) AsmWriteMsr(IA32_GS_BASE_MSR, oldGsBase);
+    if (PreserveFsBase) AsmWriteMsr(IA32_FS_BASE_MSR, oldFsBase);
 }

@@ -8,6 +8,7 @@
 #include "process_internal.h"
 #include "dmp_cpu.h"
 #include "thread.h"
+#include "cal_assembly.h"
 
 extern void SyscallEntry();
 
@@ -139,12 +140,12 @@ SyscallCpuInit(
     ASSERT(umCsSelector + 0x10 == GdtMuGetCS64Usermode());
 
     // Syscall RIP <- IA32_LSTAR
-    __writemsr(IA32_LSTAR, (QWORD) SyscallEntry);
+    AsmWriteMsr(IA32_LSTAR, (QWORD) SyscallEntry);
 
     LOG_TRACE_USERMODE("Successfully set LSTAR to 0x%X\n", (QWORD) SyscallEntry);
 
     // Syscall RFLAGS <- RFLAGS & ~(IA32_FMASK)
-    __writemsr(IA32_FMASK, RFLAGS_INTERRUPT_FLAG_BIT);
+    AsmWriteMsr(IA32_FMASK, RFLAGS_INTERRUPT_FLAG_BIT);
 
     LOG_TRACE_USERMODE("Successfully set FMASK to 0x%X\n", RFLAGS_INTERRUPT_FLAG_BIT);
 
@@ -156,7 +157,7 @@ SyscallCpuInit(
     // Sysret DS.Sel <- (IA32_STAR[63:48] + 0x8) & 0xFFFC
     starMsr.SysretCsDs = umCsSelector;
 
-    __writemsr(IA32_STAR, starMsr.Raw);
+    AsmWriteMsr(IA32_STAR, starMsr.Raw);
 
     LOG_TRACE_USERMODE("Successfully set STAR to 0x%X\n", starMsr.Raw);
 }

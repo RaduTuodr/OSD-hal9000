@@ -440,7 +440,7 @@ void
 
     atoi32(&index, IndexString, BASE_HEXA);
 
-    QWORD value = __readmsr(index);
+    QWORD value = AsmReadMsr(index);
 
     LOG("RDMSR[%x] = 0x%X\n", index, value );
 }
@@ -462,7 +462,7 @@ void
 
     LOG("WRMSR[%x] = 0x%X\n", index, value);
 
-    __writemsr(index, value );
+    AsmWriteMsr(index, value );
 }
 
 void

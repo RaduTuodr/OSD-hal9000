@@ -4,6 +4,7 @@
 #include "msr.h"
 #include "lapic_registers.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 ALWAYS_INLINE
 static
@@ -12,7 +13,7 @@ _LapicIsCpuBsp(
     void
     )
 {
-    return IsBooleanFlagOn( __readmsr(IA32_APIC_BASE_MSR), IA32_APIC_BSP_FLAG );
+    return IsBooleanFlagOn( AsmReadMsr(IA32_APIC_BASE_MSR), IA32_APIC_BSP_FLAG );
 }
 
 static
@@ -42,12 +43,12 @@ LapicInitialize(
 
     // make sure APIC is enabled and
     // not XAPIC
-    apicMsr = __readmsr(IA32_APIC_BASE_MSR);
+    apicMsr = AsmReadMsr(IA32_APIC_BASE_MSR);
 
     apicMsr |= IA32_APIC_BASE_ENABLE_FLAG;
     apicMsr &= (~IA32_APIC_EXT_ENABLE_FLAG);
 
-    __writemsr(IA32_APIC_BASE_MSR, apicMsr);
+    AsmWriteMsr(IA32_APIC_BASE_MSR, apicMsr);
 }
 
 void
@@ -283,7 +284,7 @@ LapicGetBasePhysicalAddress(
 {
     QWORD apicBaseRegister;
 
-    apicBaseRegister = __readmsr(IA32_APIC_BASE_MSR);
+    apicBaseRegister = AsmReadMsr(IA32_APIC_BASE_MSR);
 
     return (PHYSICAL_ADDRESS)IA32_APIC_BASE_MASK(apicBaseRegister);
 }

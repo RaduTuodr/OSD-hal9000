@@ -70,7 +70,7 @@ STATIC_ASSERT_INFO(FIELD_OFFSET(PCPU,StackTop) == 0x8, "Used by _syscall.yasm:30
 // in which the pointer returned is actually used. This is an instance of a time of check to
 // time of use race condition.
 #define GetCurrentPcpu()    ((PCPU*)__readgsqword(FIELD_OFFSET(PCPU,Self)))
-#define SetCurrentPcpu(pc)  (__writemsr(IA32_GS_BASE_MSR,(pc)))
+#define SetCurrentPcpu(pc)  (AsmWriteMsr(IA32_GS_BASE_MSR, (QWORD) (pc)))
 
 void
 CpuMuPreinit(

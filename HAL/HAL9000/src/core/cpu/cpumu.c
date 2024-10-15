@@ -63,9 +63,9 @@ _CpuActivateAvailableFeatures(
     // EFER
     eferFlagsToActivate |= ((m_cpuMuData.ExtendedFeatureInformation.edx.Syscall) ? IA32_EFER_SCE : 0);
 
-    __writemsr(IA32_EFER, __readmsr(IA32_EFER) | eferFlagsToActivate);
+    AsmWriteMsr(IA32_EFER, AsmReadMsr(IA32_EFER) | eferFlagsToActivate);
 
-    LOG("EFER is 0x%X\n", __readmsr(IA32_EFER));
+    LOG("EFER is 0x%X\n", AsmReadMsr(IA32_EFER));
 }
 
 ALWAYS_INLINE
@@ -156,7 +156,7 @@ CpuMuPreinit(
 
     // we're not using the SetCurrentThread macro because it will
     // try to dereference the PCPU pointer
-    __writemsr(IA32_FS_BASE_MSR, &__dummySelfThread);
+    AsmWriteMsr(IA32_FS_BASE_MSR, (QWORD) &__dummySelfThread);
 }
 
 void
@@ -172,7 +172,7 @@ CpuMuValidateConfiguration(
 
     ASSERT_INFO( m_cpuMuData.FeatureInformation.edx.PAT, "We need PAT!");
 
-    ASSERT( IA32_EXPECTED_PAT_VALUES == __readmsr(IA32_PAT) );
+    ASSERT( IA32_EXPECTED_PAT_VALUES == AsmReadMsr(IA32_PAT) );
 
     ASSERT_INFO( m_cpuMuData.FeatureInformation.edx.SSE, "We need SFENCE support!");
 
@@ -213,7 +213,7 @@ CpuMuSetMonitorFilterSize(
         return STATUS_CPU_MONITOR_FILTER_SIZE_TOO_LARGE;
     }
 
-    __writemsr( IA32_MONITOR_FILTER_SIZE_MSR, FilterSize);
+    AsmWriteMsr( IA32_MONITOR_FILTER_SIZE_MSR, FilterSize);
 
     return STATUS_SUCCESS;
 }
@@ -439,8 +439,8 @@ _CpuValidateCurrentCpu(
     cr8 = __readcr8();
 
     // read MSRs
-    eferMsr = __readmsr(IA32_EFER);
-    ia32PatValues = __readmsr(IA32_PAT);
+    eferMsr = AsmReadMsr(IA32_EFER);
+    ia32PatValues = AsmReadMsr(IA32_PAT);
 
     // Step 1. check control registers
 

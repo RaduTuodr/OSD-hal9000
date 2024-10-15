@@ -80,7 +80,7 @@ void
 
     if (!m_syscallIfVerified)
     {
-        __writemsr(0xDEADBEEF, 0x0);
+        AsmWriteMsr(0xDEADBEEF, 0x0);
 
     }
     else

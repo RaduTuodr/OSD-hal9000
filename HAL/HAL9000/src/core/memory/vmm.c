@@ -11,6 +11,7 @@
 #include "process_internal.h"
 #include "mdl.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 #define VMM_SIZE_FOR_RESERVATION_METADATA            (5*TB_SIZE)
 
@@ -356,7 +357,7 @@ VmmPreparePagingData(
     ia32PatValues = 0;
     bResult = FALSE;
 
-    ia32PatValues = __readmsr(IA32_PAT);
+    ia32PatValues = AsmReadMsr(IA32_PAT);
     bResult = _VmDeterminePatIndices(ia32PatValues,
                                      &m_vmmData.WriteBackIndex,
                                      &m_vmmData.UncacheableIndex
