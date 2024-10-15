@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "lock_common.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 #include "cal_intrin.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
@@ -40,7 +41,7 @@ SpinlockAcquire(
 
     while (LOCK_TAKEN == AtomicCompareExchange8(&Lock->State, LOCK_TAKEN, LOCK_FREE))
     {
-        _mm_pause();
+        AsmPause();
     }
 
     ASSERT(NULL == Lock->FunctionWhichTookLock);

@@ -2,6 +2,7 @@
 #include "lock_common.h"
 #include "checkin_queue.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
 
@@ -97,7 +98,7 @@ CheckinQueueWaitOn(
             {
                 semaphoreGreen = FALSE;
             }
-            _mm_pause();
+            AsmPause();
         }
         if (semaphoreGreen) busyWait = FALSE;
     }

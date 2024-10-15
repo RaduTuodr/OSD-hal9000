@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "event.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 
 #define EVENT_STATE_NOT_SIGNALED        0
 #define EVENT_STATE_SIGNALED            1
@@ -68,7 +69,7 @@ EvtWaitForSignal(
     // wait for the event to be signaled
     while (EVENT_STATE_SIGNALED != (DWORD)AtomicCompareExchange8(&Event->State, exchangeValue, EVENT_STATE_SIGNALED))
     {
-        _mm_pause();
+        AsmPause();
     }
 }
 

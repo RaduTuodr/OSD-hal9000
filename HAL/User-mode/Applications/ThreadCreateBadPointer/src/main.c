@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_assembly.h"
 
 
 STATUS
@@ -25,7 +26,7 @@ __main(
         while(&hThread)
         {
             test += 1;
-            _mm_pause();
+            AsmPause();
         }
     }
     __finally

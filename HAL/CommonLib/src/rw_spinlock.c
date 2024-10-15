@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "lock_common.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
 
@@ -36,7 +37,7 @@ RwSpinlockAcquire(
         // because this is done on DWORD it will affect ActiveWrite and ActiveReaders
         while (0 != AtomicCompareExchange32((volatile DWORD*) &Spinlock->ActiveWriter, 1, 0))
         {
-            _mm_pause();
+            AsmPause();
         }
 
         // we're here => we're the active writer
@@ -55,7 +56,7 @@ RwSpinlockAcquire(
         // check WaitingWriters and ActiveWriter (so writers will have priority)
         while (0 != AtomicCompareExchange32((volatile DWORD*) &Spinlock->WaitingWriters, pseudoActiveWriter, 0))
         {
-            _mm_pause();
+            AsmPause();
         }
 
         // we're here => we're an active reader
