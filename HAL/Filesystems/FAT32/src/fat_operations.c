@@ -1,6 +1,7 @@
 #include "fat32_base.h"
 #include "fat_operations.h"
 #include "fat_utils.h"
+#include "cal_seh.h"
 
 
 static

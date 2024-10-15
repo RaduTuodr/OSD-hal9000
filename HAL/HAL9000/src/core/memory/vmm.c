@@ -12,6 +12,7 @@
 #include "mdl.h"
 #include "cal_annotate.h"
 #include "cal_assembly.h"
+#include "cal_seh.h"
 
 #define VMM_SIZE_FOR_RESERVATION_METADATA            (5*TB_SIZE)
 

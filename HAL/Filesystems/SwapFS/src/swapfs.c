@@ -1,6 +1,7 @@
 #include "swapfs_base.h"
 #include "swapfs.h"
 #include "cal_annotate.h"
+#include "cal_seh.h"
 
 static FUNC_DriverDispatch     _SwapFsCreate;
 static FUNC_DriverDispatch     _SwapFsClose;

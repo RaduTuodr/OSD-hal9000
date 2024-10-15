@@ -4,6 +4,7 @@
 #include "perf_framework.h"
 #include "mmu.h"
 #include "rtc.h"
+#include "cal_seh.h"
 
 static const char FILES_TO_READ[][MAX_PATH] = { "C:\\WINLOA~1.RAR",
                                                 "D:\\cacheset.exe",

@@ -1,5 +1,6 @@
 #include "common_lib.h"
 #include "cl_heap.h"
+#include "cal_seh.h"
 
 // 64KB is the minimum heap size required to initialize the system
 #define HEAP_MINIMUM_SIZE               (64*KB_SIZE)

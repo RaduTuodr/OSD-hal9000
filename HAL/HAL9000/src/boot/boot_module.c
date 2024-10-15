@@ -2,6 +2,7 @@
 #include "boot_module.h"
 #include "mmu.h"
 #include "bootinfo.h"
+#include "cal_seh.h"
 
 #define BOOT_MODULE_MAX_NAME_LEN        33
 

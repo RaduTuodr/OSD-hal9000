@@ -26,6 +26,7 @@
 #include "lock_common.h"
 #include "cal_annotate.h"
 #include "cal_atomic.h"
+#include "cal_seh.h"
 
 #define PIC_MASTER_OFFSET                   0x20
 #define PIC_SLAVE_OFFSET                    0x28

@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_seh.h"
 
 #define VALUE_TO_WRITE              0x37U
 #define ZERO_ALLOC_SIZE             (2 * GB_SIZE)

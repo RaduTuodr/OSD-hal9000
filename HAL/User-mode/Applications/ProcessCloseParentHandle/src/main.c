@@ -2,6 +2,7 @@
 #include "syscall_if.h"
 #include "um_lib_helper.h"
 #include "strutils.h"
+#include "cal_seh.h"
 
 STATUS
 __main(

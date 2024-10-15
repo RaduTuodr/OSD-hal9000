@@ -9,6 +9,7 @@
 #include "cpu.h"
 #include "cal_annotate.h"
 #include "cal_atomic.h"
+#include "cal_seh.h"
 
 #define RECEIVE_THREAD_INITIAL_BUFFER_SIZE                  sizeof(NET_RECEIVE_FRAME_OUTPUT)//64*KB_SIZE
 #define TRANSMIT_THREAD_BUFFER_SIZE                         1*KB_SIZE

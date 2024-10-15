@@ -1,6 +1,7 @@
 #include "network_stack_base.h"
 #include "network_internal.h"
 #include "network_operations.h"
+#include "cal_seh.h"
 
 STATUS
 NetOpGetPhysicalAddress(

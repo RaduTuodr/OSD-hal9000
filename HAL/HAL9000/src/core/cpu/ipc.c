@@ -2,6 +2,7 @@
 #include "ipc.h"
 #include "synch.h"
 #include "smp.h"
+#include "cal_seh.h"
 
 WARNING_PUSH
 

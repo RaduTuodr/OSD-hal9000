@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_seh.h"
 
 #define VALUE_TO_WRITE              0x37U
 #define EAGER_ALLOC_SIZE            (16 * MB_SIZE)

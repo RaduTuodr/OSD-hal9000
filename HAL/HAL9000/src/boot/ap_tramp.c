@@ -7,6 +7,7 @@
 #include "idt.h"
 #include "thread_internal.h"
 #include "cal_assembly.h"
+#include "cal_seh.h"
 
 #define LOW_MEMORY_CONFIG_START         0x1000
 #define LOW_MEMORY_CONFIG_SIZE          0x1000

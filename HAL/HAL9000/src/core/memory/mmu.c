@@ -19,6 +19,7 @@
 #include "mdl.h"
 #include "cal_annotate.h"
 #include "cal_assembly.h"
+#include "cal_seh.h"
 
 #define PAGING_STRUCTURES_BASE_MEMORY                           (128*KB_SIZE)
 

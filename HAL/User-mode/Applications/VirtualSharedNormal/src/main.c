@@ -2,6 +2,7 @@
 #include "syscall_if.h"
 #include "um_lib_helper.h"
 #include "strutils.h"
+#include "cal_seh.h"
 
 #define SHARED_KEY_VALUE            0x7391392102313922ULL
 

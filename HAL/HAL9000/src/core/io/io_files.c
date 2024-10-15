@@ -3,6 +3,7 @@
 #include "filesystem.h"
 #include "iomu.h"
 #include "cal_annotate.h"
+#include "cal_seh.h"
 
 #include "strutils.h"
 

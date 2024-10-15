@@ -9,6 +9,7 @@
 #include "dmp_cpu.h"
 #include "thread.h"
 #include "cal_assembly.h"
+#include "cal_seh.h"
 
 extern void SyscallEntry();
 

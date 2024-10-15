@@ -2,6 +2,7 @@
 #include "fat32.h"
 #include "fat_operations.h"
 #include "cal_annotate.h"
+#include "cal_seh.h"
 
 FUNC_DriverDispatch     _FatDispatchCreate;
 FUNC_DriverDispatch     _FatDispatchClose;

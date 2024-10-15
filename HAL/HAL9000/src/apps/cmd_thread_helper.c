@@ -18,6 +18,7 @@
 #include "pit.h"
 #include "cal_annotate.h"
 #include "cal_assembly.h"
+#include "cal_seh.h"
 
 
 WARNING_PUSH

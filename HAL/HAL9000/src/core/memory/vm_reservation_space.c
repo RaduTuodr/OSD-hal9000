@@ -4,6 +4,7 @@
 #include "bitmap.h"
 #include "lock_common.h"
 #include "io.h"
+#include "cal_seh.h"
 
 typedef enum _VMM_RESERVATION_STATE
 {

@@ -5,6 +5,7 @@
 #include "cal_annotate.h"
 #include "cal_atomic.h"
 #include "cal_assembly.h"
+#include "cal_seh.h"
 
 /// to remove
 #include "dmp_ata.h"

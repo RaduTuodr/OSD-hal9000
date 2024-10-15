@@ -2,6 +2,7 @@
 #include "network.h"
 #include "network_internal.h"
 #include "network_operations.h"
+#include "cal_seh.h"
 
 STATUS
 NetSendFrame(

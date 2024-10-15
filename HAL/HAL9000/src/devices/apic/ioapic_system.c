@@ -8,6 +8,7 @@
 #include "lapic_system.h"
 #include "synch.h"
 #include "cal_annotate.h"
+#include "cal_seh.h"
 
 typedef struct _IO_APIC_INTERRUPT_OVERRIDE
 {

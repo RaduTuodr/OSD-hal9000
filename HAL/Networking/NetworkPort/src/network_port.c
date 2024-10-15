@@ -3,6 +3,7 @@
 #include "network_dispatch.h"
 #include "ex.h"
 #include "cal_annotate.h"
+#include "cal_seh.h"
 
 static FUNC_InterruptFunction   _NetworkPortGenericInterrupt;
 

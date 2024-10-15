@@ -2,6 +2,7 @@
 #include "test_process.h"
 #include "process.h"
 #include "iomu.h"
+#include "cal_seh.h"
 
 #define MAX_PROCESSES_TO_SPAWN          16
 

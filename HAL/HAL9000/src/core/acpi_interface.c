@@ -2,6 +2,7 @@
 #include "acpi_interface.h"
 #include "cpumu.h"
 #include "list.h"
+#include "cal_seh.h"
 
 #include "accommon.h"
 #include "io.h"

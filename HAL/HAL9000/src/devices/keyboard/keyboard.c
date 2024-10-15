@@ -5,6 +5,7 @@
 #include "ex_event.h"
 #include "cal_annotate.h"
 #include "cal_assembly.h"
+#include "cal_seh.h"
 
 #define KBD_ENCODER_INPUT_PORT         0x60
 #define KBD_ENCODER_COMMAND_PORT       0x60

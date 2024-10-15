@@ -5,6 +5,7 @@
 #include "dmp_net_device.h"
 #include "test_net_stack.h"
 #include "strutils.h"
+#include "cal_seh.h"
 
 WARNING_PUSH
 

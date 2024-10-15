@@ -2,6 +2,7 @@
 #include "cmd_fs_helper.h"
 
 #include "cal_annotate.h"
+#include "cal_seh.h"
 #include "display.h"
 #include "print.h"
 #include "io.h"

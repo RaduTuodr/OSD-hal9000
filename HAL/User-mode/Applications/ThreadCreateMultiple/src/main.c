@@ -2,6 +2,7 @@
 #include "syscall_if.h"
 #include "um_lib_helper.h"
 #include "cal_annotate.h"
+#include "cal_seh.h"
 
 #define THREADS_TO_CREATE           10
 

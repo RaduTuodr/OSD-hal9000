@@ -6,6 +6,7 @@
 #include "pit.h"
 #include "checkin_queue.h"
 #include "cal_annotate.h"
+#include "cal_seh.h"
 
 // warning C26165: Possibly failing to release lock '* pCtx->FirstMutex' in function '_ThreadChainer'.
 // Noone cares about these mutexes, noone uses them besides the tests => no deadlock

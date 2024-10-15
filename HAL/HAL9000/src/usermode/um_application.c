@@ -7,6 +7,7 @@
 #include "mmu.h"
 #include "exe_loader.h"
 #include "process_internal.h"
+#include "cal_seh.h"
 
 static
 STATUS

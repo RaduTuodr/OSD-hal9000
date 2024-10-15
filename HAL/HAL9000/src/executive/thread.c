@@ -13,6 +13,7 @@
 #include "cal_annotate.h"
 #include "cal_atomic.h"
 #include "cal_assembly.h"
+#include "cal_seh.h"
 
 #define TID_INCREMENT               4
 

@@ -3,6 +3,7 @@
 #include "eth_eeprom.h"
 #include "network_port.h"
 #include "cal_annotate.h"
+#include "cal_seh.h"
 
 ALWAYS_INLINE
 static
