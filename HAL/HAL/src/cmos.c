@@ -1,6 +1,7 @@
 #include "hal_base.h"
 #include "cmos.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 #define CMOS_ADDRESS_PORT               0x70
 #define CMOS_DATA_PORT                  0x71
@@ -15,8 +16,8 @@ CmosGetValue(
 {
     ASSERT(RegisterIndex <= MAX_BYTE);
 
-    __outbyte(CMOS_ADDRESS_PORT, (BYTE) RegisterIndex | (DisableNMI << CMOS_DISABLE_NMI_BIT ));
-    return __inbyte(CMOS_DATA_PORT);
+    AsmOutByte(CMOS_ADDRESS_PORT, (BYTE) RegisterIndex | (DisableNMI << CMOS_DISABLE_NMI_BIT ));
+    return AsmInByte(CMOS_DATA_PORT);
 }
 
 void
@@ -28,8 +29,8 @@ CmosWriteValue(
 {
     ASSERT(RegisterIndex <= MAX_BYTE);
 
-    __outbyte(CMOS_ADDRESS_PORT, (BYTE)RegisterIndex | (DisableNMI << CMOS_DISABLE_NMI_BIT));
-    __outbyte(CMOS_DATA_PORT,Value);
+    AsmOutByte(CMOS_ADDRESS_PORT, (BYTE)RegisterIndex | (DisableNMI << CMOS_DISABLE_NMI_BIT));
+    AsmOutByte(CMOS_DATA_PORT,Value);
 }
 
 static

@@ -46,7 +46,7 @@ AsmWriteEflags(
 }
 
 BYTE
-AsmInbyte(
+AsmInByte(
     WORD Port
     )
 {
@@ -378,7 +378,7 @@ AsmWriteEflags(
 }
 
 BYTE
-AsmInbyte(
+AsmInByte(
     WORD Port
     )
 {

@@ -11,6 +11,7 @@ WARNING_POP
 #include "pci_system.h"
 #include "pit.h"
 #include "iomu.h"
+#include "cal_assembly.h"
 
 #ifndef ACPI_USE_ALTERNATE_PROTOTYPE_AcpiOsInitialize
 ACPI_STATUS
@@ -759,7 +760,7 @@ AcpiOsReadPort (
     switch (Width)
     {
     case 8:
-        *Value = __inbyte(port);
+        *Value = AsmInByte(port);
         break;
     case 16:
         *Value = __inword(port);
@@ -796,13 +797,13 @@ AcpiOsWritePort (
     switch (Width)
     {
     case 8:
-        __outbyte(port, Value);
+        AsmOutByte(port, (BYTE) Value);
         break;
     case 16:
-        __outword(port, Value);
+        __outword(port, (WORD) Value);
         break;
     case 32:
-        __outdword(port, Value);
+        __outdword(port, (DWORD) Value);
         break;
     }
 

@@ -35,7 +35,7 @@ AsmWriteEflags(
     );
 
 BYTE
-AsmInbyte(
+AsmInByte(
     WORD Port
     );
 

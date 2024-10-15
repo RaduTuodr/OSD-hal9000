@@ -100,5 +100,5 @@ CpuClearDirectionFlag(
     void
     )
 {
-    AsWriteEflags(AsmReadEflags() & (~RFLAGS_DIRECTION_BIT));
+    AsmWriteEflags(AsmReadEflags() & (~RFLAGS_DIRECTION_BIT));
 }

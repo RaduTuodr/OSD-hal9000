@@ -4,6 +4,7 @@
 #include "strutils.h"
 #include "ex_event.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 #define KBD_ENCODER_INPUT_PORT         0x60
 #define KBD_ENCODER_COMMAND_PORT       0x60
@@ -281,7 +282,7 @@ _KeyboardCtrlReadStatus(
     void
 )
 {
-    return __inbyte(KBD_CONTROLLER_SREG_PORT);
+    return AsmInByte(KBD_CONTROLLER_SREG_PORT);
 }
 
 static
@@ -291,7 +292,7 @@ _KeyboardEncReadBuffer(
     void
 )
 {
-    return __inbyte(KBD_ENCODER_INPUT_PORT);
+    return AsmInByte(KBD_ENCODER_INPUT_PORT);
 }
 
 static
@@ -530,7 +531,7 @@ _KeyboardCtrlSendCommand(
     // we can't send any commands while the keyboard buffer is full
     while (IsBooleanFlagOn(_KeyboardCtrlReadStatus(), KBD_SREG_INPUT_BUFFER_FULL));
 
-    __outbyte(KBD_CONTROLLER_COMMAND_PORT, Command);
+    AsmOutByte(KBD_CONTROLLER_COMMAND_PORT, Command);
 }
 
 static
@@ -543,7 +544,7 @@ _KeyboardEncSendCommand(
     // we can't send any commands while the keyboard buffer is full
     while (IsBooleanFlagOn(_KeyboardCtrlReadStatus(), KBD_SREG_INPUT_BUFFER_FULL));
 
-    __outbyte(KBD_ENCODER_COMMAND_PORT, Command);
+    AsmOutByte(KBD_ENCODER_COMMAND_PORT, Command);
 }
 
 static

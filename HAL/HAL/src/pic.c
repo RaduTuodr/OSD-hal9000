@@ -1,6 +1,7 @@
 #include "hal_base.h"
 #include "pic.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 // COMMAND on write | STATUS on read
 // DATA on write | IMR on read
@@ -48,10 +49,10 @@ _PicGetIrqRegister(
     IN      BYTE        Ocw3
     )
 {
-    __outbyte( PIC1_COMMAND, Ocw3 );
-    __outbyte( PIC2_COMMAND, Ocw3 );
+    AsmOutByte( PIC1_COMMAND, Ocw3 );
+    AsmOutByte( PIC2_COMMAND, Ocw3 );
 
-    return BYTES_TO_WORD(__inbyte(PIC2_COMMAND), __inbyte(PIC1_COMMAND) );
+    return BYTES_TO_WORD(AsmInByte(PIC2_COMMAND), AsmInByte(PIC1_COMMAND) );
 }
 
 void
@@ -63,40 +64,40 @@ PicInitialize(
     // ICW1 - This is the primary control word used to initialize the PIC
 
     // starts the initialization sequence (in cascade mode)
-    __outbyte(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);  
+    AsmOutByte(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);  
 
     // must be sent to both PICs
-    __outbyte(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4);
+    AsmOutByte(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4);
 
 
     // ICW2 - This control word is used to map the base address of the IDT of which the PIC are to use
 
     // Starting offset for PIC1
-    __outbyte(PIC1_DATA, MasterBase);
+    AsmOutByte(PIC1_DATA, MasterBase);
 
     // Starting offset for PIC2
-    __outbyte(PIC2_DATA, SlaveBase);
+    AsmOutByte(PIC2_DATA, SlaveBase);
 
     
     // ICW3 - let the PICs know what IRQ lines to use when communicating with each other
 
     // ICW3: tell Master PIC that there is a slave PIC at IRQ2 (0000 0100)
     // We must send the bit which corresponds to IRQ2 (1<<2)
-    __outbyte(PIC1_DATA, 1 << 2);                       
+    AsmOutByte(PIC1_DATA, 1 << 2);                       
     
     // ICW3: tell Slave PIC its cascade identity (0000 0010)
     // For some reason on the secondary PIC we need to tell it the value instead of the bit :)
-    __outbyte(PIC2_DATA, 2);                       
+    AsmOutByte(PIC2_DATA, 2);                       
 
 
     // ICW4 - This controls how everything is to operate
-    __outbyte(PIC1_DATA, ICW4_8086);
+    AsmOutByte(PIC1_DATA, ICW4_8086);
     
-    __outbyte(PIC2_DATA, ICW4_8086);
+    AsmOutByte(PIC2_DATA, ICW4_8086);
     
     // mask all interrupts, we will be using the IOAPIC
-    __outbyte(PIC1_DATA, MAX_BYTE);
-    __outbyte(PIC2_DATA, MAX_BYTE);
+    AsmOutByte(PIC1_DATA, MAX_BYTE);
+    AsmOutByte(PIC2_DATA, MAX_BYTE);
 
     // Intel MP specification Section 3.6.2.1 PIC Mode
     // Before entering Symmetric I/O Mode, either the BIOS or the operating system must switch out of
@@ -113,10 +114,10 @@ PicInitialize(
     /// is set7
 
     // Select IMCR
-    __outbyte( 0x22, 0x70 );
+    AsmOutByte( 0x22, 0x70 );
 
     // Write 0x1
-    __outbyte( 0x23, 0x1 );
+    AsmOutByte( 0x23, 0x1 );
 }
 
 void
@@ -130,7 +131,7 @@ PicSendEOI(
 
     picCommand = Irq >= IRQS_PER_PIC ? PIC2_COMMAND : PIC1_COMMAND;
 
-    __outbyte(picCommand, PIC_COMMAND_EOI);
+    AsmOutByte(picCommand, PIC_COMMAND_EOI);
 }
 
 void
@@ -161,7 +162,7 @@ PicChangeIrqMask(
 
     irqShift = (1 << irqLine);
 
-    value = __inbyte(picData);
+    value = AsmInByte(picData);
     if (MaskIrq)
     {
         value = value | irqShift;
@@ -172,7 +173,7 @@ PicChangeIrqMask(
         value = value & (~irqShift);
     }
 
-    __outbyte(picData, value);
+    AsmOutByte(picData, value);
 }
 
 WORD

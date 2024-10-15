@@ -4,6 +4,7 @@
 #include "ata_registers.h"
 #include "cal_annotate.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 
 /// to remove
 #include "dmp_ata.h"
@@ -77,7 +78,7 @@ _AtaWaitIdle(
     IN      PATA_DEVICE_REGISTERS       Device
     )
 {
-    while (IsBooleanFlagOn(__inbyte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_BUSY));
+    while (IsBooleanFlagOn(AsmInByte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_BUSY));
 }
 
 ALWAYS_INLINE
@@ -87,7 +88,7 @@ _AtaWaitDataRequest(
     IN      PATA_DEVICE_REGISTERS       Device
     )
 {
-    while (!IsBooleanFlagOn(__inbyte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_DRQ));
+    while (!IsBooleanFlagOn(AsmInByte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_DRQ));
 }
 
 ALWAYS_INLINE
@@ -97,7 +98,7 @@ _AtaWaitDeviceReady(
     IN      PATA_DEVICE_REGISTERS       Device
     )
 {
-    while (!IsBooleanFlagOn(__inbyte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_DRDY));
+    while (!IsBooleanFlagOn(AsmInByte(Device->BaseRegister + AtaRegisterStatus), ATA_SREG_DRDY));
 }
 
 ALWAYS_INLINE
@@ -171,22 +172,22 @@ _AtaWriteRegister(
     if (RegisterOffset < AtaRegisterSectorCountHigh)
     {
         // normal registers
-        __outbyte(AtaDevice->BaseRegister + RegisterOffset, Data);
+        AsmOutByte(AtaDevice->BaseRegister + RegisterOffset, Data);
     }
     else if( RegisterOffset < AtaRegisterAlternateStatus)
     {
         // 2 byte FIFO registers
-        __outbyte(AtaDevice->BaseRegister + RegisterOffset - (AtaRegisterSectorCountHigh - AtaRegisterSectorCount), Data);
+        AsmOutByte(AtaDevice->BaseRegister + RegisterOffset - (AtaRegisterSectorCountHigh - AtaRegisterSectorCount), Data);
     }
     else if (RegisterOffset <= AtaRegisterDeviceAddress)
     {
         // write to control register
-        __outbyte(AtaDevice->ControlBase + RegisterOffset - AtaRegisterAlternateStatus, Data);
+        AsmOutByte(AtaDevice->ControlBase + RegisterOffset - AtaRegisterAlternateStatus, Data);
     }
     else if (RegisterOffset < AtaRegisterPrdtAddress)
     {
         // write to bus controller
-        __outbyte(AtaDevice->BusMasterBase + RegisterOffset - AtaRegisterBusCommand, Data);
+        AsmOutByte(AtaDevice->BusMasterBase + RegisterOffset - AtaRegisterBusCommand, Data);
     }
     else
     {
@@ -224,23 +225,23 @@ _AtaReadRegister(
     if (RegisterOffset < AtaRegisterSectorCountHigh)
     {
         // normal registers
-        result = __inbyte(AtaDevice->BaseRegister + RegisterOffset);
+        result = AsmInByte(AtaDevice->BaseRegister + RegisterOffset);
     }
     else if (RegisterOffset < AtaRegisterAlternateStatus)
     {
         // 2 byte FIFO registers
-        result = __inbyte(AtaDevice->BaseRegister + RegisterOffset - (AtaRegisterSectorCountHigh - AtaRegisterSectorCount));
+        result = AsmInByte(AtaDevice->BaseRegister + RegisterOffset - (AtaRegisterSectorCountHigh - AtaRegisterSectorCount));
     }
     else if (RegisterOffset <= AtaRegisterDeviceAddress)
     {
         // write to control register
         // the control registers we are interested in start at BAR1 + 2
-        result = __inbyte(AtaDevice->ControlBase + RegisterOffset - (AtaRegisterAlternateStatus - 2));
+        result = AsmInByte(AtaDevice->ControlBase + RegisterOffset - (AtaRegisterAlternateStatus - 2));
     }
     else if (RegisterOffset < AtaRegisterPrdtAddress)
     {
         // write to bus controller
-        result = __inbyte(AtaDevice->BusMasterBase + RegisterOffset - AtaRegisterBusCommand);
+        result = AsmInByte(AtaDevice->BusMasterBase + RegisterOffset - AtaRegisterBusCommand);
     }
     else
     {

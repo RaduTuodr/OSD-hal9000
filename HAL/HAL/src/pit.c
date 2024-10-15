@@ -1,5 +1,6 @@
 #include "hal_base.h"
 #include "pit.h"
+#include "cal_assembly.h"
 
 #define PIT_FREQUENCY_HZ                                    (1'193'182ULL)
 
@@ -93,11 +94,11 @@ PitSetTimer(
         BYTE value;
 
         // get current gate controls
-        value = __inbyte(PIT_CONTROL_REG_PORT);
+        value = AsmInByte(PIT_CONTROL_REG_PORT);
 
         // 0xFD is used to disable speaker output (bit #1)
         // bit0 enables channel 2
-        __outbyte(PIT_CONTROL_REG_PORT, (value & (~PIT_CONTROL_SPEAKER_OUTPUT)) | PIT_CONTROL_CH2_INPUT);
+        AsmOutByte(PIT_CONTROL_REG_PORT, (value & (~PIT_CONTROL_SPEAKER_OUTPUT)) | PIT_CONTROL_CH2_INPUT);
     }
 
     // write frequency to data buffer
@@ -117,11 +118,11 @@ PitStartTimer(
     BYTE value;
 
     // stop timer countdown
-    value = __inbyte(PIT_CONTROL_REG_PORT) & (~PIT_CONTROL_CH2_INPUT);
-    __outbyte(PIT_CONTROL_REG_PORT, value);
+    value = AsmInByte(PIT_CONTROL_REG_PORT) & (~PIT_CONTROL_CH2_INPUT);
+    AsmOutByte(PIT_CONTROL_REG_PORT, value);
 
     // start timer countdown
-    __outbyte(PIT_CONTROL_REG_PORT, value | PIT_CONTROL_CH2_INPUT);
+    AsmOutByte(PIT_CONTROL_REG_PORT, value | PIT_CONTROL_CH2_INPUT);
 }
 
 void
@@ -130,7 +131,7 @@ PitWaitTimer(
     )
 {
     // when bit 5 is set => Timer fired
-    while (!(__inbyte(PIT_CONTROL_REG_PORT) & PIT_CONTROL_CH2_OUTPUT));
+    while (!(AsmInByte(PIT_CONTROL_REG_PORT) & PIT_CONTROL_CH2_OUTPUT));
 }
 
 void
@@ -167,16 +168,16 @@ _PitWriteData(
     cmdRegister.OperatingMode = OperatingMode;
     cmdRegister.AccessMode = PIT_COMM_ACCESS_LO_HI;
     cmdRegister.Channel = Channel;
-    __outbyte(PIT_COMMAND_REG_PORT, cmdRegister.Raw);
+    AsmOutByte(PIT_COMMAND_REG_PORT, cmdRegister.Raw);
 
     // write low frequency
-    __outbyte(PIT_CHANNEL_DATA_PORT_BASE + Channel, WORD_LOW(Data));
+    AsmOutByte(PIT_CHANNEL_DATA_PORT_BASE + Channel, WORD_LOW(Data));
 
     // short delay
-    __inbyte(0x60);
+    AsmInByte(0x60);
 
     // write high frequency
-    __outbyte(PIT_CHANNEL_DATA_PORT_BASE + Channel, WORD_HIGH(Data));
+    AsmOutByte(PIT_CHANNEL_DATA_PORT_BASE + Channel, WORD_HIGH(Data));
 }
 
 static
@@ -194,15 +195,15 @@ _PitReadData(
     cmdRegister.OperatingMode = 0;
     cmdRegister.AccessMode = PIT_COMM_ACCESS_LATCH;
     cmdRegister.Channel = Channel;
-    __outbyte(PIT_COMMAND_REG_PORT, cmdRegister.Raw);
+    AsmOutByte(PIT_COMMAND_REG_PORT, cmdRegister.Raw);
 
     // write low frequency
-    lo = __inbyte(PIT_CHANNEL_DATA_PORT_BASE + Channel);
+    lo = AsmInByte(PIT_CHANNEL_DATA_PORT_BASE + Channel);
 
     // short delay
-    __inbyte(0x60);
+    AsmInByte(0x60);
 
-    hi = __inbyte(PIT_CHANNEL_DATA_PORT_BASE + Channel);
+    hi = AsmInByte(PIT_CHANNEL_DATA_PORT_BASE + Channel);
 
     return BYTES_TO_WORD(hi,lo);
 }

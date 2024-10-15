@@ -3,6 +3,7 @@
 #include "dmp_common.h"
 #include "../../HAL/headers/ioapic_registers.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 ALWAYS_INLINE
 static
@@ -50,8 +51,8 @@ DumpIoApic(
 
     oldState = DumpTakeLock();
 
-    LOG("ELCR 1: 0b%08b\n", __inbyte(0x4d0));
-    LOG("ELCR 2: 0b%08b\n", __inbyte(0x4d1));
+    LOG("ELCR 1: 0b%08b\n", AsmInByte(0x4d0));
+    LOG("ELCR 2: 0b%08b\n", AsmInByte(0x4d1));
 
     LOG("IO Apic ID: 0x%x\n", IoApicGetId(IoApicBaseAddress));
     LOG("Apic version: 0x%x\n", IoApicGetVersion(IoApicBaseAddress));

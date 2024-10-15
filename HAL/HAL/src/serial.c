@@ -1,6 +1,7 @@
 #include "hal_base.h"
 #include "serial.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 // Serial Port Register Offsets
 #define     DATA_REG_OFFSET                 0x0     // Stores Data for both I&O
@@ -55,10 +56,10 @@ _SerialOut(
     )
 {
     // we wait for the data register to be ready to receive new data
-    while( ( __inbyte( Port + LSR_REG_OFFSET ) & LSR_THR_READY ) == 0 );
+    while( ( AsmInByte( Port + LSR_REG_OFFSET ) & LSR_THR_READY ) == 0 );
 
     // we output the byte
-    __outbyte( Port, Data );
+    AsmOutByte( Port, Data );
 }
 
 void
@@ -69,20 +70,20 @@ SerialInitialize(
     ASSERT( 0 != Port );
 
     // Disable all interrupts
-    __outbyte( Port + INT_REG_OFFSET, 0x00);    
-    __outbyte( Port + LINE_CREG_OFFSET, DLAB_MASK );
+    AsmOutByte( Port + INT_REG_OFFSET, 0x00);    
+    AsmOutByte( Port + LINE_CREG_OFFSET, DLAB_MASK );
 
     // set baud rate divisor to 1 => BaudRate = 115200
-    __outbyte( Port + LSB_DIV_OFFSET_VALUE, 1 );
-    __outbyte( Port + MSB_DIV_OFFSET_VALUE, 0 );
+    AsmOutByte( Port + LSB_DIV_OFFSET_VALUE, 1 );
+    AsmOutByte( Port + MSB_DIV_OFFSET_VALUE, 0 );
 
     // 7 data bits, no parity, one stop bit
-    __outbyte( Port + LINE_CREG_OFFSET, PARITY_BIT | STOP_BIT | DATA_BITS );
+    AsmOutByte( Port + LINE_CREG_OFFSET, PARITY_BIT | STOP_BIT | DATA_BITS );
 
     // we enable FIFO
     // we would theoretically be interrupted every 14 characters received but because we have interrupts disabled
     // this will never happen
-    __outbyte( Port + FIFO_REG_OFFSET, FIFO_RECEIVE_TRIG_1 | FIFO_RECEIVE_TRIG_0 | FIFO_TRANSMIT_RESET | FIFO_RECEIVER_RESET | FIFO_ENABLE );
+    AsmOutByte( Port + FIFO_REG_OFFSET, FIFO_RECEIVE_TRIG_1 | FIFO_RECEIVE_TRIG_0 | FIFO_TRANSMIT_RESET | FIFO_RECEIVER_RESET | FIFO_ENABLE );
 }
 
 void 
