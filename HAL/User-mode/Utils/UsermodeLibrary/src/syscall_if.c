@@ -1,9 +1,11 @@
 #include "um_lib_base.h"
 #include "syscall_if.h"
 #include "syscall_no.h"
+#include "cal_annotate.h"
 
 extern
 STATUS
+MS_ABI
 SyscallEntry(
     IN      SYSCALL_ID              SyscallId,
     ...

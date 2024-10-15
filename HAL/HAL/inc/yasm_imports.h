@@ -5,7 +5,7 @@
 
 typedef
 void
-(CDECL FUNC_Magic) (
+(CDECL MS_ABI FUNC_Magic) (
     void
     );
 
@@ -18,7 +18,7 @@ extern FUNC_Magic       __magic;
 
 typedef
 void
-(CDECL FUNC_StiAndHlt) (
+(CDECL MS_ABI FUNC_StiAndHlt) (
    void
    );
 
@@ -31,7 +31,7 @@ extern FUNC_StiAndHlt   __sti_and_hlt;
 
 typedef 
 void
-(CDECL FUNC_LoadTR ) (
+(CDECL MS_ABI FUNC_LoadTR ) (
     IN       WORD       GdtIndex               
     );
 
@@ -45,7 +45,7 @@ extern FUNC_LoadTR      __ltr;
 
 typedef
 void
-(CDECL FUNC_StoreGDT) (
+(CDECL MS_ABI FUNC_StoreGDT) (
     OUT     PGDT        Gdt
     );
 
@@ -59,7 +59,7 @@ extern FUNC_StoreGDT    __sgdt;
 
 typedef
 void
-(CDECL FUNC_ChangeStack)(
+(CDECL MS_ABI FUNC_ChangeStack)(
     IN  PVOID       InitialStackBase,
     IN  PVOID       NewStackBase
     );

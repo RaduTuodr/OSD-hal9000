@@ -77,7 +77,7 @@ UmThreadCreate(
 
 static
 STATUS
-(CDECL __start_thread)(
+(CDECL MS_ABI __start_thread)(
     IN_OPT      PVOID       Context
     )
 {

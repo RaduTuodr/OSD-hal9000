@@ -7,7 +7,7 @@
 
 typedef
 void
-(CDECL FUNC_ReloadGDT) (
+(CDECL MS_ABI FUNC_ReloadGDT) (
     IN      PGDT        NewGdt,
     IN      WORD        CsSelector,
     IN      WORD        DsSelector

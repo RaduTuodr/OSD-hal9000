@@ -258,7 +258,7 @@ ThreadExecuteForEachThreadEntry(
 // Description:  Returns the running thread.
 // Returns:      void
 //******************************************************************************
-#define GetCurrentThread()      ((THREAD*)__HALreadfsqword(FIELD_OFFSET(THREAD, Self)))
+#define GetCurrentThread()      ((THREAD*) AsmReadFsQword(FIELD_OFFSET(THREAD, Self)))
 
 //******************************************************************************
 // Function:     SetCurrentThread

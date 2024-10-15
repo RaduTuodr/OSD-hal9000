@@ -1,5 +1,7 @@
 #include "cal_assembly.h"
 
+#include "cal_annotate.h"
+
 #ifdef CAL_MSVC
 
 void
@@ -251,6 +253,22 @@ AsmXsetbv(
     )
 {
     _xsetbv(Register, Value);
+}
+
+typedef
+QWORD
+(CDECL MS_ABI FUNC_ReadFsQword)(
+    DWORD Offset
+    );
+
+extern FUNC_ReadFsQword __CALreadfsqword;
+
+QWORD
+AsmReadFsQword(
+    DWORD Offset
+    )
+{
+    return __CALreadfsqword(Offset);
 }
 
 QWORD
@@ -734,6 +752,14 @@ AsmXsetbv(
         : "c" (Register), "d" (Rdx), "a" (Rax)
         : "memory"
     );
+}
+
+QWORD
+AsmReadFsQword(
+    DWORD Offset
+    )
+{
+    return *((QWORD *)(((BYTE *) AsmReadMsr(0xC0000100)) + Offset));
 }
 
 QWORD

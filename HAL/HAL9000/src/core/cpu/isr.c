@@ -50,6 +50,7 @@ _IsrInterruptHandler(
 
 
 void
+MS_ABI
 IsrCommonHandler(
     IN BYTE                                 InterruptIndex,
     IN PINTERRUPT_STACK_COMPLETE            StackPointer,

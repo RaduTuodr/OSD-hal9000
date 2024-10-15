@@ -8,14 +8,16 @@
 #include "process_internal.h"
 #include "dmp_cpu.h"
 #include "thread.h"
+#include "cal_annotate.h"
 #include "cal_assembly.h"
 #include "cal_seh.h"
 
-extern void SyscallEntry();
+extern void MS_ABI SyscallEntry();
 
 #define SYSCALL_IF_VERSION_KM       SYSCALL_IMPLEMENTED_IF_VERSION
 
 void
+MS_ABI
 SyscallHandler(
     INOUT   COMPLETE_PROCESSOR_STATE    *CompleteProcessorState
     )

@@ -12,6 +12,7 @@
 #include "display.h"
 #include "log.h"
 #include "print.h"
+#include "cal_annotate.h"
 #include "cal_assembly.h"
 
 //#define TST
@@ -25,6 +26,7 @@
 int _fltused = 1;
 
 void
+MS_ABI
 Entry64(
     IN  int                       argc,
     IN  HAL_BOOT_INFORMATION*     argv

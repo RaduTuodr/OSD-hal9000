@@ -7,13 +7,6 @@
 #include "cpu_if.h"
 #include "cal_annotate.h"
 
-typedef
-QWORD
-(CDECL FUNC_ReadFsQword)(
-    IN              DWORD           Offset
-    );
-
-extern FUNC_ReadFsQword                     __HALreadfsqword;
 
 #define NO_OF_TOTAL_INTERRUPTS              256
 #define NO_OF_RESERVED_EXCEPTIONS           32

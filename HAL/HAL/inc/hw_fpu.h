@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cal_warning.h"
+#include "cal_annotate.h"
 
 #define INCLUDE_FP_SUPPORT                  0
 
@@ -90,6 +91,7 @@ WARNING_POP
 // to make sure the compiler doesn't generate SSE instructions before
 // actually activating SSE support :)
 void
+MS_ABI
 HalActivateFpu(
     void
     );

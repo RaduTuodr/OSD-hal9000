@@ -167,6 +167,11 @@ AsmXsetbv(
     );
 
 QWORD
+AsmReadFsQword(
+    DWORD Offset
+    );
+
+QWORD
 AsmReadGsQword(
     DWORD Offset
     );

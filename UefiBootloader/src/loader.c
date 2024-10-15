@@ -46,7 +46,7 @@ typedef struct
 
 #pragma pack(pop)
 
-typedef void (*StartOS) (UINT64 EntryAddress, UINT64 BootInfo, UINT64 Transition);
+typedef void MS_ABI (*StartOS) (UINT64 EntryAddress, UINT64 BootInfo, UINT64 Transition);
 
 typedef struct
 {

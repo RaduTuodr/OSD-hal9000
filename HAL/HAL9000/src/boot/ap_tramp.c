@@ -6,6 +6,7 @@
 #include "gdtmu.h"
 #include "idt.h"
 #include "thread_internal.h"
+#include "cal_annotate.h"
 #include "cal_assembly.h"
 #include "cal_seh.h"
 
@@ -247,6 +248,7 @@ ApTrampCleanupLowerMemory(
 }
 
 void    
+MS_ABI
 ApInitCpu(
     IN      struct _PCPU*   Cpu
     )

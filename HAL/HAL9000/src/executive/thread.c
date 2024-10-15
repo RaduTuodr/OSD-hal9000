@@ -19,11 +19,11 @@
 
 #define THREAD_TIME_SLICE           1
 
-extern void ThreadStart();
+extern void MS_ABI ThreadStart();
 
 typedef
 void
-(CDECL FUNC_ThreadSwitch)(
+(CDECL MS_ABI FUNC_ThreadSwitch)(
     OUT_PTR         PVOID*          OldStack,
     IN              PVOID           NewStack
     );
@@ -96,6 +96,7 @@ _ThreadSchedule(
 REQUIRES_EXCL_LOCK(m_threadSystemData.ReadyThreadsLock)
 RELEASES_EXCL_AND_NON_REENTRANT_LOCK(m_threadSystemData.ReadyThreadsLock)
 void
+MS_ABI
 ThreadCleanupPostSchedule(
     void
     );
@@ -129,6 +130,7 @@ _ThreadDereference(
 static FUNC_FreeFunction            _ThreadDestroy;
 
 static
+MS_ABI
 void
 _ThreadKernelFunction(
     IN      PFUNC_ThreadStart       Function,
@@ -1038,6 +1040,7 @@ _ThreadSchedule(
 REQUIRES_EXCL_LOCK(m_threadSystemData.ReadyThreadsLock)
 RELEASES_EXCL_AND_NON_REENTRANT_LOCK(m_threadSystemData.ReadyThreadsLock)
 void
+MS_ABI
 ThreadCleanupPostSchedule(
     void
     )
@@ -1229,6 +1232,7 @@ _ThreadDestroy(
 }
 
 static
+MS_ABI
 void
 _ThreadKernelFunction(
     IN      PFUNC_ThreadStart       Function,

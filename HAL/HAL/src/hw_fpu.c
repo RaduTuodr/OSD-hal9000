@@ -54,6 +54,7 @@ _HalEnableFpu(
 }
 
 void
+MS_ABI
 HalActivateFpu(
     void
     )

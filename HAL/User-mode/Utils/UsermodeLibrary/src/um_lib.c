@@ -16,6 +16,7 @@ static FUNC_AssertFunction _UmLibAssert;
 static BOOLEAN m_syscallIfVerified;
 
 extern
+MS_ABI
 void
 __start(
     DWORD       argc,
