@@ -766,7 +766,7 @@ AcpiOsReadPort (
         *Value = AsmInWord(port);
         break;
     case 32:
-        *Value = __indword(port);
+        *Value = AsmInDword(port);
         break;
     }
 
@@ -803,7 +803,7 @@ AcpiOsWritePort (
         AsmOutWord(port, (WORD) Value);
         break;
     case 32:
-        __outdword(port, (DWORD) Value);
+        AsmOutDword(port, (DWORD) Value);
         break;
     }
 

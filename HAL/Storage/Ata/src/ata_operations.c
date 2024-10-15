@@ -519,7 +519,7 @@ _AtaWriteDmaRegisters(
     LOG_TRACE_STORAGE("Prdt: 0x%x\n", Prdt );
 
     // set PRDT
-    __outdword(AtaDevice->BusMasterBase + AtaRegisterPrdtAddress - AtaRegisterBusCommand, Prdt);
+    AsmOutDword(AtaDevice->BusMasterBase + AtaRegisterPrdtAddress - AtaRegisterBusCommand, Prdt);
 
     _AtaWriteRegister(AtaDevice, AtaRegisterBusStatus, (!WriteOperation * ATA_BUS_CMD_READ_BIT) );
 }

@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_assembly.h"
 
 STATUS
 __main(
@@ -12,7 +13,7 @@ __main(
     UNREFERENCED_PARAMETER(argv);
 
     LOG("Congratulations - you have successfully read an IO port: 0x%x",
-        __indword(0x60));
+        AsmInDword(0x60));
     LOG_ERROR("Should have terminated the process!");
 
     return STATUS_SUCCESS;

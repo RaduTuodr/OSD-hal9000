@@ -2,6 +2,7 @@
 #include "pci.h"
 #include "pci_common.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 #define PCI_CONFIG_ADDRESS                              0xCF8
 #define PCI_CONFIG_DATA                                 0xCFC
@@ -54,8 +55,8 @@ _PciReadRegister(
     IN      PCI_CONFIG_REGISTER ConfigRegister
     )
 {
-    __outdword(PCI_CONFIG_ADDRESS, ConfigRegister.Raw);
-    return __indword(PCI_CONFIG_DATA);
+    AsmOutDword(PCI_CONFIG_ADDRESS, ConfigRegister.Raw);
+    return AsmInDword(PCI_CONFIG_DATA);
 }
 
 static
@@ -66,8 +67,8 @@ _PciWriteRegister(
     IN      DWORD               Data
     )
 {
-    __outdword(PCI_CONFIG_ADDRESS, ConfigRegister.Raw);
-    __outdword(PCI_CONFIG_DATA, Data);
+    AsmOutDword(PCI_CONFIG_ADDRESS, ConfigRegister.Raw);
+    AsmOutDword(PCI_CONFIG_DATA, Data);
 }
 
 //******************************************************************************
