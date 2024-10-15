@@ -100,7 +100,7 @@ _HalSetRequestedFpuFeatures(
     _In_        XCR0_SAVED_STATE            Features
     )
 {
-    _xsetbv(XCR0_INDEX, Features);
+    AsmXsetbv(XCR0_INDEX, Features);
 }
 
 ALWAYS_INLINE
