@@ -30,7 +30,7 @@ AsmHalt(
 }
 
 QWORD
-AsmReadElfags(
+AsmReadEflags(
     void
     )
 {
@@ -350,7 +350,7 @@ AsmHalt(
 }
 
 QWORD
-AsmReadElfags(
+AsmReadEflags(
     void
     )
 {

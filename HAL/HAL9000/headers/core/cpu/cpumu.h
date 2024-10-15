@@ -137,7 +137,7 @@ CpuMuRaiseIrql(
     ASSERT_INFO(prevIrql <= Irql, "Previous IRQL: 0x%x\nCurrent IRQL: 0x%x\n",
                 prevIrql, Irql );
 
-    __writecr8(Irql);
+    __writecr8((QWORD) Irql);
 
     return prevIrql;
 }
@@ -153,7 +153,7 @@ CpuMuLowerIrql(
     ASSERT_INFO(prevIrql >= Irql, "Previous IRQL: 0x%x\nCurrent IRQL: 0x%x\n",
                 prevIrql, Irql );
 
-    __writecr8(Irql);
+    __writecr8((QWORD) Irql);
 
     return prevIrql;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 ALWAYS_INLINE
 extern
@@ -68,7 +69,7 @@ CpuGetApicId(
 {
     CPUID_INFO cpuId;
 
-    __cpuid(cpuId.values, CpuidIdxFeatureInformation);
+    AsmCpuid(cpuId.values, CpuidIdxFeatureInformation);
 
     return cpuId.FeatureInformation.ebx.ApicId;
 }
@@ -82,7 +83,7 @@ CpuIsIntel(
 {
     CPUID_INFO cpuId;
 
-    __cpuid(cpuId.values, CpuidIdxBasicInformation);
+    AsmCpuid(cpuId.values, CpuidIdxBasicInformation);
 
     return ( cpuId.ebx == 'uneG' &&
              cpuId.edx == 'Ieni' &&

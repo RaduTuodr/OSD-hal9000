@@ -17,6 +17,7 @@
 #include "vmm.h"
 #include "pit.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 
 WARNING_PUSH
@@ -401,14 +402,14 @@ void
     {
         CPUID_INFO cpuId;
 
-        __cpuid(cpuId.values, CpuidIdxBasicInformation);
+        AsmCpuid(cpuId.values, CpuidIdxBasicInformation);
 
         for( DWORD i = 0; i <= cpuId.BasicInformation.MaxValueForBasicInfo; ++i )
         {
             _CmdReadAndDumpCpuid(i, 0);
         }
 
-        __cpuid( cpuId.values, CpuidIdxFeatureInformation );
+        AsmCpuid( cpuId.values, CpuidIdxFeatureInformation );
 
         if (cpuId.FeatureInformation.ecx.HV)
         {
@@ -418,7 +419,7 @@ void
             }
         }
 
-        __cpuid(cpuId.values, CpuidIdxExtendedMaxFunction);
+        AsmCpuid(cpuId.values, CpuidIdxExtendedMaxFunction);
 
         for( DWORD i = 0x8000'0000; i <= cpuId.ExtendedInformation.MaxValueForExtendedInfo; ++i )
         {
@@ -708,7 +709,7 @@ _CmdReadAndDumpCpuid(
 {
     CPUID_INFO cpuidInfo;
 
-    __cpuidex(cpuidInfo.values, Index, SubIndex );
+    AsmCpuidex(cpuidInfo.values, Index, SubIndex );
 
     DumpCpuidValues(Index, SubIndex, cpuidInfo );
 }

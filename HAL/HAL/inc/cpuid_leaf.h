@@ -334,7 +334,7 @@ typedef struct _CPUID_PROCESSOR_ADDRESS_SIZES_INFORMATION
 } CPUID_PROCESSOR_ADDRESS_SIZES_INFORMATION, *PCPUID_PROCESSOR_ADDRESS_SIZES_INFORMATION;
 STATIC_ASSERT(sizeof(CPUID_PROCESSOR_ADDRESS_SIZES_INFORMATION) == sizeof(DWORD) * 4);
 
-// structure retrieved by __cpuid operations
+// structure retrieved by cpuid operations
 typedef struct _CPUID_INFO
 {
     union {

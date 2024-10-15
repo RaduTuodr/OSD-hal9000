@@ -25,7 +25,7 @@ AsmHalt(
     ); 
 
 QWORD
-AsmReadElfags(
+AsmReadEflags(
     void
     );
 

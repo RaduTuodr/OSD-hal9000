@@ -2,6 +2,7 @@
 #include "hw_fpu.h"
 #include "cpu.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 // The pragma optimize off is required for all the functions which are called from
 // HalActivateFpu - this is because we don't want the compiler to generate any SSE
@@ -16,7 +17,7 @@ _HalCheckBasicFpuFeatures(
 {
     CPUID_INFO cpuidFeatInfo;
 
-    __cpuid(cpuidFeatInfo.values, CpuidIdxFeatureInformation);
+    AsmCpuid(cpuidFeatInfo.values, CpuidIdxFeatureInformation);
 
     // Check for floating point unit on chip
     // Check for FXSAVE/FXRSTOR support
@@ -80,7 +81,7 @@ _HalCheckRequestedFpuFeatures(
     // x87 FPU/MMX state must be 1!
     if (!IsBooleanFlagOn(RequestedFeatures, XCR0_SAVED_STATE_x87_MMX)) return FALSE;
 
-    __cpuidex(cpuidFeatInfo.values, CpuidIdxExtendedStateEnumerationMainLeaf, 0x0);
+    AsmCpuidex(cpuidFeatInfo.values, CpuidIdxExtendedStateEnumerationMainLeaf, 0x0);
 
     availableFeatures = DWORDS_TO_QWORD(
         cpuidFeatInfo.ExtendedStateMainLeaf.Xcr0FeatureSupportHigh,
@@ -111,7 +112,7 @@ _HalCheckEnabledFeaturesSaveSize(
 {
     CPUID_INFO cpuidFeatInfo;
 
-    __cpuidex(cpuidFeatInfo.values, CpuidIdxExtendedStateEnumerationMainLeaf, 0x0);
+    AsmCpuidex(cpuidFeatInfo.values, CpuidIdxExtendedStateEnumerationMainLeaf, 0x0);
 
     return (cpuidFeatInfo.ExtendedStateMainLeaf.MaxSizeRequiredByFeaturesInXcr0 <= MaxSizeSupported);
 }
@@ -151,7 +152,7 @@ HalGetActiveFpuFeatures(
     {
         CPUID_INFO cpuidFeatInfo;
 
-        __cpuidex(cpuidFeatInfo.values, CpuidIdxExtendedStateEnumerationMainLeaf, 0x0);
+        AsmCpuidex(cpuidFeatInfo.values, CpuidIdxExtendedStateEnumerationMainLeaf, 0x0);
 
         if (ActivatedFeaturesSaveSize != NULL)
         {

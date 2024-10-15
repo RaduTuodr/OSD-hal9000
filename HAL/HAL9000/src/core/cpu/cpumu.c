@@ -10,6 +10,7 @@
 #include "cal_annotate.h"
 #include "cal_assert.h"
 #include "cal_intrin.h"
+#include "cal_assembly.h"
 
 #define STACK_MINIMUM_SIZE          PAGE_SIZE
 #define STACK_MAXIMUM_SIZE          (16*PAGE_SIZE)
@@ -74,26 +75,26 @@ _CpuMuCollectBasicInformation(
     void
     )
 {
-    __cpuid((int*) &m_cpuMuData.BasicInformation, CpuidIdxBasicInformation);
+    AsmCpuid((int*) &m_cpuMuData.BasicInformation, CpuidIdxBasicInformation);
 
     if (m_cpuMuData.BasicInformation.MaxValueForBasicInfo >= CpuidIdxFeatureInformation)
     {
-        __cpuid((int*)&m_cpuMuData.FeatureInformation, CpuidIdxFeatureInformation);
+        AsmCpuid((int*)&m_cpuMuData.FeatureInformation, CpuidIdxFeatureInformation);
     }
 
     if (m_cpuMuData.BasicInformation.MaxValueForBasicInfo >= CpuidIdxMonitorLeaf)
     {
-        __cpuid((int*)&m_cpuMuData.MonitorLeaf, CpuidIdxMonitorLeaf);
+        AsmCpuid((int*)&m_cpuMuData.MonitorLeaf, CpuidIdxMonitorLeaf);
     }
 
     if (m_cpuMuData.BasicInformation.MaxValueForBasicInfo >= CpuidIdxStructuredExtendedFeaturesLeaf)
     {
-        __cpuid((int*)&m_cpuMuData.StructuredExtendedFeatures, CpuidIdxStructuredExtendedFeaturesLeaf);
+        AsmCpuid((int*)&m_cpuMuData.StructuredExtendedFeatures, CpuidIdxStructuredExtendedFeaturesLeaf);
     }
 
     if (m_cpuMuData.BasicInformation.MaxValueForBasicInfo >= CpuidIdxExtendedStateEnumerationMainLeaf)
     {
-        __cpuidex((int*)&m_cpuMuData.ExtendedStateMainLeaf, CpuidIdxExtendedStateEnumerationMainLeaf, 0x0);
+        AsmCpuidex((int*)&m_cpuMuData.ExtendedStateMainLeaf, CpuidIdxExtendedStateEnumerationMainLeaf, 0x0);
     }
 }
 
@@ -104,11 +105,11 @@ _CpuMuCollectExtendedInformation(
     void
     )
 {
-    __cpuid((int*) &m_cpuMuData.ExtendedCpuidInformation, CpuidIdxExtendedMaxFunction);
+    AsmCpuid((int*) &m_cpuMuData.ExtendedCpuidInformation, CpuidIdxExtendedMaxFunction);
 
     if (m_cpuMuData.ExtendedCpuidInformation.MaxValueForExtendedInfo >= CpuidIdxExtendedFeatureInformation)
     {
-        __cpuid((int*) &m_cpuMuData.ExtendedFeatureInformation, CpuidIdxExtendedFeatureInformation);
+        AsmCpuid((int*) &m_cpuMuData.ExtendedFeatureInformation, CpuidIdxExtendedFeatureInformation);
     }
 }
 

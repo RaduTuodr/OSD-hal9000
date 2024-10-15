@@ -14,7 +14,7 @@ add_executable(AppHelloWorld.exe ${APP_HELLOWORLD_SOURCES})
 target_include_directories(AppHelloWorld.exe PUBLIC $<$<COMPILE_LANGUAGE:C>:${APP_HELLOWORLD_INCLUDES}>)
 target_compile_options(AppHelloWorld.exe PRIVATE ${APP_FLAGS} PRIVATE ${APP_HELLOWORLD_PDB_FLAG})
 target_compile_definitions(AppHelloWorld.exe PRIVATE ${GLOBAL_DEFINES} PRIVATE ${MBCS_DEFINE})
-target_link_libraries(AppHelloWorld.exe PRIVATE CommonLibNoLocks UsermodeLibrary)
+target_link_libraries(AppHelloWorld.exe PRIVATE CommonLibNoLocks UsermodeLibrary CompilerAbstraction)
 target_link_options(AppHelloWorld.exe PRIVATE ${APP_LINK_FLAGS})
 
 install(TARGETS AppHelloWorld.exe DESTINATION apps/AppHelloWorld)

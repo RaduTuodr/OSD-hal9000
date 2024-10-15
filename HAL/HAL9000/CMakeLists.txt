@@ -118,6 +118,7 @@ target_link_libraries(HAL9000.bin PRIVATE
     Volume
     Ata
     Acpica
+    CompilerAbstraction
 )
 target_link_options(HAL9000.bin PRIVATE ${HAL9000_LINK_FLAGS})
 
