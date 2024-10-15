@@ -3,6 +3,7 @@
 #include "display_internal.h"
 #include "cal_annotate.h"
 #include "cal_assert.h"
+#include "cal_assembly.h"
 
 #pragma pack(push,1)
 typedef struct _SCREEN_CHARACTER
@@ -61,7 +62,7 @@ DispPreinitScreen(
     if (DisplayInformation->FrameBufferBpp != 32)
     {
         // We cannot write to other types of framebuffers
-        __halt();
+        AsmHalt();
     }
 
     memzero(&m_displayData, sizeof(DISPLAY_DATA));

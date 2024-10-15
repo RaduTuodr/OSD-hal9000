@@ -5,6 +5,7 @@
 #include "thread.h"
 #include "cal_annotate.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 
 static volatile DWORD m_osAsserted = 0;
 
@@ -37,5 +38,5 @@ void
     AssertFreeLock();
 
     CpuIntrDisable();
-    __halt();
+    AsmHalt();
 }

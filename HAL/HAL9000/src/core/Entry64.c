@@ -12,6 +12,7 @@
 #include "display.h"
 #include "log.h"
 #include "print.h"
+#include "cal_assembly.h"
 
 //#define TST
 
@@ -33,7 +34,7 @@ Entry64(
     COMMON_LIB_INIT initSettings;
 
     // We don't have commonlib support yet, as a result we have no way of asserting at this point
-    if (!IS_STACK_ALIGNED) __halt();
+    if (!IS_STACK_ALIGNED) AsmHalt();
 
     status = STATUS_SUCCESS;
     memzero(&initSettings, sizeof(COMMON_LIB_INIT));
@@ -50,7 +51,7 @@ Entry64(
     if (!SUCCEEDED(status))
     {
         // not good lads
-        __halt();
+        AsmHalt();
     }
 
     // No display configured yet
@@ -58,12 +59,12 @@ Entry64(
     // // ASSERT_INFO(NULL != argv, "We are expecting a non-NULL pointer\n");
     if (argc != 1 || argv == NULL)
     {
-        __halt();
+        AsmHalt();
     }
 
     if (!SUCCEEDED(ValidateHalBootInformation(argv)))
     {
-        __halt();
+        AsmHalt();
     }
 
     gVirtualToPhysicalOffset = argv->VirtualToPhysicalOffset;
@@ -89,5 +90,5 @@ Entry64(
     // at the end of this routine interrupts should be disabled
     SystemUninit();
 
-    __halt();
+    AsmHalt();
 }

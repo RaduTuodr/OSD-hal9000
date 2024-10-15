@@ -2,6 +2,7 @@
 #include "assert.h"
 #include "lock_common.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 #define ASSERT_BUFFER_SIZE              512
 
@@ -78,7 +79,7 @@ void
 {
     UNREFERENCED_PARAMETER(Message);
 
-    __halt();
+    AsmHalt();
 }
 
 #ifndef _COMMONLIB_NO_LOCKS_

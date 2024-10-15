@@ -61,7 +61,7 @@ HalActivateFpu(
 #if INCLUDE_FP_SUPPORT
     // We have nothing here, no commonlib, no runtime support if something
     // goes wrong => we need to halt
-    if (!_HalCheckBasicFpuFeatures()) __halt();
+    if (!_HalCheckBasicFpuFeatures()) AsmHalt();
 
     _HalEnableFpu();
 #endif
