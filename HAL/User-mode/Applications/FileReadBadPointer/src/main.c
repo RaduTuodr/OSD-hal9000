@@ -25,7 +25,7 @@ __main(
         LOG_FUNC_ERROR("SyscallFileCreate", status);
     }
 
-     status = SyscallFileRead(handle, (PVOID) 0x14'0000'0000ULL, PAGE_SIZE, &bytesRead);
+     status = SyscallFileRead(handle, (PVOID) 0x1400000000ULL, PAGE_SIZE, &bytesRead);
      if (SUCCEEDED(status))
      {
          LOG_ERROR("SyscallFileRead should have failed!\n");

@@ -4,7 +4,7 @@
 #include "strutils.h"
 
 #define VALUE_TO_WRITE              0x37U
-#define SHARED_KEY_VALUE            0xC391'3921'0231'3922ULL
+#define SHARED_KEY_VALUE            0xC391392102313922ULL
 
 #define SIZE_TO_ALLOCATE            (16 * MB_SIZE)
 

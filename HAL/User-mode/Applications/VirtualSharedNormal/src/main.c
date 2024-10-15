@@ -3,7 +3,7 @@
 #include "um_lib_helper.h"
 #include "strutils.h"
 
-#define SHARED_KEY_VALUE            0x7391'3921'0231'3922ULL
+#define SHARED_KEY_VALUE            0x7391392102313922ULL
 
 typedef enum _SCENARIO_IDX
 {

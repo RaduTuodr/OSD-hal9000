@@ -12,7 +12,7 @@ __main(
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
-    AsmWriteMsr(0xC000'0100, 0x5);
+    AsmWriteMsr(0xC0000100, 0x5);
     LOG_ERROR("Should have terminated the process!");
 
     return STATUS_SUCCESS;

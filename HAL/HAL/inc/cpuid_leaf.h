@@ -17,9 +17,9 @@ typedef enum _CPUID_IDX
     CpuidIdxStructuredExtendedFeaturesLeaf      = 0x7,
     CpuidIdxArchPerfMonLeaf                     = 0xA,
     CpuidIdxExtendedStateEnumerationMainLeaf    = 0xD,
-    CpuidIdxExtendedMaxFunction                 = 0x8000'0000,
-    CpuidIdxExtendedFeatureInformation          = 0x8000'0001,
-    CpuidIdxProcessorAddressSizes               = 0x8000'0008,
+    CpuidIdxExtendedMaxFunction                 = 0x80000000,
+    CpuidIdxExtendedFeatureInformation          = 0x80000001,
+    CpuidIdxProcessorAddressSizes               = 0x80000008,
 } CPUID_IDX;
 
 // CPUID related information

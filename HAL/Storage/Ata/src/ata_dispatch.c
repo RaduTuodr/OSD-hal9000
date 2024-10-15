@@ -4,7 +4,7 @@
 #include "cal_annotate.h"
 #include "cal_atomic.h"
 
-#define LBA48_MAX_VALUE                 0x0000'FFFF'FFFF'FFFFULL
+#define LBA48_MAX_VALUE                 0x0000FFFFFFFFFFFFULL
 
 ALWAYS_INLINE
 static

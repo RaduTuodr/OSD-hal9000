@@ -8,7 +8,7 @@ MSVC_WARNING_DISABLE(4206)
 #else
 #include "common_lib.h"
 
-#define DEFAULT_SECURITY_COOKIE_VALUE       (QWORD)0xBEEF'0301'2497'EC03ULL
+#define DEFAULT_SECURITY_COOKIE_VALUE       (QWORD)0xBEEF03012497EC03ULL
 
 /// TODO: should we initialize the cookie at runtime?
 const UINT64 __security_cookie = DEFAULT_SECURITY_COOKIE_VALUE;

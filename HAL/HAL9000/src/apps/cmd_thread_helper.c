@@ -413,7 +413,7 @@ void
 
         if (cpuId.FeatureInformation.ecx.HV)
         {
-            for (DWORD i = 0x4000'0000; i <= 0x4000'0020; ++i)
+            for (DWORD i = 0x40000000; i <= 0x40000020; ++i)
             {
                 _CmdReadAndDumpCpuid(i, 0);
             }
@@ -421,7 +421,7 @@ void
 
         AsmCpuid(cpuId.values, CpuidIdxExtendedMaxFunction);
 
-        for( DWORD i = 0x8000'0000; i <= cpuId.ExtendedInformation.MaxValueForExtendedInfo; ++i )
+        for( DWORD i = 0x80000000; i <= cpuId.ExtendedInformation.MaxValueForExtendedInfo; ++i )
         {
             _CmdReadAndDumpCpuid(i, 0);
         }

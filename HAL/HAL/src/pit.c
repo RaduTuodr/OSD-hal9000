@@ -2,7 +2,7 @@
 #include "pit.h"
 #include "cal_assembly.h"
 
-#define PIT_FREQUENCY_HZ                                    (1'193'182ULL)
+#define PIT_FREQUENCY_HZ                                    (1193182ULL)
 
 #define PIT_PERIODIC_CHANNEL                                0
 #define PIT_ONETIME_CHANNEL                                 2
