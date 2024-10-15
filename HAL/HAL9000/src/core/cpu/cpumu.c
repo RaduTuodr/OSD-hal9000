@@ -56,9 +56,9 @@ _CpuActivateAvailableFeatures(
     // CR4
     cr4FlagsToActivate |= ((m_cpuMuData.StructuredExtendedFeatures.ebx.SMEP) ? CR4_SMEP : 0);
 
-    __writecr4(__readcr4() | cr4FlagsToActivate);
+    AsmWriteCr4(AsmReadCr4() | cr4FlagsToActivate);
 
-    LOGL("CR4 is 0x%X\n", __readcr4());
+    LOGL("CR4 is 0x%X\n", AsmReadCr4());
 
     // EFER
     eferFlagsToActivate |= ((m_cpuMuData.ExtendedFeatureInformation.edx.Syscall) ? IA32_EFER_SCE : 0);
@@ -435,7 +435,7 @@ _CpuValidateCurrentCpu(
 
     // read CRs
     cr0 = AsmReadCr0();
-    cr4 = __readcr4();
+    cr4 = AsmReadCr4();
     cr8 = __readcr8();
 
     // read MSRs

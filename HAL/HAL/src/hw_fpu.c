@@ -47,8 +47,8 @@ _HalEnableFpu(
     //  ->  FXSAVE and FXRSTOR instructions (needed - I have no idea why exactly)
     //  ->  Operating System Support for Unmasked SIMD Floating-Point Exceptions
     //  ->  XSAVE and Processor Extended States-Enable Bit
-    __writecr4(
-        __readcr4() |
+    AsmWriteCr4(
+        AsmReadCr4() |
         (CR4_OSFXSR | CR4_OSXMMEXCPT | CR4_OSXSAVE)
     );
 }

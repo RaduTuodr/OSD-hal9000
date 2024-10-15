@@ -1101,7 +1101,7 @@ MmuActivateProcessIds(
 {
     if (m_mmuData.PcidSupportAvailable)
     {
-        __writecr4(__readcr4() | CR4_PCIDE);
+        AsmWriteCr4(AsmReadCr4() | CR4_PCIDE);
     }
 
     MmuChangeProcessSpace(ProcessRetrieveSystemProcess());
