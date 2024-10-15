@@ -95,15 +95,15 @@ AsmWriteCr0(
     QWORD Cr0
     );
 
-QWORD 
-AsmReadCr1(
-    void
-    );
+// QWORD 
+// AsmReadCr1(
+//     void
+//     );
 
-void 
-AsmWriteCr0(
-    QWORD Cr1
-    );
+// void 
+// AsmWriteCr1(
+//     QWORD Cr1
+//     );
 
 QWORD 
 AsmReadCr2(

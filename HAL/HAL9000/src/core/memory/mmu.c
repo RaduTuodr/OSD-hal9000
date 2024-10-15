@@ -18,6 +18,7 @@
 #include "io.h"
 #include "mdl.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 #define PAGING_STRUCTURES_BASE_MEMORY                           (128*KB_SIZE)
 
@@ -472,7 +473,7 @@ MmuInitSystem(
     // We can't use the VmmChangeCr3 function because that functions expects a PCID
     // and an invalidate parameter which we currently don't until we spawn the system
     // process
-    __writecr3(m_mmuData.PagingData.Data.BasePhysicalAddress);
+    AsmWriteCr3((QWORD) m_mmuData.PagingData.Data.BasePhysicalAddress);
     LOG("Changed to new cr3\n");
     VmmInitReservationSystem();
 
@@ -775,7 +776,7 @@ MmuGetPhysicalAddress(
 {
     return MmuGetPhysicalAddressEx(VirtualAddress,
                                    NULL,
-                                   __readcr3());
+                                   (const PHYSICAL_ADDRESS) AsmReadCr3());
 }
 
 PTR_SUCCESS

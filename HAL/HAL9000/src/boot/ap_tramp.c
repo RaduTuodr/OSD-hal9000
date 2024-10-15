@@ -6,6 +6,7 @@
 #include "gdtmu.h"
 #include "idt.h"
 #include "thread_internal.h"
+#include "cal_assembly.h"
 
 #define LOW_MEMORY_CONFIG_START         0x1000
 #define LOW_MEMORY_CONFIG_SIZE          0x1000
@@ -146,7 +147,7 @@ MSVC_WARNING_SUPPRESS(4152)
 
         pConfig->SystemConfig.LowGdt.Base = (DWORD)((QWORD)pLowMemoryCode + initialCodeSize + placeholderCodeSize);
         pConfig->SystemConfig.LowGdt.Limit = (WORD)(lowGdtSize - 1);
-        cr3 = __readcr3();
+        cr3 = (PHYSICAL_ADDRESS) AsmReadCr3();
         ASSERT((QWORD)cr3 <= MAX_DWORD);
 
         // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'

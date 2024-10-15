@@ -8,6 +8,7 @@
 #include "cpumu.h"
 #include "dmp_cpu.h"
 #include "process.h"
+#include "cal_assembly.h"
 
 #define UNDEFINED_INTERRUPT_TEXT                "UNKNOWN INTERRUPT"
 #define STACK_BYTES_TO_DUMP_ON_EXCEPTION        0x100
@@ -111,7 +112,7 @@ _IsrExceptionHandler(
 
         ASSERT(ErrorCodeAvailable);
 
-        pfAddr = __readcr2();
+        pfAddr = (PVOID) AsmReadCr2();
         LOG_TRACE_EXCEPTION("#PF address: 0x%X\n", pfAddr);
         exceptionHandled = MmuSolvePageFault(pfAddr, errorCode );
         if (!exceptionHandled)

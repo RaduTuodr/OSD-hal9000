@@ -1,6 +1,8 @@
 #pragma once
 
-#define MdlAllocate(...)            MdlAllocateEx(__VA_ARGS__, __readcr3(), NULL)
+#include "cal_assembly.h"
+
+#define MdlAllocate(...)            MdlAllocateEx(__VA_ARGS__, (const PHYSICAL_ADDRESS) AsmReadCr3(), NULL)
 
 typedef struct _PAGING_LOCK_DATA*   PPAGING_LOCK_DATA;
 

@@ -455,7 +455,7 @@ VmmChangeCr3(
 
     // If CR4.PCIDE = 1 and bit 63 of the instruction�s source operand is 1, the instruction is not required to
     // invalidate any TLB entries or entries in paging - structure caches.
-    __writecr3((Invalidate ? 0 : MOV_TO_CR3_DO_NOT_INVALIDATE_PCID_MAPPINGS) | (QWORD)Pml4Base | Pcid);
+    AsmWriteCr3((Invalidate ? 0 : MOV_TO_CR3_DO_NOT_INVALIDATE_PCID_MAPPINGS) | (QWORD)Pml4Base | Pcid);
 
     /// TODO: This should be broadcast on all CPUs to invalidate their mappings for PCID Pcid
 }

@@ -480,7 +480,7 @@ void
     dirtyCount = 0;
     accessedCount = 0;
     pData = NULL;
-    cr3.Raw = (QWORD) __readcr3();
+    cr3.Raw = (QWORD) AsmReadCr3();
 
     pData = ExAllocatePoolWithTag(PoolAllocateZeroMemory, PAGE_SIZE, HEAP_TEMP_TAG, PAGE_SIZE);
     if (pData == NULL)
