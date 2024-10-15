@@ -11,6 +11,7 @@
 #include "hw_fpu.h"
 #include "cal_annotate.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 
 extern void ApAsmStub();
 
@@ -573,7 +574,7 @@ SmpCpuInit(
     }
 
     // make sure TPR is 0
-    __writecr8(0);
+    AsmWriteCr8(0);
 
     return STATUS_SUCCESS;
 }

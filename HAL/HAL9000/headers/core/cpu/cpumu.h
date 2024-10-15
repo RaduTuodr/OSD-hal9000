@@ -9,6 +9,7 @@
 #include "list.h"
 #include "synch.h"
 #include "cpu_structures.h"
+#include "cal_assembly.h"
 
 #define STACK_DEFAULT_SIZE          (8*PAGE_SIZE)
 #define STACK_GUARD_SIZE            (2*PAGE_SIZE)
@@ -132,12 +133,12 @@ CpuMuRaiseIrql(
     IN IRQL Irql
     )
 {
-    IRQL prevIrql = __readcr8();
+    IRQL prevIrql = AsmReadCr8();
 
     ASSERT_INFO(prevIrql <= Irql, "Previous IRQL: 0x%x\nCurrent IRQL: 0x%x\n",
                 prevIrql, Irql );
 
-    __writecr8((QWORD) Irql);
+    AsmWriteCr8((QWORD) Irql);
 
     return prevIrql;
 }
@@ -148,12 +149,12 @@ CpuMuLowerIrql(
     IN IRQL Irql
     )
 {
-    IRQL prevIrql = __readcr8();
+    IRQL prevIrql = AsmReadCr8();
 
     ASSERT_INFO(prevIrql >= Irql, "Previous IRQL: 0x%x\nCurrent IRQL: 0x%x\n",
                 prevIrql, Irql );
 
-    __writecr8((QWORD) Irql);
+    AsmWriteCr8((QWORD) Irql);
 
     return prevIrql;
 }

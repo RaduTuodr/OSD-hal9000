@@ -436,7 +436,7 @@ _CpuValidateCurrentCpu(
     // read CRs
     cr0 = AsmReadCr0();
     cr4 = AsmReadCr4();
-    cr8 = __readcr8();
+    cr8 = AsmReadCr8();
 
     // read MSRs
     eferMsr = AsmReadMsr(IA32_EFER);

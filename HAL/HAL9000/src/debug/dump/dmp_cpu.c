@@ -92,7 +92,7 @@ DumpControlRegisters(
     LOG("CR2: 0x%X\n", AsmReadCr2());
     LOG("CR3: 0x%X\n", AsmReadCr3());
     LOG("CR4: 0x%X\n", AsmReadCr4());
-    LOG("CR8: 0x%X\n", __readcr8());
+    LOG("CR8: 0x%X\n", AsmReadCr8());
     DumpReleaseLock(intrState);
 }
 
