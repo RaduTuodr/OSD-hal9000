@@ -3,6 +3,7 @@
 #include "cal_annotate.h"
 #include "cal_atomic.h"
 #include "cal_warning.h"
+#include "cal_assembly.h"
 
 #define MAXPHYADDR                                  52
 
@@ -380,9 +381,9 @@ PageInvalidateTlb(
     IN          PVOID           Page
     )
 {
-    // This is a HACK done to prevent a Visual C compiler bug which sometimes (if 2 __invlpg are one after another)
-    // causes the __invlpg to generate a swapgs instruction :|
+    // This is a HACK done to prevent a Visual C compiler bug which sometimes (if 2 AsmInvlpg are one after another)
+    // causes the AsmInvlpg to generate a swapgs instruction :|
     // Yeah, good job Microsoft...
     AtomicReadWriteBarrier();
-    __invlpg(Page);
+    AsmInvlpg(Page);
 }
