@@ -1,6 +1,7 @@
 #include "HAL9000.h"
 #include "dmp_cpu.h"
 #include "dmp_common.h"
+#include "cal_assembly.h"
 
 #define MAX_REGISTER_NAME_LENGTH        3
 #define MAX_LEAF_NAME_LENGTH            50
@@ -87,7 +88,7 @@ DumpControlRegisters(
 
     intrState = DumpTakeLock();
     LOG("\nControl registers:\n");
-    LOG("CR0: 0x%X\n", __readcr0());
+    LOG("CR0: 0x%X\n", AsmReadCr0());
     LOG("CR2: 0x%X\n", __readcr2());
     LOG("CR3: 0x%X\n", __readcr3());
     LOG("CR4: 0x%X\n", __readcr4());

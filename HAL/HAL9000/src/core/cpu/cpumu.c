@@ -434,7 +434,7 @@ _CpuValidateCurrentCpu(
     QWORD ia32PatValues;
 
     // read CRs
-    cr0 = __readcr0();
+    cr0 = AsmReadCr0();
     cr4 = __readcr4();
     cr8 = __readcr8();
 

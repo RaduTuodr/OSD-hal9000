@@ -844,9 +844,9 @@ VmmSolvePageFault(
                 /// According to the Intel manual the WP flag has nothing to do with accessing UM pages
                 /// It is more generic, if WP is set => supervisor accesses can write to any virtual address
                 /// even if it is read-only
-                __writecr0(__readcr0() & ~CR0_WP);
+                AsmWriteCr0(AsmReadCr0() & ~CR0_WP);
                 memzero(PtrOffset(alignedAddress, bytesReadFromFile), PAGE_SIZE - (DWORD)bytesReadFromFile);
-                __writecr0(__readcr0() | CR0_WP);
+                AsmWriteCr0(AsmReadCr0() | CR0_WP);
             }
 
             if (NULL != pCpu)

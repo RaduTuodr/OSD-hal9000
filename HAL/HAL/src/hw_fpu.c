@@ -41,7 +41,7 @@ _HalEnableFpu(
     )
 {
     // make sure emulation is disabled in CR0
-    __writecr0(__readcr0() &~(CR0_EM));
+    AsmWriteCr0(AsmReadCr0() &~(CR0_EM));
 
     // Enable
     //  ->  FXSAVE and FXRSTOR instructions (needed - I have no idea why exactly)
