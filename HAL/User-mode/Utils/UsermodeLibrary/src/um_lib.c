@@ -1,5 +1,6 @@
 #include "um_lib_base.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 #define RFLAGS_DIRECTION_BIT            ((QWORD)1<<10)
 
@@ -99,5 +100,5 @@ CpuClearDirectionFlag(
     void
     )
 {
-    __writeeflags(__readeflags() & (~RFLAGS_DIRECTION_BIT));
+    __writeeflags(AsmReadEflags() & (~RFLAGS_DIRECTION_BIT));
 }
