@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "lock_common.h"
 #include "cal_atomic.h"
+#include "cal_assembly.h"
 #include "cal_intrin.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
@@ -42,14 +43,14 @@ MonitorLockAcquire(
 MSVC_WARNING_SUPPRESS(4127)
     while(TRUE)
     {
-        _mm_monitor(Lock, 0, 0);
+        AsmMonitor(Lock, 0, 0);
 
         if (LOCK_FREE == AtomicCompareExchange8(&Lock->Lock.State, LOCK_TAKEN, LOCK_FREE))
         {
             break;
         }
 
-        _mm_mwait(0, 0);
+        AsmMwait(0, 0);
     }
 
     ASSERT(NULL == Lock->Lock.FunctionWhichTookLock);

@@ -19,6 +19,6 @@ RtcGetTickCount(
     void
     )
 {
-    _mm_lfence();
+    AsmLfence();
     return AsmRdtsc();
 }
