@@ -1,7 +1,7 @@
 #pragma once
 
 C_HEADER_START
-#include <sal.h>
+#include "cal_sal.h"
 
 #define PTR_SUCCESS                                 _Success_(NULL != return)
 #define SIZE_SUCCESS                                _Success_(MAX_DWORD != return)
