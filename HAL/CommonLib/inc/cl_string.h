@@ -1,6 +1,9 @@
 #pragma once
 
 C_HEADER_START
+
+#include "cal_vargs.h"
+
 #define INVALID_STRING_SIZE             MAX_DWORD
 
 //******************************************************************************
@@ -125,7 +128,7 @@ cl_snprintf(
     ...
     );
 
-#define cl_sprintf(outBuff,inBuff,...)     cl_snprintf(outBuff,MAX_PATH,inBuff,__VA_ARGS__)
+#define cl_sprintf(outBuff,inBuff,...)     cl_snprintf(outBuff,MAX_PATH,inBuff VA_ARGS(__VA_ARGS__))
 
 STATUS
 cl_vsnprintf(

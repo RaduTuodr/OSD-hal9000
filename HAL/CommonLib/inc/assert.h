@@ -3,6 +3,7 @@
 C_HEADER_START
 
 #include "cal_annotate.h"
+#include "cal_vargs.h"
 #include "cal_warning.h"
 #include "native/string.h"
 
@@ -32,7 +33,7 @@ typedef FUNC_AssertFunction*        PFUNC_AssertFunction;
 
 #define ASSERT_INFO(Cond,Msg,...)   if((Cond)){} else                                                                                                    \
                                     {                                                                                                                    \
-                                        AssertInfo( "[ASSERT][%s][%d]Condition: (" ## #Cond ## ") failed\n" ##Msg, cl_strrchr(__FILE__, '\\') + 1, __LINE__, __VA_ARGS__ );      \
+                                        AssertInfo( "[ASSERT][%s][%d]Condition: (" ## #Cond ## ") failed\n" ##Msg, cl_strrchr(__FILE__, '\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__) );      \
                                     }
 
 #define NOT_REACHED                  MSVC_WARNING_SUPPRESS(4127) ASSERT(FALSE)
