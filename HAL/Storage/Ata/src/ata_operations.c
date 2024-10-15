@@ -281,7 +281,7 @@ _AtaReadBuffer(
         // wait device to be ready
         _AtaWaitDataRequest(AtaDevice);
 
-        tempData = __inword(AtaDevice->BaseRegister + AtaRegisterData);
+        tempData = AsmInWord(AtaDevice->BaseRegister + AtaRegisterData);
         memcpy(Buffer + i, &tempData, sizeof(WORD));
     }
 }
@@ -307,7 +307,7 @@ _AtaWriteBuffer(
         // wait device to be ready
         _AtaWaitDataRequest(AtaDevice);
 
-        __outword(AtaDevice->BaseRegister + AtaRegisterData, Buffer[i]);
+        AsmOutWord(AtaDevice->BaseRegister + AtaRegisterData, Buffer[i]);
     }
 }
 
