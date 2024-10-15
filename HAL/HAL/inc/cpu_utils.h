@@ -10,7 +10,7 @@ CpuClearDirectionFlag(
     void
     )
 {
-    __writeeflags(AsmReadEflags() & (~RFLAGS_DIRECTION_BIT));
+    AsWriteEflags(AsmReadEflags() & (~RFLAGS_DIRECTION_BIT));
 }
 
 ALWAYS_INLINE
@@ -33,7 +33,7 @@ CpuIntrSetState(
     QWORD rFlags = AsmReadEflags();
     QWORD newFlags = IntrState ? ( rFlags | RFLAGS_INTERRUPT_FLAG_BIT ) : ( rFlags & ( ~RFLAGS_INTERRUPT_FLAG_BIT));
 
-    __writeeflags(newFlags);
+    AsWriteEflags(newFlags);
 
     return IsBooleanFlagOn(rFlags, RFLAGS_INTERRUPT_FLAG_BIT);
 }
