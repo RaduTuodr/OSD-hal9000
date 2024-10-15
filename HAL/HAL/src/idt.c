@@ -3,6 +3,7 @@
 #include "idt.h"
 #include "tss.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 #define PREDEFINED_IDT_SIZE                     10
 #define PREDEFINED_IDT_ENTRY_SIZE               16
@@ -127,5 +128,5 @@ IdtReload(
     void
     )
 {
-    __lidt(&m_idt);
+    AsmLidt(&m_idt);
 }
