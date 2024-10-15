@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 void
 RtcInit(
@@ -19,5 +20,5 @@ RtcGetTickCount(
     )
 {
     _mm_lfence();
-    return __rdtsc();
+    return AsmRdtsc();
 }
