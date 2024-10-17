@@ -1,4 +1,4 @@
-if (CMAKE_GNU_C_COMPILER_ID STREQUAL "GNU")
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     include(GCCFlags)
 else()
     include(MSVCFlags)

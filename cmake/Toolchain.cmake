@@ -6,17 +6,51 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release)
 
 set(CMAKE_C_COMPILER_WORKS 1)
 
-set(CMAKE_C_COMPILE_OBJECT
-    "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> /c /Fo:<OBJECT> <SOURCE>"
-)
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
 
-set(CMAKE_C_LINK_EXECUTABLE
-      "<CMAKE_LINKER> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> /OUT:<TARGET> <OBJECTS> <LINK_LIBRARIES>"
-)
+      set(CMAKE_C_COMPILE_OBJECT
+            "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> /c /Fo:<OBJECT> <SOURCE>"
+      )
 
-set(CMAKE_C_CREATE_STATIC_LIBRARY
-      "<CMAKE_AR> <FLAGS> <LINK_FLAGS> /NOLOGO /OUT:<TARGET> <OBJECTS>"
-)
+      set(CMAKE_C_LINK_EXECUTABLE
+            "<CMAKE_LINKER> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> /OUT:<TARGET> <OBJECTS> <LINK_LIBRARIES>"
+      )
+
+      set(CMAKE_C_CREATE_STATIC_LIBRARY
+            "<CMAKE_AR> <FLAGS> <LINK_FLAGS> /NOLOGO /OUT:<TARGET> <OBJECTS>"
+      )
+
+else()
+      find_program(CMAKE_C_COMPILER
+            NAMES "x86_64-elf-gcc"
+            HINTS ${CMAKE_SOURCE_DIR}/tools/elfgcc/bin
+            REQUIRED
+      )
+
+      find_program(CMAKE_LINKER
+            NAMES "x86_64-elf-gcc"
+            HINTS ${CMAKE_SOURCE_DIR}/tools/elfgcc/bin
+            REQUIRED
+      )
+
+      find_program(CMAKE_AR
+            NAMES "x86_64-elf-ar"
+            HINTS ${CMAKE_SOURCE_DIR}/tools/elfgcc/bin
+            REQUIRED
+      )
+
+      set(CMAKE_C_COMPILE_OBJECT
+            "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -c -o <OBJECT> <SOURCE>"
+      )
+
+      set(CMAKE_C_LINK_EXECUTABLE
+            "<CMAKE_LINKER> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>"
+      )
+
+      set(CMAKE_C_CREATE_STATIC_LIBRARY
+            "<CMAKE_AR> rcs <TARGET> <OBJECTS>"
+      )
+endif()
 
 set(CMAKE_C_FLAGS_INIT)
 set(CMAKE_C_LINK_FLAGS_INIT)

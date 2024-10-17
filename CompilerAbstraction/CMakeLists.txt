@@ -4,9 +4,11 @@ set(COMPILER_ABSTRACTION_INCLUDES
     ${CMAKE_SOURCE_DIR}/CompilerAbstraction/inc
 )
 
-set(COMPILER_ABSTRACTION_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CompilerAbstraction>/CompilerAbstraction.pdb>
-)
+if (MSVC)
+    set(COMPILER_ABSTRACTION_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CompilerAbstraction>/CompilerAbstraction.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE COMPILER_ABSTRACTION_SOURCES src/*.c src/*.yasm)
 

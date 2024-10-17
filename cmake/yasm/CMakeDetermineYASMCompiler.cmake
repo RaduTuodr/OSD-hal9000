@@ -1,6 +1,8 @@
 find_program(CMAKE_YASM_COMPILER
     NAMES "vsyasm"
-    HINTS ${CMAKE_SOURCE_DIR}/tools/bin)
+    HINTS ${CMAKE_SOURCE_DIR}/tools/yasm/bin
+    REQUIRED
+)
 mark_as_advanced(CMAKE_YASM_COMPILER)
 
 set(CMAKE_YASM_COMPILER_ID "YASM")

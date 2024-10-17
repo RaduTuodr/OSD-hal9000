@@ -9,6 +9,6 @@ ExternalProject_Add(Yasm
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/yasm_repo
     BINARY_DIR ${CMAKE_BINARY_DIR}/yasm_repo
     CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/../tools
+        -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/../tools/yasm
         -DBUILD_SHARED_LIBS=OFF
 )
