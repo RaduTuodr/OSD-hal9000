@@ -434,4 +434,10 @@
 
 #define __range(x,y)
 
+// Added by DS
+
+#define __out_z
+#define _Notnull_
+#define _Post_ptr_invalid_
+
 #endif

@@ -8,7 +8,7 @@ MSVC_WARNING_DISABLE(4206)
 
 #include "common_lib.h"
 
-#define UNUSED_PATTERN     (DWORD)0xCC'CC'CC'CCUL
+#define UNUSED_PATTERN     (DWORD)0xCCCCCCCCUL
 
 #pragma pack(push,8)
 typedef struct _RTC_vardesc

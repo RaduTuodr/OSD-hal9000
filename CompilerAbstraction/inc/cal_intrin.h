@@ -4,10 +4,10 @@
 
 #ifdef CAL_MSVC
 
-#define IntrinAddressOfReturnAddress _AddressOfReturnAddress
+#define IntrinAddressOfReturnAddress _AddressOfReturnAddress()
 
 #else
 
-#define IntrinAddressOfReturnAddress ((void *) (((__int64_t *) __builtin_frame_address(0)) - 1))
+#define IntrinAddressOfReturnAddress ((void *) (((int64_t *) __builtin_frame_address(0)) - 1))
 
 #endif

@@ -32,4 +32,4 @@ add_subdirectory(CompilerAbstraction)
 
 # add_subdirectory(UefiBootloader)
 
-# add_subdirectory(HAL)
+add_subdirectory(HAL)

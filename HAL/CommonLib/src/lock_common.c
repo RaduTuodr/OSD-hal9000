@@ -18,6 +18,7 @@ WARNING_PUSH
 // David Sipos: Modified to 4113, in VS2022 I get this error
 MSVC_WARNING_DISABLE(4113) // Error for VS2022
 MSVC_WARNING_DISABLE(4028) // Error for VS2019
+GNU_WARNING_IGNORE("-Wincompatible-pointer-types")
 
 void
 LockSystemInit(

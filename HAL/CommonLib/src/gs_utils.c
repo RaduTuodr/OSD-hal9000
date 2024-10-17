@@ -25,7 +25,7 @@ GSNotifyStackChange(
     ASSERT(IsAddressAligned(OldStackBase,PAGE_SIZE));
     ASSERT(IsAddressAligned(NewStackBase,PAGE_SIZE));
 
-    newRsp = IntrinAddressOfReturnAddress();
+    newRsp = IntrinAddressOfReturnAddress;
     usedStackSize = min(OldStackSize, PtrDiff(NewStackBase, newRsp));
 
     // Search [OldRsp, OldStackBase) for cookies

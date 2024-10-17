@@ -20,17 +20,19 @@ set(COMMON_LIB_NO_LOCKS_DEFINES
     _COMMONLIB_NO_LOCKS_
 )
 
-set(COMMON_LIB_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CommonLib>/CommonLib.pdb>
-)
+if (MSVC)
+    set(COMMON_LIB_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CommonLib>/CommonLib.pdb>
+    )
 
-set(COMMON_LIB_NON_NATIVE_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CommonLibNonNative>/CommonLibNonNative.pdb>
-)
+    set(COMMON_LIB_NON_NATIVE_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CommonLibNonNative>/CommonLibNonNative.pdb>
+    )
 
-set(COMMON_LIB_NO_LOCKS_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CommonLibNoLocks>/CommonLibNoLocks.pdb>
-)
+    set(COMMON_LIB_NO_LOCKS_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CommonLibNoLocks>/CommonLibNoLocks.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE COMMON_LIB_SOURCES src/*.c src/*.yasm)
 

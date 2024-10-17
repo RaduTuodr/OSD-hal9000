@@ -28,12 +28,17 @@ typedef FUNC_AssertFunction*        PFUNC_AssertFunction;
 // The ASSERT macros validate a specified condition, in case the
 // condition does not hold the registered FUNC_AssertFunction is called
 #ifndef ASSERT
-#define ASSERT(Cond)                ASSERT_INFO((Cond),"")
+// GCC has problems with the empty string
+// #define ASSERT(Cond)                ASSERT_INFO((Cond),"")
+#define ASSERT(Cond)         if((Cond)){} else                                                                                                  \
+                             {                                                                                                                 \
+                                AssertInfo( "[ASSERT][%s][%d]Condition: (" #Cond ") failed\n", cl_strrchr(__FILE__, '\\') + 1, __LINE__);      \
+                             }
 #endif // ASSERT
 
 #define ASSERT_INFO(Cond,Msg,...)   if((Cond)){} else                                                                                                    \
                                     {                                                                                                                    \
-                                        AssertInfo( "[ASSERT][%s][%d]Condition: (" ## #Cond ## ") failed\n" ##Msg, cl_strrchr(__FILE__, '\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__) );      \
+                                        AssertInfo( "[ASSERT][%s][%d]Condition: (" #Cond ") failed\n" Msg, cl_strrchr(__FILE__, '\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__) );      \
                                     }
 
 #define NOT_REACHED                  MSVC_WARNING_SUPPRESS(4127) ASSERT(FALSE)

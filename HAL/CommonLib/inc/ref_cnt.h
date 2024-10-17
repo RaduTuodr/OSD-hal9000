@@ -1,6 +1,8 @@
 #pragma once
 
 C_HEADER_START
+#include "cal_annotate.h"
+
 //******************************************************************************
 // Function:     FUNC_FreeFunction
 // Description:  Function called when the ReferenceCount of the object reaches 0
@@ -10,7 +12,7 @@ C_HEADER_START
 //******************************************************************************
 typedef
 void
-(_cdecl FUNC_FreeFunction)(
+(CDECL FUNC_FreeFunction)(
     IN      PVOID       Object,
     IN_OPT  PVOID       Context
     );

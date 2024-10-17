@@ -21,8 +21,12 @@
 #define NO_RETURN __attribute__((noreturn))
 #define DEPRECATED __attribute__((deprecated))
 
-#define CDECL __attribute__((cdecl))
-#define FASTCALL __attribute__((fastcall))
+// GCC ignores this attribute and generates a warning
+// #define CDECL __attribute__((cdecl))
+// #define FASTCALL __attribute__((fastcall))
+
+#define CDECL
+#define FASTCALL
 #define STDCALL __attribute__((stdcall))
 #define MS_ABI __attribute__((ms_abi))
 
