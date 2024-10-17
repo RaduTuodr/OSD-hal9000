@@ -16,7 +16,7 @@ typedef struct _THREAD* PTHREAD;
 
 typedef
 STATUS
-(CDECL FUNC_ThreadStart)(
+(CDECL MS_ABI FUNC_ThreadStart)(
     IN_OPT      PVOID       Context
     );
 

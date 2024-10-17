@@ -6,9 +6,11 @@ set(USERMODE_LIBRARY_INCLUDES
     ${PROJECT_SOURCE_DIR}/Shared/common
 )
 
-set(USERMODE_LIBRARY_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:UsermodeLibrary>/UsermodeLibrary.pdb>
-)
+if (MSVC)
+    set(USERMODE_LIBRARY_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:UsermodeLibrary>/UsermodeLibrary.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE USERMODE_LIBRARY_SOURCES src/*.c src/*.yasm)
 

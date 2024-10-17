@@ -4,10 +4,10 @@
 #include "cal_vargs.h"
 
 #define LOG(buf,...)                            LogBuffer(buf VA_ARGS(__VA_ARGS__))
-#define LOGL(buf,...)                           LOG("[%s][%d]"##buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOGL(buf,...)                           LOG("[%s][%d]" buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
 
-#define LOG_WARNING(buf,...)                    LOGL("[WARNING]"##buf VA_ARGS(__VA_ARGS__) )
-#define LOG_ERROR(buf,...)                      LOGL("[ERROR]"##buf VA_ARGS(__VA_ARGS__) )
+#define LOG_WARNING(buf,...)                    LOGL("[WARNING]" buf VA_ARGS(__VA_ARGS__) )
+#define LOG_ERROR(buf,...)                      LOGL("[ERROR]" buf VA_ARGS(__VA_ARGS__) )
 #define LOG_FUNC_ERROR(func,status)             LOG_ERROR("Function %s failed with status 0x%x\n", (func), (status) )
 #define LOG_FUNC_ERROR_ALLOC(func,size)         LOG_ERROR("Function %s failed alloc for size 0x%x\n", (func), (size))
 
