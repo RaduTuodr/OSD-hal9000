@@ -15,45 +15,66 @@ set(ACPI_DEFINES
     WIN64
 )
 
-set(ACPI_FLAGS
-    /Zi 
-    /Fd:$<TARGET_FILE_DIR:Acpica>/Acpica.pdb
-    /nologo
-    /W4
-    /WX-
-    /diagnostics:column
-    /O1
-    /Ob1
-    /Os
-    /GF
-    /Gm-
-    /MT
-    /GS
-    /Gy
-    /fp:precise
-    /Za
-    /Zc:wchar_t
-    /Zc:forScope
-    /Zc:inline
-    /FR
-    /Gr
-    /TC
-    /FC
-    /errorReport:prompt
-    /FS
-)
+if (MSVC)
+    set(ACPI_FLAGS
+        /Zi 
+        /Fd:$<TARGET_FILE_DIR:Acpica>/Acpica.pdb
+        /nologo
+        /W4
+        /WX-
+        /diagnostics:column
+        /O1
+        /Ob1
+        /Os
+        /GF
+        /Gm-
+        /MT
+        /GS
+        /Gy
+        /fp:precise
+        /Za
+        /Zc:wchar_t
+        /Zc:forScope
+        /Zc:inline
+        /FR
+        /Gr
+        /TC
+        /FC
+        /errorReport:prompt
+        /FS
+    )
 
-set(ACPI_LINK_FLAGS
-    /DEBUG
-    /NOLOGO
-    /MACHINE:X64
-)
+    set(ACPI_LINK_FLAGS
+        /DEBUG
+        /NOLOGO
+        /MACHINE:X64
+    )
 
-set(ACPI_IGNORE_WARNINGS
-    /wd4295
-    /wd4244
-    /wd4715
-)
+    set(ACPI_IGNORE_WARNINGS
+        /wd4295
+        /wd4244
+        /wd4715
+    )
+else()
+    list(APPEND ACPI_DEFINES __HAL9000__)
+
+    set(ACPI_FLAGS
+        -g 
+        -Wall
+        -Wextra
+        -O1
+        -MT
+        -fstack-protector-strong
+        -fstack-clash-protection
+        -ffunction-sections
+        -fshort-wchar
+        -fno-zero-initialized-in-bss
+    )
+
+    set(ACPI_LINK_FLAGS)
+
+    set(ACPI_IGNORE_WARNINGS)
+endif()
 
 file(GLOB_RECURSE ACPI_DEBUGGER_SOURCES src/Debugger/*.c)
 file(GLOB_RECURSE ACPI_DISASSEMBLER_SOURCES src/Disassembler/*.c)

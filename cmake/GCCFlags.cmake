@@ -54,7 +54,7 @@ set(GLOBAL_DEBUG_FLAGS
     -g    
     -MP
     -O0
-    -fstack-proector-strong
+    -fstack-protector-strong
     -fstack-clash-protection
     -Werror
     -Wall
@@ -66,7 +66,7 @@ set(GLOBAL_RELEASE_FLAGS
     -ffunction-sections
     -MP
     -O2
-    -fstack-proector-strong
+    -fstack-protector-strong
     -fstack-clash-protection
     -Werror
     -Wall
