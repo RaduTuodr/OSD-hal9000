@@ -13,10 +13,10 @@ typedef __int16 int16_t;
 typedef __int32 int32_t;
 typedef __int64 int64_t;
 #else
-typedef __int8_t int8_t;
-typedef __int16_t int16_t;
-typedef __int32_t int32_t;
-typedef __int64_t int64_t;
+typedef char int8_t;
+typedef short int16_t;
+typedef int int32_t;
+typedef long long int64_t;
 #endif
 
 // Unsigned types
@@ -26,10 +26,10 @@ typedef unsigned __int16 uint16_t;
 typedef unsigned __int32 uint32_t;
 typedef unsigned __int64 uint64_t;
 #else
-typedef unsigned __int8_t uint8_t;
-typedef unsigned __int16_t uint16_t;
-typedef unsigned __int32_t uint32_t;
-typedef unsigned __int64_t uint64_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
 #endif
 
 // Integer limits (taken from stdint.h, did not verify them)
