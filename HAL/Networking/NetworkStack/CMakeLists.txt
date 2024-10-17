@@ -10,9 +10,11 @@ set(NETWORK_STACK_INCLUDES
     ${PROJECT_SOURCE_DIR}/HAL/inc
 )
 
-set(NETWORK_STACK_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:NetworkStack>/NetworkStack.pdb>
-)
+if (MSVC)
+    set(NETWORK_STACK_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:NetworkStack>/NetworkStack.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE NETWORK_STACK_SOURCES src/*.c src/*.yasm)
 

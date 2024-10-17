@@ -10,9 +10,11 @@ set(NETWORK_PORT_INCLUDES
     ${PROJECT_SOURCE_DIR}/HAL/inc
 )
 
-set(NETWORK_PORT_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:NetworkPort>/NetworkPort.pdb>
-)
+if (MSVC)
+    set(NETWORK_PORT_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:NetworkPort>/NetworkPort.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE NETWORK_PORT_SOURCES src/*.c src/*.yasm)
 
