@@ -10,9 +10,11 @@ set(DISK_INCLUDES
     ${PROJECT_SOURCE_DIR}/HAL/inc
 )
 
-set(DISK_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:Disk>/Disk.pdb>
-)
+if (MSVC)
+    set(DISK_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:Disk>/Disk.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE DISK_SOURCES src/*.c src/*.yasm)
 

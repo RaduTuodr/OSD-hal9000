@@ -10,9 +10,11 @@ set(ATA_INCLUDES
     ${PROJECT_SOURCE_DIR}/HAL/inc
 )
 
-set(ATA_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:Ata>/Ata.pdb>
-)
+if (MSVC)
+    set(ATA_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:Ata>/Ata.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE ATA_SOURCES src/*.c src/*.yasm)
 

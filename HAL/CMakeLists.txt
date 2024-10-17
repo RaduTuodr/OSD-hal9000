@@ -12,13 +12,13 @@ project(HAL9000 LANGUAGES C)
 
 # add_subdirectory(Networking/Eth_82574L)
 # add_subdirectory(Networking/NetworkPort)
-add_subdirectory(Networking/NetworkStack)
+# add_subdirectory(Networking/NetworkStack)
 
 # add_subdirectory(Storage/Ata)
 # add_subdirectory(Storage/Disk)
 # add_subdirectory(Storage/Volume)
 
-# add_subdirectory(User-mode/Utils/UsermodeLibrary)
+add_subdirectory(User-mode/Utils/UsermodeLibrary)
 # add_subdirectory(User-mode/Applications)
 
 # add_subdirectory(ACPI)

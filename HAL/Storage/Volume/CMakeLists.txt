@@ -10,9 +10,11 @@ set(VOLUME_INCLUDES
     ${PROJECT_SOURCE_DIR}/HAL/inc
 )
 
-set(VOLUME_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:Volume>/Volume.pdb>
-)
+if (MSVC)
+    set(VOLUME_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:Volume>/Volume.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE VOLUME_SOURCES src/*.c src/*.yasm)
 
