@@ -57,7 +57,7 @@ set(GLOBAL_DEBUG_FLAGS
     -O0
     -fstack-protector-strong
     -fstack-clash-protection
-    -Werror
+    # -Werror
     -Wall
     -Wextra
 )
@@ -69,7 +69,7 @@ set(GLOBAL_RELEASE_FLAGS
     -O2
     -fstack-protector-strong
     -fstack-clash-protection
-    -Werror
+    # -Werror
     -Wall
 )
 

@@ -35,7 +35,7 @@
 %define     VIRTUAL_DISPLAY_ADDRESS     0xFFFF850000000000
 %define     KERNEL_BASE_VIRTUAL         (PA_2_VA_DIFFERENCE + KERNEL_BASE)      ; magic 1T
 %define     KERNEL_BASE                 0x01000000                              ; 16 MB
-%define     KERNEL_LENGTH               0x00200000                              ; 2 MB
+%define     KERNEL_LENGTH               0x00400000                              ; 2 MB
 %define     KERNEL_XE_NO_OF_PAGES       ((KERNEL_LENGTH+PAGE_SIZE-1)/PAGE_SIZE)
 %define     KERNEL_XD_NO_OF_PAGES       (PTE_PER_TABLE-KERNEL_XE_NO_OF_PAGES)
 

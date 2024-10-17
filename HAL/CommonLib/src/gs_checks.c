@@ -12,6 +12,7 @@ MSVC_WARNING_DISABLE(4206)
 
 /// TODO: should we initialize the cookie at runtime?
 const UINT64 __security_cookie = DEFAULT_SECURITY_COOKIE_VALUE;
+const UINT64 __stack_chk_guard = DEFAULT_SECURITY_COOKIE_VALUE;
 
 // called when a buffer bound check fails
 // E.g: char buf[10] buf[10] = 'A';
