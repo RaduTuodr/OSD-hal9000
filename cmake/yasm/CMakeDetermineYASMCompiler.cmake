@@ -1,8 +1,15 @@
-find_program(CMAKE_YASM_COMPILER
-    NAMES "vsyasm"
-    HINTS ${CMAKE_SOURCE_DIR}/tools/yasm/bin
-    REQUIRED
-)
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
+    find_program(CMAKE_YASM_COMPILER
+        NAMES "vsyasm"
+        HINTS ${CMAKE_SOURCE_DIR}/tools/yasm/bin
+        REQUIRED
+    )
+else()
+    find_program(CMAKE_YASM_COMPILER
+        NAMES "nasm"
+        REQUIRED
+    )
+endif()
 mark_as_advanced(CMAKE_YASM_COMPILER)
 
 set(CMAKE_YASM_COMPILER_ID "YASM")

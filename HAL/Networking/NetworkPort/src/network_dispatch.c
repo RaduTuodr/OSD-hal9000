@@ -135,7 +135,7 @@ NetPortDeviceControl(
 }
 
 STATUS
-(CDECL NetPortTransmitFunction)(
+(CDECL MS_ABI NetPortTransmitFunction)(
     IN_OPT      PVOID       Context
     )
 {

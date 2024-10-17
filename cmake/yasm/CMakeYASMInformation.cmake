@@ -1,6 +1,12 @@
-set(CMAKE_YASM_COMPILE_OBJECT 
-    "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> -Xvc -pnasm -rnasm -f win64 -o <OBJECT> --objext=yasm.obj <SOURCE>"
-)
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
+    set(CMAKE_YASM_COMPILE_OBJECT 
+        "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> -Xvc -pnasm -rnasm -f win64 -o <OBJECT> --objext=yasm.obj <SOURCE>"
+    )
+else()
+    set(CMAKE_YASM_COMPILE_OBJECT 
+        "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> -f elf64 -o <OBJECT> <SOURCE>"
+    )
+endif()
 
 set(CMAKE_INCLUDE_FLAG_YASM "-I")
 

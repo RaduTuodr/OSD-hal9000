@@ -60,7 +60,7 @@ __main(
 }
 
 STATUS
-(CDECL _HelloWorldFromThread)(
+(CDECL MS_ABI _HelloWorldFromThread)(
     IN_OPT      PVOID       Context
     )
 {

@@ -31,6 +31,7 @@ SECTIONS
     {
         *(.data)
         *(.data1)
+        *(.bss)
     } :data
 
     .rodata : ALIGN(0x1000)
@@ -38,4 +39,12 @@ SECTIONS
         *(.rodata)
         *(.rodata1)
     } :rodata
+
+    /DISCARD/ :
+    {
+        *(.symtab)
+        *(.strtab)
+        *(.shstrtab)
+        *(.comment)
+    }
 }
