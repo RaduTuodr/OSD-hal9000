@@ -64,39 +64,39 @@
 #define LOG_ATC(lvl,comp,buf,...)               LogEx((lvl), (comp), (buf) VA_ARGS(__VA_ARGS__))
 
 #define LOG_AT(lvl,buf,...)                     LogEx((lvl), LogComponentGeneric, buf VA_ARGS(__VA_ARGS__))
-#define LOG_ATLC(lvl,comp,buf,...)              LogEx((lvl), (comp), "[%s][%d]"##buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_ATLC(lvl,comp,buf,...)              LogEx((lvl), (comp), "[%s][%d]" buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
 
 #define LOG(buf,...)                            LogEx(LogLevelInfo, LogComponentGeneric, buf VA_ARGS(__VA_ARGS__))
-#define LOGP(buf,...)                           LogEx(LogLevelInfo, LogComponentGeneric, "[CPU:%02x]"##buf, CpuGetApicId() VA_ARGS(__VA_ARGS__))
+#define LOGP(buf,...)                           LogEx(LogLevelInfo, LogComponentGeneric, "[CPU:%02x]" buf, CpuGetApicId() VA_ARGS(__VA_ARGS__))
 
-#define LOGP_WARNING(buf,...)                   LogEx(LogLevelWarning, LogComponentGeneric, "[CPU:%02x]"##buf, CpuGetApicId() VA_ARGS(__VA_ARGS__))
-#define LOGP_ERROR(buf,...)                     LogEx(LogLevelError, LogComponentGeneric, "[CPU:%02x]"##buf, CpuGetApicId() VA_ARGS(__VA_ARGS__))
+#define LOGP_WARNING(buf,...)                   LogEx(LogLevelWarning, LogComponentGeneric, "[CPU:%02x]" buf, CpuGetApicId() VA_ARGS(__VA_ARGS__))
+#define LOGP_ERROR(buf,...)                     LogEx(LogLevelError, LogComponentGeneric, "[CPU:%02x]" buf, CpuGetApicId() VA_ARGS(__VA_ARGS__))
 
-#define LOGL(buf,...)                           LogEx(LogLevelInfo, LogComponentGeneric, "[%s][%d]"##buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOGPL(buf,...)                          LogEx(LogLevelInfo, LogComponentGeneric, "[CPU:%02x][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOGTPL(buf,...)                         LogEx(LogLevelInfo, LogComponentGeneric, "[TH:%s][CPU:%02x][%s][%d]"##buf, ThreadGetName(NULL), CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOGL(buf,...)                           LogEx(LogLevelInfo, LogComponentGeneric, "[%s][%d]" buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOGPL(buf,...)                          LogEx(LogLevelInfo, LogComponentGeneric, "[CPU:%02x][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOGTPL(buf,...)                         LogEx(LogLevelInfo, LogComponentGeneric, "[TH:%s][CPU:%02x][%s][%d]" buf, ThreadGetName(NULL), CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
 
-#define LOG_TRACE(buf,...)                      LogEx(LogLevelTrace, LogComponentGeneric, "[CPU:%02x][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_COMP(comp,buf,...)            LogEx(LogLevelTrace, (comp), "[CPU:%02x][" #comp "][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE(buf,...)                      LogEx(LogLevelTrace, LogComponentGeneric, "[CPU:%02x][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_COMP(comp,buf,...)            LogEx(LogLevelTrace, (comp), "[CPU:%02x][" #comp "][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
 
-#define LOG_TRACE_IO(buf,...)                   LogEx(LogLevelTrace, LogComponentIo, "[CPU:%02x][LogComponentIo]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_EXCEPTION(buf,...)            LogEx(LogLevelTrace, LogComponentException, "[CPU:%02x][LogComponentException]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_INTERRUPT(buf,...)            LogEx(LogLevelTrace, LogComponentInterrupt, "[CPU:%02x][LogComponentInterrupt]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_VMM(buf,...)                  LogEx(LogLevelTrace, LogComponentVmm, "[CPU:%02x][LogComponentVmm]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_MMU(buf,...)                  LogEx(LogLevelTrace, LogComponentMmu, "[CPU:%02x][LogComponentMmu]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_CPU(buf,...)                  LogEx(LogLevelTrace, LogComponentCpu, "[CPU:%02x][LogComponentCpu]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_ACPI(buf,...)                 LogEx(LogLevelTrace, LogComponentAcpi, "[CPU:%02x][LogComponentAcpi]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_THREAD(buf,...)               LogEx(LogLevelTrace, LogComponentThread, "[CPU:%02x][LogComponentThread]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_STORAGE(buf,...)              LogEx(LogLevelTrace, LogComponentStorage, "[CPU:%02x][LogComponentStorage]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_FILESYSTEM(buf,...)           LogEx(LogLevelTrace, LogComponentFileSystem, "[CPU:%02x][LogComponentFileSystem]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_NETWORK(buf,...)              LogEx(LogLevelTrace, LogComponentNetwork, "[CPU:%02x][LogComponentNetwork]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_USERMODE(buf,...)             LogEx(LogLevelTrace, LogComponentUserMode, "[CPU:%02x][LogComponentUserMode]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_PROCESS(buf,...)              LogEx(LogLevelTrace, LogComponentProcess, "[CPU:%02x][LogComponentProcess]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
-#define LOG_TRACE_PCI(buf,...)                  LogEx(LogLevelTrace, LogComponentPci, "[CPU:%02x][LogComponentPci]][%s][%d]"##buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_IO(buf,...)                   LogEx(LogLevelTrace, LogComponentIo, "[CPU:%02x][LogComponentIo]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_EXCEPTION(buf,...)            LogEx(LogLevelTrace, LogComponentException, "[CPU:%02x][LogComponentException]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_INTERRUPT(buf,...)            LogEx(LogLevelTrace, LogComponentInterrupt, "[CPU:%02x][LogComponentInterrupt]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_VMM(buf,...)                  LogEx(LogLevelTrace, LogComponentVmm, "[CPU:%02x][LogComponentVmm]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_MMU(buf,...)                  LogEx(LogLevelTrace, LogComponentMmu, "[CPU:%02x][LogComponentMmu]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_CPU(buf,...)                  LogEx(LogLevelTrace, LogComponentCpu, "[CPU:%02x][LogComponentCpu]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_ACPI(buf,...)                 LogEx(LogLevelTrace, LogComponentAcpi, "[CPU:%02x][LogComponentAcpi]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_THREAD(buf,...)               LogEx(LogLevelTrace, LogComponentThread, "[CPU:%02x][LogComponentThread]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_STORAGE(buf,...)              LogEx(LogLevelTrace, LogComponentStorage, "[CPU:%02x][LogComponentStorage]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_FILESYSTEM(buf,...)           LogEx(LogLevelTrace, LogComponentFileSystem, "[CPU:%02x][LogComponentFileSystem]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_NETWORK(buf,...)              LogEx(LogLevelTrace, LogComponentNetwork, "[CPU:%02x][LogComponentNetwork]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_USERMODE(buf,...)             LogEx(LogLevelTrace, LogComponentUserMode, "[CPU:%02x][LogComponentUserMode]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_PROCESS(buf,...)              LogEx(LogLevelTrace, LogComponentProcess, "[CPU:%02x][LogComponentProcess]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_TRACE_PCI(buf,...)                  LogEx(LogLevelTrace, LogComponentPci, "[CPU:%02x][LogComponentPci]][%s][%d]" buf, CpuGetApicId(), strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
 
-#define LOG_WARNING(buf,...)                    LogEx(LogLevelWarning, LogComponentGeneric, "[%s][%d]"##buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_WARNING(buf,...)                    LogEx(LogLevelWarning, LogComponentGeneric, "[%s][%d]" buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
 
-#define LOG_ERROR(buf,...)                      LogEx(LogLevelError, LogComponentGeneric, "[%s][%d]"##buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
+#define LOG_ERROR(buf,...)                      LogEx(LogLevelError, LogComponentGeneric, "[%s][%d]" buf, strrchr(__FILE__,'\\') + 1, __LINE__ VA_ARGS(__VA_ARGS__))
 #define LOG_FUNC_ERROR(func,status)             LogEx(LogLevelError, LogComponentGeneric, "[%s][%d]Function %s failed with status 0x%x\n", strrchr(__FILE__,'\\') + 1, __LINE__, func, status)
 #define LOG_FUNC_ERROR_ALLOC(func,size)         LogEx(LogLevelError, LogComponentGeneric, "[%s][%d]Function %s failed alloc for size 0x%x\n", strrchr(__FILE__,'\\') + 1, __LINE__, func, size)
 
@@ -167,24 +167,24 @@ STATIC_ASSERT_INFO(sizeof(LOG_LEVEL) == sizeof(DWORD), "We are using AtomicExcha
 
 typedef enum _LOG_COMPONENT
 {
-    LogComponentGeneric     = 0b0000'0000'0000'0000'0000'0000'0000'0001,
-    LogComponentIo          = 0b0000'0000'0000'0000'0000'0000'0000'0010,
-    LogComponentException   = 0b0000'0000'0000'0000'0000'0000'0000'0100,
-    LogComponentInterrupt   = 0b0000'0000'0000'0000'0000'0000'0000'1000,
-    LogComponentVmm         = 0b0000'0000'0000'0000'0000'0000'0001'0000,
-    LogComponentMmu         = 0b0000'0000'0000'0000'0000'0000'0010'0000,
-    LogComponentCpu         = 0b0000'0000'0000'0000'0000'0000'0100'0000,
-    LogComponentAcpi        = 0b0000'0000'0000'0000'0000'0000'1000'0000,
-    LogComponentThread      = 0b0000'0000'0000'0000'0000'0001'0000'0000,
-    LogComponentStorage     = 0b0000'0000'0000'0000'0000'0010'0000'0000,
-    LogComponentFileSystem  = 0b0000'0000'0000'0000'0000'0100'0000'0000,
-    LogComponentNetwork     = 0b0000'0000'0000'0000'0000'1000'0000'0000,
-    LogComponentUserMode    = 0b0000'0000'0000'0000'0001'0000'0000'0000,
-    LogComponentProcess     = 0b0000'0000'0000'0000'0010'0000'0000'0000,
-    LogComponentPci         = 0b0000'0000'0000'0000'0100'0000'0000'0000,
-    LogComponentTest        = 0b0000'0000'0000'0000'1000'0000'0000'0000,
+    LogComponentGeneric     = 0b00000000000000000000000000000001,
+    LogComponentIo          = 0b00000000000000000000000000000010,
+    LogComponentException   = 0b00000000000000000000000000000100,
+    LogComponentInterrupt   = 0b00000000000000000000000000001000,
+    LogComponentVmm         = 0b00000000000000000000000000010000,
+    LogComponentMmu         = 0b00000000000000000000000000100000,
+    LogComponentCpu         = 0b00000000000000000000000001000000,
+    LogComponentAcpi        = 0b00000000000000000000000010000000,
+    LogComponentThread      = 0b00000000000000000000000100000000,
+    LogComponentStorage     = 0b00000000000000000000001000000000,
+    LogComponentFileSystem  = 0b00000000000000000000010000000000,
+    LogComponentNetwork     = 0b00000000000000000000100000000000,
+    LogComponentUserMode    = 0b00000000000000000001000000000000,
+    LogComponentProcess     = 0b00000000000000000010000000000000,
+    LogComponentPci         = 0b00000000000000000100000000000000,
+    LogComponentTest        = 0b00000000000000001000000000000000,
 
-    LogComponentAll         = 0b1111'1111'1111'1111'1111'1111'1111'1111
+    LogComponentAll         = 0b11111111111111111111111111111111
 } _Enum_is_bitflag_ LOG_COMPONENT;
 STATIC_ASSERT_INFO(sizeof(LOG_COMPONENT) == sizeof(DWORD), "We are using AtomicExchange32 for components!");
 

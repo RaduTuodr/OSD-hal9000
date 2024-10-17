@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.30.2 FATAL_ERROR)
 
 project(HAL9000 LANGUAGES C)
 
-add_subdirectory(CommonLib)
+# add_subdirectory(CommonLib)
 
 # add_subdirectory(Filesystems/FAT32)
-# add_subdirectory(Filesystems/SwapFS)
+add_subdirectory(Filesystems/SwapFS)
 
 # add_subdirectory(Misc/ELF_Parser)
 # add_subdirectory(Misc/PE_Parser)

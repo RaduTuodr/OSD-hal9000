@@ -94,8 +94,8 @@ MSVC_WARNING_DISABLE(4201)
 #define PCI_MEM_SPACE_32_BIT            0b00
 #define PCI_MEM_SPACE_64_BIT            0b10
 
-#define PCI_GET_PA_FROM_MEM_ADDR(Bar)   ((PHYSICAL_ADDRESS)((QWORD)(Bar)->Raw & 0xFFFF'FFF0))
-#define PCI_GET_PORT_FROM_IO_ADDR(Bar)  ((Bar)->Raw & 0xFFFF'FFFC)
+#define PCI_GET_PA_FROM_MEM_ADDR(Bar)   ((PHYSICAL_ADDRESS)((QWORD)(Bar)->Raw & 0xFFFFFFF0))
+#define PCI_GET_PORT_FROM_IO_ADDR(Bar)  ((Bar)->Raw & 0xFFFFFFFC)
 
 typedef volatile union _PCI_BAR
 {

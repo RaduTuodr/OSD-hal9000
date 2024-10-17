@@ -27,16 +27,16 @@ typedef enum _APIC_DESTINATION_SHORTHAND
 
 typedef enum _APIC_DIVIDE_VALUE
 {
-    ApicDivideBy2       = 0b0'0'00,
-    ApicDivideBy4       = 0b0'0'01,
-    ApicDivideBy8       = 0b0'0'10,
-    ApicDivideBy16      = 0b0'0'11,
-    ApicDivideBy32      = 0b1'0'00,
-    ApicDivideBy64      = 0b1'0'01,
-    ApicDivideBy128     = 0b1'0'10,
-    ApicDivideBy1       = 0b1'0'11,
+    ApicDivideBy2       = 0b0000,
+    ApicDivideBy4       = 0b0001,
+    ApicDivideBy8       = 0b0010,
+    ApicDivideBy16      = 0b0011,
+    ApicDivideBy32      = 0b1000,
+    ApicDivideBy64      = 0b1001,
+    ApicDivideBy128     = 0b1010,
+    ApicDivideBy1       = 0b1011,
 
-    ApicDivideReserved  = 0b1'1'11
+    ApicDivideReserved  = 0b1111
 } APIC_DIVIDE_VALUE;
 
 typedef enum _APIC_PIN_POLARITY

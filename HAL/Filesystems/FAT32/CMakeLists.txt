@@ -10,9 +10,11 @@ set(FAT32_INCLUDES
     ${PROJECT_SOURCE_DIR}/HAL/inc
 )
 
-set(FAT32_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:FAT32>/FAT32.pdb>
-)
+if (MSVC)
+    set(FAT32_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:FAT32>/FAT32.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE FAT32_SOURCES src/*.c src/*.yasm)
 

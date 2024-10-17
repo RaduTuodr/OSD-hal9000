@@ -439,5 +439,6 @@
 #define __out_z
 #define _Notnull_
 #define _Post_ptr_invalid_
+#define _Enum_is_bitflag_
 
 #endif

@@ -10,9 +10,11 @@ set(SWAP_FS_INCLUDES
     ${PROJECT_SOURCE_DIR}/HAL/inc
 )
 
-set(SWAP_FS_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:SwapFS>/SwapFS.pdb>
-)
+if (MSVC)
+    set(SWAP_FS_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:SwapFS>/SwapFS.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE SWAP_FS_SOURCES src/*.c src/*.yasm)
 
