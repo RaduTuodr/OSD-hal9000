@@ -313,6 +313,22 @@ void AsmLfence(
     _mm_lfence();
 }
 
+BYTE AsmVmxVmread(
+    QWORD Field,
+    QWORD *FieldValue
+    )
+{
+    return __vmx_vmread(Field, FieldValue);
+}
+
+BYTE AsmVmxVmwrite(
+    QWORD Field,
+    QWORD FieldValue
+    )
+{
+    return __vmx_vwmwrite(Field, FieldValue);
+}
+
 #else
 
 void
@@ -802,6 +818,42 @@ void AsmLfence(
     )
 {
     __builtin_ia32_lfence();
+}
+
+BYTE AsmVmxVmread(
+    QWORD Field,
+    QWORD *FieldValue
+    )
+{
+    QWORD flags;
+    __asm__ __volatile__ ("vmread %1, (%2); pushfq; pop %0"
+        : "=r" (flags) 
+        : "r" (Field), "r" (FieldValue) 
+        : "memory"
+    );
+    if (flags & 1)
+        return 2;
+    if (flags & (1 << 6))
+        return 1;
+    return 0;
+}
+
+BYTE AsmVmxVmwrite(
+    QWORD Field,
+    QWORD FieldValue
+    )
+{
+    QWORD flags;
+    __asm__ __volatile__ ("vmwrite %2, %1; pushfq; pop %0"
+        : "=r" (flags) 
+        : "r" (Field), "r" (FieldValue) 
+        : "memory"
+    );
+    if (flags & 1)
+        return 2;
+    if (flags & (1 << 6))
+        return 1;
+    return 0;
 }
 
 #endif

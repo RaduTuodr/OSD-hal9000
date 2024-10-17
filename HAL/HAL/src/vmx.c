@@ -1,6 +1,7 @@
 #include "hal_base.h"
 #include "vmx.h"
 #include "cal_annotate.h"
+#include "cal_assembly.h"
 
 WARNING_PUSH
 
@@ -11,7 +12,9 @@ MSVC_WARNING_DISABLE(28039)
 #define VMX_RESULT_FAIL_WITH_ERROR          (VMX_RESULT)1
 #define VMX_RESULT_FAIL_NO_ERROR            (VMX_RESULT)2
 
+#ifdef CAL_MSVC
 typedef DWORD VM_INSTR_ERROR;
+#endif
 
 typedef enum _VM_INSTR_ERROR
 {
@@ -72,7 +75,7 @@ VmxRead(
 {
     QWORD fieldValue;
 
-    VMX_RESULT vmxResult = __vmx_vmread(Field, &fieldValue);
+    VMX_RESULT vmxResult = AsmVmxVmread(Field, &fieldValue);
     VM_INSTR_ERROR errCode = _VmxGetInstrError(vmxResult);
 
     ASSERT_INFO(
@@ -90,7 +93,7 @@ VmxWrite(
     IN      QWORD       Value
     )
 {
-    VMX_RESULT vmxResult = __vmx_vmwrite(Field, Value);
+    VMX_RESULT vmxResult = AsmVmxVmwrite(Field, Value);
     VM_INSTR_ERROR errCode = _VmxGetInstrError(vmxResult);
 
     ASSERT_INFO(

@@ -6,9 +6,11 @@ set(HAL_INCLUDES
     ${PROJECT_SOURCE_DIR}/CommonLib/inc
 )
 
-set(HAL_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:HAL>/HAL.pdb>
-)
+if (MSVC)
+    set(HAL_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:HAL>/HAL.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE HAL_SOURCES src/*.c src/*.yasm)
 

@@ -200,3 +200,13 @@ AsmMonitor(
 void AsmLfence(
     void
     );
+
+BYTE AsmVmxVmread(
+    QWORD Field,
+    QWORD *FieldValue
+    );
+
+BYTE AsmVmxVmwrite(
+    QWORD Field,
+    QWORD FieldValue
+    );
