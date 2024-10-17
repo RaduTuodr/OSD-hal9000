@@ -770,7 +770,7 @@ _SmpSetupInitialApStack(
     // sizeof(PVOID) for proper alignment
     pStackTop = (pStackTop - SHADOW_STACK_SIZE - sizeof(PVOID) - sizeof(PVOID));
     *((PQWORD)pStackTop) = (QWORD)ApInitCpu;
-    *((PQWORD)pStackTop + 1) = 0xDEADC0DE'DEADC0DE;
+    *((PQWORD)pStackTop + 1) = 0xDEADC0DEDEADC0DE;
     *((PQWORD)pStackTop + 2) = (QWORD)CorrespondingCpu;
 
     pStackTop = (pStackTop - SHADOW_STACK_SIZE - sizeof(PVOID) - sizeof(PVOID));

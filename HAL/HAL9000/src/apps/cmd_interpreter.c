@@ -14,6 +14,7 @@
 #include "cmd_basic.h"
 #include "boot_module.h"
 #include "cal_annotate.h"
+#include "cal_warning.h"
 
 WARNING_PUSH
 
@@ -24,7 +25,11 @@ MSVC_WARNING_DISABLE(4029)
 
 #define CMD_EXIT            "exit"
 
-static FUNC_GenericCommand  _CmdPrintHelp;
+static
+void
+(CDECL _CmdPrintHelp)(
+    const QWORD NumberOfParameters
+    );
 
 // warning C4212: nonstandard extension used: function declaration used ellipsis
 WARNING_PUSH
@@ -43,71 +48,71 @@ typedef struct _COMMAND_DEFINITION
 
 static const COMMAND_DEFINITION COMMANDS[] =
 {
-    { "reset", "Restarts the system", CmdResetSystem, 0, 0},
-    { "shutdown", "Shuts the system down", CmdShutdownSystem, 0, 0},
+    { "reset", "Restarts the system", (PFUNC_GenericCommand) CmdResetSystem, 0, 0},
+    { "shutdown", "Shuts the system down", (PFUNC_GenericCommand) CmdShutdownSystem, 0, 0},
 
-    { "log", "[ON|OFF] - enables or disables logging", CmdLogSetState, 1, 1},
-    { "loglevel", "$LOG_LEVEL - decimal value from enum", CmdSetLogLevel, 1, 1},
-    { "logcomp", "$LOG_COMPONENT - hexadecimal value from enum", CmdSetLogComponents, 1, 1},
+    { "log", "[ON|OFF] - enables or disables logging", (PFUNC_GenericCommand) CmdLogSetState, 1, 1},
+    { "loglevel", "$LOG_LEVEL - decimal value from enum", (PFUNC_GenericCommand) CmdSetLogLevel, 1, 1},
+    { "logcomp", "$LOG_COMPONENT - hexadecimal value from enum", (PFUNC_GenericCommand) CmdSetLogComponents, 1, 1},
 
-    { "cls", "Clears screen", CmdClearScreen, 0, 0},
+    { "cls", "Clears screen", (PFUNC_GenericCommand) CmdClearScreen, 0, 0},
 
-    { "vol", "Displays volumes", CmdPrintVolumeInformation, 0, 0},
-    { "less", "$FILENAME [async]\n\tdisplay $FILENAME contents\n\tasync - use DMA read instead of polling", CmdReadFile, 1, 2 },
-    { "fwrite", "$FILENAME [char] [ext] [async]\n\twrite predefined buffer into $FILENAME\n\text - if 'ext' then extend file size\n\tasync - use DMA read instead of polling", CmdWriteFile, 1, 4},
-    { "stat", "$FILENAME\n\tdisplays $FILENAME information", CmdStatFile, 1, 1},
-    { "mkdir", "$DIRECTORY\n\tcreates a new directory", CmdMakeDirectory, 1, 1},
-    { "touch", "$FILENAME\n\tcreates a new file", CmdMakeFile, 1, 1},
-    { "ls", "$DIRECTORY [-R]\n\tlists directory contents\n\tif -R specified goes recursively", CmdListDirectory, 1, 2},
+    { "vol", "Displays volumes", (PFUNC_GenericCommand) CmdPrintVolumeInformation, 0, 0},
+    { "less", "$FILENAME [async]\n\tdisplay $FILENAME contents\n\tasync - use DMA read instead of polling", (PFUNC_GenericCommand) CmdReadFile, 1, 2 },
+    { "fwrite", "$FILENAME [char] [ext] [async]\n\twrite predefined buffer into $FILENAME\n\text - if 'ext' then extend file size\n\tasync - use DMA read instead of polling", (PFUNC_GenericCommand) CmdWriteFile, 1, 4},
+    { "stat", "$FILENAME\n\tdisplays $FILENAME information", (PFUNC_GenericCommand) CmdStatFile, 1, 1},
+    { "mkdir", "$DIRECTORY\n\tcreates a new directory", (PFUNC_GenericCommand) CmdMakeDirectory, 1, 1},
+    { "touch", "$FILENAME\n\tcreates a new file", (PFUNC_GenericCommand) CmdMakeFile, 1, 1},
+    { "ls", "$DIRECTORY [-R]\n\tlists directory contents\n\tif -R specified goes recursively", (PFUNC_GenericCommand) CmdListDirectory, 1, 2},
 
-    { "swap", "R|W [0x$OFFSET]\n\t$OFFSET - offset inside swap where to perform operation", CmdSwap, 1, 2},
+    { "swap", "R|W [0x$OFFSET]\n\t$OFFSET - offset inside swap where to perform operation", (PFUNC_GenericCommand) CmdSwap, 1, 2},
 
-    { "cpu", "Displays CPU related information", CmdListCpus, 0, 0},
-    { "int", "List interrupts received", CmdListCpuInterrupts, 0, 0},
-    { "yield", "Yields processor", CmdYield, 0, 0},
+    { "cpu", "Displays CPU related information", (PFUNC_GenericCommand) CmdListCpus, 0, 0},
+    { "int", "List interrupts received", (PFUNC_GenericCommand) CmdListCpuInterrupts, 0, 0},
+    { "yield", "Yields processor", (PFUNC_GenericCommand) CmdYield, 0, 0},
     { "timer", "$MODE [$TIME_IN_US] [$TIMES]\n\tSee EX_TIMER_TYPE for timer types\n\t$TIME_IN_US time in uS until timer fires"
-                "\n\t$TIMES - number of times to wait for timer, valid only if periodic", CmdTestTimer, 1, 3},
+                "\n\t$TIMES - number of times to wait for timer, valid only if periodic", (PFUNC_GenericCommand) CmdTestTimer, 1, 3},
 
-    { "threads", "Displays all threads", CmdListThreads, 0, 0},
+    { "threads", "Displays all threads", (PFUNC_GenericCommand) CmdListThreads, 0, 0},
     { "run", "$TEST [$NO_OF_THREADS]\n\tRuns the $TEST specified"
              "\n\t$NO_OF_THREADS the number of threads for running the test,"
              "if the number is not specified then it will run on 2 * NumberOfProcessors",
-             CmdRunTest, 1, 2},
+             (PFUNC_GenericCommand) CmdRunTest, 1, 2},
 
-    { "processes", "Displays all processes", CmdListProcesses, 0, 0},
-    { "procstat", "0x$PID - displays information about a process", CmdProcessDump, 1, 1},
-    { "procstart", "$PATH_TO_EXE - starts a process", CmdStartProcess, 1, 1},
-    { "proctest", "$TEST_NAME - runs a process test", CmdTestProcess, 1, 1},
+    { "processes", "Displays all processes", (PFUNC_GenericCommand) CmdListProcesses, 0, 0},
+    { "procstat", "0x$PID - displays information about a process", (PFUNC_GenericCommand) CmdProcessDump, 1, 1},
+    { "procstart", "$PATH_TO_EXE - starts a process", (PFUNC_GenericCommand) CmdStartProcess, 1, 1},
+    { "proctest", "$TEST_NAME - runs a process test", (PFUNC_GenericCommand) CmdTestProcess, 1, 1},
 
-    { "sysinfo", "Retrieves system information", CmdDisplaySysInfo, 0, 0},
-    { "getidle", "Retrieves idle timeout", CmdGetIdle, 0, 0},
-    { "setidle", "$PERIOD_IN_SECONDS - Sets idle timeout", CmdSetIdle, 1, 1},
+    { "sysinfo", "Retrieves system information", (PFUNC_GenericCommand) CmdDisplaySysInfo, 0, 0},
+    { "getidle", "Retrieves idle timeout", (PFUNC_GenericCommand) CmdGetIdle, 0, 0},
+    { "setidle", "$PERIOD_IN_SECONDS - Sets idle timeout", (PFUNC_GenericCommand) CmdSetIdle, 1, 1},
 
-    { "rdmsr", "0x$INDEX\n\t$INDEX is the MSR to read", CmdRdmsr, 1, 1},
-    { "wrmsr", "0x$INDEX 0x$VALUE\n\t$INDEX is the MSR to write\n\t$VALUE is the value to place in the MSR", CmdWrmsr, 2, 2},
-    { "chkad", "Check if paging accessed/dirty bits mechanism is working", CmdCheckAd, 0, 0},
-    { "spawn", "$CPU_BOUND $IO_BOUND\n\tNumber of CPU bound threads to spawn\n\tNumber of IO bound threads to spawn", CmdSpawnThreads, 2, 2},
+    { "rdmsr", "0x$INDEX\n\t$INDEX is the MSR to read", (PFUNC_GenericCommand) CmdRdmsr, 1, 1},
+    { "wrmsr", "0x$INDEX 0x$VALUE\n\t$INDEX is the MSR to write\n\t$VALUE is the value to place in the MSR", (PFUNC_GenericCommand) CmdWrmsr, 2, 2},
+    { "chkad", "Check if paging accessed/dirty bits mechanism is working", (PFUNC_GenericCommand) CmdCheckAd, 0, 0},
+    { "spawn", "$CPU_BOUND $IO_BOUND\n\tNumber of CPU bound threads to spawn\n\tNumber of IO bound threads to spawn", (PFUNC_GenericCommand) CmdSpawnThreads, 2, 2},
     { "cpuid", "[0x$INDEX] [0x$SUBINDEX]\n\tIf index is not specified lists all available CPUID values"
-                "\n\tIf subindex is specified displays subleaf information", CmdCpuid, 0, 2},
+                "\n\tIf subindex is specified displays subleaf information", (PFUNC_GenericCommand) CmdCpuid, 0, 2},
     { "ipi", "$MODE [$DEST] {$WAIT]\n\tSee SMP_IPI_SEND_MODE for destination mode\n\t$DEST - processor IDs"
-              "\n\tIf last parameter is specified will wait until all CPUs acknowledge IPI", CmdSendIpi, 1, 3},
+              "\n\tIf last parameter is specified will wait until all CPUs acknowledge IPI", (PFUNC_GenericCommand) CmdSendIpi, 1, 3},
 
-    { "networks", "Displays network information", CmdListNetworks, 0, 0},
-    { "netrecv", "[YES|NO] - receive network packets\n\tIf yes will resend the packets received, if no it will not", CmdNetRecv, 0, 1},
-    { "netsend", "Send network packets", CmdNetSend, 0, 0},
+    { "networks", "Displays network information", (PFUNC_GenericCommand) CmdListNetworks, 0, 0},
+    { "netrecv", "[YES|NO] - receive network packets\n\tIf yes will resend the packets received, if no it will not", (PFUNC_GenericCommand) CmdNetRecv, 0, 1},
+    { "netsend", "Send network packets", (PFUNC_GenericCommand) CmdNetSend, 0, 0},
     { "netstatus", "$DEV_ID $RX_EN $TX_EN - changes the state of a network device"
                    "\n\tDevice ID\n\tIf $RX_EN is 1 => will enable receive on device\n\tIf $TX_EN is 1 => will enable send on device",
-                    CmdChangeDevStatus, 3, 3},
+                    (PFUNC_GenericCommand) CmdChangeDevStatus, 3, 3},
 
-    { "tests", "Runs functional tests", CmdRunAllFunctionalTests, 0, 0},
-    { "perf", "Runs performance tests", CmdRunAllPerformanceTests, 0, 0},
+    { "tests", "Runs functional tests", (PFUNC_GenericCommand) CmdRunAllFunctionalTests, 0, 0},
+    { "perf", "Runs performance tests", (PFUNC_GenericCommand) CmdRunAllPerformanceTests, 0, 0},
 
-    { "recursion", "Generates an infinite recursion", CmdInfiniteRecursion, 0, 0},
-    { "rtcfail", "Causes an RTC check stack to assert", CmdRtcFail, 0, 0},
-    { "rangefail", "Causes a range check failure to assert", CmdRangeFail, 0, 0},
-    { "bitecookie", "Causes a GS cookie corruption to assert", CmdBiteCookie, 0, 0},
+    { "recursion", "Generates an infinite recursion", (PFUNC_GenericCommand) CmdInfiniteRecursion, 0, 0},
+    { "rtcfail", "Causes an RTC check stack to assert", (PFUNC_GenericCommand) CmdRtcFail, 0, 0},
+    { "rangefail", "Causes a range check failure to assert", (PFUNC_GenericCommand) CmdRangeFail, 0, 0},
+    { "bitecookie", "Causes a GS cookie corruption to assert", (PFUNC_GenericCommand) CmdBiteCookie, 0, 0},
 
-    { "help", "Displays this help menu", _CmdPrintHelp, 0, 0}
+    { "help", "Displays this help menu", (PFUNC_GenericCommand) _CmdPrintHelp, 0, 0}
 };
 
 #define NO_OF_COMMANDS      ARRAYSIZE(COMMANDS)
@@ -262,7 +267,9 @@ MSVC_WARNING_SUPPRESS(4127)
         }
 
         // we have a command
+GNU_WARNING_IGNORE("-Wincompatible-pointer-types")
         bExit = ExecCmd(argIndex, pCmdArgs);
+GNU_WARNING_ERROR("-Wincompatible-pointer-types")
     }
     else
     {
@@ -306,7 +313,9 @@ _CmdExecuteModuleCommands(
     context = NULL;
     bExit = FALSE;
 
+GNU_WARNING_IGNORE("-Wincompatible-pointer-types")
     status = BootModuleGet("Tests", &pBaseAddress, &modLen);
+GNU_WARNING_ERROR("-Wincompatible-pointer-types")
     if (!SUCCEEDED(status))
     {
         LOG_WARNING("BootModuleGet failed with status 0x%x for Tests module\n", status);

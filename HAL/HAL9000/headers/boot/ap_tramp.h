@@ -14,6 +14,7 @@ ApTrampCleanupLowerMemory(
     );
 
 void
+MS_ABI
 ApInitCpu(
     IN      struct _PCPU*   Cpu
     );

@@ -172,7 +172,7 @@ MSVC_WARNING_SUPPRESS(28113)
 }
 
 STATUS
-(CDECL _TestReceivePacketsForAdapter)(
+(CDECL MS_ABI _TestReceivePacketsForAdapter)(
     IN_OPT      PVOID       Context
     )
 {
@@ -267,7 +267,7 @@ STATUS
 }
 
 STATUS
-(CDECL _TestTransmitPacketsForAdapter)(
+(CDECL MS_ABI _TestTransmitPacketsForAdapter)(
     IN_OPT      PVOID       Context
     )
 {

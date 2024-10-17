@@ -2201,6 +2201,7 @@ _MmuMapEfiRuntimeServices(
 
 static
 STATUS
+MS_ABI
 _MmuZeroWorkerThreadFunction(
     IN_OPT      PVOID           Context
     )

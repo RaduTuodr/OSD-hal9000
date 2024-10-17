@@ -108,7 +108,7 @@ void
 }
 
 STATUS
-(CDECL TestThreadPriorityMutex)(
+(CDECL MS_ABI TestThreadPriorityMutex)(
     IN_OPT      PVOID       Context
     )
 {
@@ -219,7 +219,7 @@ void
 }
 
 STATUS
-(CDECL TestThreadPriorityWakeup)(
+(CDECL MS_ABI TestThreadPriorityWakeup)(
     IN_OPT      PVOID       Context
     )
 {
@@ -271,7 +271,7 @@ void
 }
 
 STATUS
-(CDECL TestThreadPriorityExecution)(
+(CDECL MS_ABI TestThreadPriorityExecution)(
     IN_OPT      PVOID       Context
     )
 {

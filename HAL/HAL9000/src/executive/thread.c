@@ -1083,7 +1083,7 @@ ThreadCleanupPostSchedule(
 
 static
 STATUS
-(CDECL _IdleThread)(
+(CDECL MS_ABI _IdleThread)(
     IN_OPT      PVOID       Context
     )
 {

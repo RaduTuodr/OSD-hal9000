@@ -111,7 +111,7 @@ typedef struct _DRIVER_DECLARATION
     BOOLEAN                 Mandatory;
 } DRIVER_DECLARATION, *PDRIVER_DECLARATION;
 
-#define DECLARE_DRIVER(name,entry,mand)    { name ## ".sys" , (entry), (mand) }
+#define DECLARE_DRIVER(name,entry,mand)    { name ".sys" , (entry), (mand) }
 
 static const DRIVER_DECLARATION SYSTEM_DRIVER = DECLARE_DRIVER( "system", SystemDriverEntry, TRUE );
 

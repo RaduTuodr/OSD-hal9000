@@ -389,7 +389,7 @@ CpuMuChangeStack(
     IN          PVOID       NewStack
     )
 {
-    PVOID oldStackBase = (PVOID)AlignAddressUpper(IntrinAddressOfReturnAddress(), PAGE_SIZE);
+    PVOID oldStackBase = (PVOID)AlignAddressUpper(IntrinAddressOfReturnAddress, PAGE_SIZE);
 
     ASSERT( NULL != NewStack );
 
@@ -468,4 +468,14 @@ _CpuValidateCurrentCpu(
     ASSERT(IsBooleanFlagOn(eferMsr, IA32_EFER_NXE));
 
     ASSERT(IA32_EXPECTED_PAT_VALUES == ia32PatValues);
+}
+
+PVOID
+CpuGetCurrent(
+    void
+    )
+{
+    // warning C4306: 'type cast': conversion from 'BYTE' to 'PVOID' of greater size
+MSVC_WARNING_SUPPRESS(4306)
+    return (PVOID) ( CURRENT_CPU_MASK | CpuGetApicId());
 }

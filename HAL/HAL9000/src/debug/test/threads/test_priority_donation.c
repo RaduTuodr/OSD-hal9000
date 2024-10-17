@@ -129,7 +129,7 @@ _SpawnThreadAndCheckPriority(
 }
 
 STATUS
-(CDECL TestThreadPriorityDonationBasic)(
+(CDECL MS_ABI TestThreadPriorityDonationBasic)(
     IN_OPT      PVOID       Context
     )
 {
@@ -218,7 +218,7 @@ WARNING_PUSH
 MSVC_WARNING_DISABLE(28199)
 
 STATUS
-(CDECL TestThreadPriorityDonationMultiple)(
+(CDECL MS_ABI TestThreadPriorityDonationMultiple)(
     IN_OPT      PVOID       Context
     )
 {
@@ -395,7 +395,7 @@ typedef struct _DONATION_CHAIN_THREAD_DATA
 } DONATION_CHAIN_THREAD_DATA, *PDONATION_CHAIN_THREAD_DATA;
 
 STATUS
-(CDECL TestThreadPriorityDonationChain)(
+(CDECL MS_ABI TestThreadPriorityDonationChain)(
     IN_OPT      PVOID       Context
     )
 {
@@ -516,7 +516,7 @@ STATUS
 }
 
 STATUS
-(CDECL _ThreadTakeMutex)(
+(CDECL MS_ABI _ThreadTakeMutex)(
     IN_OPT      PVOID       Context
     )
 {
@@ -547,7 +547,7 @@ STATUS
 }
 
 STATUS
-(CDECL _ThreadChainer)(
+(CDECL MS_ABI _ThreadChainer)(
     IN_OPT      PVOID       Context
     )
 {

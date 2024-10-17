@@ -98,7 +98,7 @@ _TestThreadSleepWaitTimer(
 }
 
 STATUS
-(CDECL TestThreadTimerSleep)(
+(CDECL MS_ABI TestThreadTimerSleep)(
     IN_OPT      PVOID       Context
     )
 {
@@ -120,7 +120,7 @@ STATUS
 }
 
 STATUS
-(CDECL TestThreadTimerMultiple)(
+(CDECL MS_ABI TestThreadTimerMultiple)(
     IN_OPT      PVOID       Context
     )
 {

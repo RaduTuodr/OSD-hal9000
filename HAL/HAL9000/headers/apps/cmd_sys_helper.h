@@ -1,9 +1,29 @@
 #pragma once
 
-#include "cmd_common.h"
+#include "cal_annotate.h"
 
-FUNC_GenericCommand CmdDisplaySysInfo;
-FUNC_GenericCommand CmdSetIdle;
-FUNC_GenericCommand CmdGetIdle;
-FUNC_GenericCommand CmdResetSystem;
-FUNC_GenericCommand CmdShutdownSystem;
+void
+(CDECL CmdDisplaySysInfo)(
+    IN          QWORD       NumberOfParameters
+    );
+
+void
+(CDECL CmdSetIdle)(
+    IN          QWORD       NumberOfParameters,
+    IN_Z        char*       SecondsString
+    );
+
+void
+(CDECL CmdGetIdle)(
+    IN          QWORD       NumberOfParameters
+    );
+
+void
+(CDECL CmdResetSystem)(
+    IN          QWORD       NumberOfParameters
+    );
+
+void
+(CDECL CmdShutdownSystem)(
+    IN          QWORD       NumberOfParameters
+    );

@@ -159,14 +159,9 @@ CpuMuLowerIrql(
     return prevIrql;
 }
 
-#define CURRENT_CPU_MASK        0x8000'0000'0000'0000ULL
+#define CURRENT_CPU_MASK        0x8000000000000000ULL
 
-ALWAYS_INLINE
-extern
 PVOID
-CpuGetCurrent(void)
-{
-    // warning C4306: 'type cast': conversion from 'BYTE' to 'PVOID' of greater size
-MSVC_WARNING_SUPPRESS(4306)
-    return (PVOID) ( CURRENT_CPU_MASK | CpuGetApicId());
-}
+CpuGetCurrent(
+    void
+    );

@@ -13,6 +13,7 @@
 #define MSVC_WARNING_DISABLE(x) DO_PRAGMA(warning(disable: ## x))
 
 #define GNU_WARNING_IGNORE(x)
+#define GNU_WARNING_ERROR(x)
 
 #else
 
@@ -23,5 +24,6 @@
 #define MSVC_WARNING_DISABLE(x)
 
 #define GNU_WARNING_IGNORE(x) DO_PRAGMA(GCC diagnostic ignored x)
+#define GNU_WARNING_ERROR(x) DO_PRAGMA(GCC diagnostic error x)
 
 #endif

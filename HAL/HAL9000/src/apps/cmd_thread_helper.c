@@ -746,7 +746,7 @@ _ThreadBusyWait(
 }
 
 STATUS
-(CDECL _ThreadCpuBound)(
+(CDECL MS_ABI _ThreadCpuBound)(
     IN_OPT      PVOID       Context
     )
 {
@@ -760,7 +760,7 @@ STATUS
 }
 
 STATUS
-(CDECL _ThreadIoBound)(
+(CDECL MS_ABI _ThreadIoBound)(
     IN_OPT      PVOID       Context
     )
 {

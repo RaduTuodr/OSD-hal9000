@@ -1,8 +1,25 @@
 #pragma once
 
-#include "cmd_common.h"
+void
+CmdListNetworks(
+    IN          QWORD       NumberOfParameters
+    );
 
-FUNC_GenericCommand CmdListNetworks;
-FUNC_GenericCommand CmdNetRecv;
-FUNC_GenericCommand CmdNetSend;
-FUNC_GenericCommand CmdChangeDevStatus;
+void
+CmdNetRecv(
+    IN      QWORD       NumberOfParameters,
+    IN_Z    char*       ResendString
+    );
+
+void
+CmdNetSend(
+    IN          QWORD       NumberOfParameters
+   );
+
+void
+CmdChangeDevStatus(
+    IN      QWORD       NumberOfParameters,
+    IN_Z    char*       DeviceString,
+    IN_Z    char*       RxEnableString,
+    IN_Z    char*       TxEnableString
+    );

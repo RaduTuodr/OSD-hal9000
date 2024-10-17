@@ -1,15 +1,61 @@
 #pragma once
 
-#include "cmd_common.h"
+#include "cal_annotate.h"
 
-FUNC_GenericCommand CmdPrintVolumeInformation;
-FUNC_GenericCommand CmdInfiniteRecursion;
-FUNC_GenericCommand CmdRtcFail;
-FUNC_GenericCommand CmdRangeFail;
-FUNC_GenericCommand CmdBiteCookie;
-FUNC_GenericCommand CmdLogSetState;
-FUNC_GenericCommand CmdSetLogLevel;
-FUNC_GenericCommand CmdSetLogComponents;
-FUNC_GenericCommand CmdClearScreen;
-FUNC_GenericCommand CmdRunAllFunctionalTests;
-FUNC_GenericCommand CmdRunAllPerformanceTests;
+void
+CmdPrintVolumeInformation(
+    IN      QWORD           NumberOfParameters
+    );
+
+void
+CmdInfiniteRecursion(
+    IN      QWORD           NumberOfParameters
+    );
+
+void
+CmdRtcFail(
+    IN      QWORD           NumberOfParameters
+    );
+
+void
+CmdRangeFail(
+    IN      QWORD           NumberOfParameters
+    );
+
+void
+(CDECL CmdBiteCookie)(
+    IN      QWORD           NumberOfParameters
+    );
+
+void
+(CDECL CmdLogSetState)(
+    IN      QWORD           NumberOfParameters,
+    IN      char*           LogState
+    );
+
+void
+(CDECL CmdSetLogLevel)(
+    IN      QWORD           NumberOfParameters,
+    IN      char*           LogLevelString
+    );
+
+void
+(CDECL CmdSetLogComponents)(
+    IN      QWORD           NumberOfParameters,
+    IN      char*           LogComponentsString
+    );
+
+void
+(CDECL CmdClearScreen)(
+    IN          QWORD       NumberOfParameters
+    );
+
+void
+(CDECL CmdRunAllFunctionalTests)(
+    IN          QWORD       NumberOfParameters
+    );
+
+void
+(CDECL CmdRunAllPerformanceTests)(
+    IN          QWORD       NumberOfParameters
+    );

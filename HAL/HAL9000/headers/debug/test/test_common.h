@@ -6,7 +6,7 @@
 
 #define TEST_MAX_NO_OF_HEAP_ALLOCATIONS     50
 
-#define LOG_TEST_LOG(buf,...)               LogEx(LogLevelTrace, LogComponentTest, "[TEST]"##buf VA_ARGS(__VA_ARGS__))
+#define LOG_TEST_LOG(buf,...)               LogEx(LogLevelTrace, LogComponentTest, "[TEST]" buf VA_ARGS(__VA_ARGS__))
 #define LOG_TEST_PASS                       LOG_TEST_LOG("\n[PASS]\n");
 
 void

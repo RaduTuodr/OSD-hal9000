@@ -317,7 +317,7 @@ TestAllThreadFunctionalities(
 }
 
 STATUS
-(CDECL TestThreadYield)(
+(CDECL MS_ABI TestThreadYield)(
     IN_OPT      PVOID       Context
     )
 {
@@ -342,7 +342,7 @@ STATUS
 }
 
 STATUS
-(CDECL TestMutexes)(
+(CDECL MS_ABI TestMutexes)(
     IN_OPT      PVOID       Context
     )
 {
@@ -367,7 +367,7 @@ STATUS
 }
 
 STATUS
-(CDECL TestCpuIntense)(
+(CDECL MS_ABI TestCpuIntense)(
     IN_OPT      PVOID       Context
     )
 {
