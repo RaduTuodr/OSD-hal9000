@@ -1,10 +1,10 @@
 #pragma once
 
+#include "cal_types.h"
+
 #define MZ_SIGNATURE                            'ZM'
 #define NT_SIGNATURE                             0x00004550  // PE00
 
-typedef unsigned __int64 ULONGLONG;
-typedef __int32 LONG;
 
 #define IMAGE_DIRECTORY_ENTRY_EXPORT          0   // Export Directory
 

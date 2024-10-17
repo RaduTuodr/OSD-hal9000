@@ -6,9 +6,11 @@ set(PE_PARSER_INCLUDES
     ${PROJECT_SOURCE_DIR}/CommonLib/inc
 )
 
-set(PE_PARSER_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:PE_Parser>/PE_Parser.pdb>
-)
+if (MSVC)
+    set(PE_PARSER_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:PE_Parser>/PE_Parser.pdb>
+    )
+endif()
 
 file(GLOB_RECURSE PE_PARSER_SOURCES src/*.c src/*.yasm)
 
