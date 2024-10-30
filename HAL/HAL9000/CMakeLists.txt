@@ -107,11 +107,12 @@ else()
 
     set(HAL9000_COMMON_LINK_FLAGS
         -g
+        -O0
+        -static
         -ffreestanding
         -nostdlib
         -nodefaultlibs
         # /BASE:0xFFFF800001000000
-        -static
         # /ALIGN:512
         -T ${CMAKE_CURRENT_LIST_DIR}/HAL9000.ld
     )
@@ -124,7 +125,7 @@ else()
 endif()
 
 set(HAL9000_LINK_FLAGS
-    $<$<COMPILE_LANGUAGE:C>:${HAL9000_COMMON_LINK_FLAGS}>
+    ${HAL9000_COMMON_LINK_FLAGS}
     ${HAL9000_MAP_LINK_FLAG}
     $<$<CONFIG:Release>:${HAL9000_RELEASE_LINK_FLAGS}>
     ${HAL9000_PDB_LINK_FLAG}

@@ -155,6 +155,61 @@ ExectuableLoaderInitFromPEHeader(
   
     return STATUS_SUCCESS;
 }
+STATUS
+ExectuableLoaderInitFromElfHeader(
+    EXE_LOADER_CONTEXT *Context,
+    PVOID PhysicalImageBase,
+    PVOID VirtualImageBase,
+    DWORD ImageSize,
+    PVOID HeaderInfo
+    )
+{
+    STATUS status;
+    _EXE_LOADER_CONTEXT *context;
+
+    status = STATUS_SUCCESS;
+    context = NULL;
+
+    if (NULL == Context)
+    {
+        return STATUS_INVALID_PARAMETER1;
+    }
+ 
+    if (NULL == PhysicalImageBase)
+    {
+        return STATUS_INVALID_PARAMETER2;
+    }
+    
+    if (NULL == VirtualImageBase)
+    {
+        return STATUS_INVALID_PARAMETER3;
+    }
+    
+    if (0 == ImageSize)
+    {
+        return STATUS_INVALID_PARAMETER4;
+    }
+
+    if (NULL == HeaderInfo)
+    {
+        return STATUS_INVALID_PARAMETER5;
+    }
+
+    status = ExecutableLoaderPreinit(Context);
+    if (!SUCCEEDED(status))
+    {
+        return status;
+    }
+
+    context = (_EXE_LOADER_CONTEXT *) *Context;
+    context->Format = ExecutableFormatELF;
+    context->Image = PhysicalImageBase;
+    context->VirtualImage = VirtualImageBase;
+    context->ImageSize = ImageSize;
+    memcpy(&(context->Header.ElfFileHeader), HeaderInfo, sizeof(Elf64_Ehdr));
+  
+    return STATUS_SUCCESS;
+}
 
 STATUS
 ExecutableLoaderGetFormat(

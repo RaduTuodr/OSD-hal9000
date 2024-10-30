@@ -308,7 +308,7 @@ MSVC_WARNING_SUPPRESS(28039)
     LOGL("SmpCleanupLowerMemory completed\n");
 
     // After the APs have woken up we no longer need the 1:1 VA->PA mappings
-    MmuDiscardIdentityMappings();
+    MmuDiscardIdentityMappings((PVOID) BootInformation->KernelBaseAddress, BootInformation->KernelSize);
 
     LOGL("MmuDiscardIdentityMappings completed\n");
 

@@ -111,12 +111,22 @@ typedef enum _MMU_HEAP_INDEX
     MmuHeapIndexReserved    = MmuHeapIndexSpecial + 1
 } MMU_HEAP_INDEX;
 
+typedef struct _KERNEL_INFO
+{
+    BOOLEAN IsPe;
+    union {
+        PE_NT_HEADER_INFO PeHeader;
+        Elf64_Ehdr ElfHeader;
+    } Header;
+    PVOID ImageBase;
+    DWORD ImageSize;
+} KERNEL_INFO, *PKERNEL_INFO;
 
 typedef struct _MMU_DATA
 {
     PAGING_LOCK_DATA                PagingData;
 
-    PE_NT_HEADER_INFO               KernelInfo;
+    KERNEL_INFO                     KernelInfo;
     PVOID                           TemporaryStackBase;
     BOOLEAN                         PcidSupportAvailable;
 
@@ -136,10 +146,26 @@ _MmuInitPagingSystem(
 
 static
 STATUS
+_MmuElfRetrieveKernelInfoAndValidate(
+    IN PVOID KernelBase,
+    IN DWORD ImageSize,
+    OUT PKERNEL_INFO KernelInfo
+    );
+
+static
+STATUS
+_MmuPeRetrieveKernelInfoAndValidate(
+    IN PVOID KernelBase,
+    IN DWORD ImageSize,
+    OUT PKERNEL_INFO KernelInfo
+    );
+
+static
+STATUS
 _MmuRetrieveKernelInfoAndValidate(
     IN      PVOID                   KernelBase,
     IN      DWORD                   ImageSize,
-    OUT     PPE_NT_HEADER_INFO      KernelInfo
+    OUT     PKERNEL_INFO            KernelInfo
     );
 
 static
@@ -155,7 +181,7 @@ STATUS
 _MmuMapKernelMemory(
     IN          PPAGING_DATA            PagingData,
     IN          PHYSICAL_ADDRESS        PhysicalAddress,
-    IN          PPE_NT_HEADER_INFO      KernelInfo
+    IN          PKERNEL_INFO            KernelInfo
     );
 
 static
@@ -164,7 +190,8 @@ _MmuMapElfInMemory(
     PVOID                   Image,
     DWORD                   ImageSize,
     Elf64_Ehdr*             FileHeader,
-    PPAGING_DATA            PagingData
+    PPAGING_DATA            PagingData,
+    PVOID                   AddressToMap
     );
 
 static
@@ -356,8 +383,8 @@ MmuInitSystem(
     }
     LOGL("_MmuRetrieveKernelInfoAndValidate succeeded\n");
 
-    alignedKernelSize = AlignAddressUpper(m_mmuData.KernelInfo.Size, PAGE_SIZE);
-    pNewStackTop = PtrOffset(m_mmuData.KernelInfo.ImageBase,
+    alignedKernelSize = AlignAddressUpper(bootInfo->KernelSize, PAGE_SIZE);
+    pNewStackTop = PtrOffset(KernelBaseAddress,
                              alignedKernelSize + TEMP_STACK_SIZE + STACK_GUARD_SIZE);
     pmmBaseAddress = pNewStackTop;
     m_mmuData.TemporaryStackBase = pNewStackTop - TEMP_STACK_SIZE;
@@ -432,11 +459,11 @@ MmuInitSystem(
 
     // maps the kernel to memory
     status = _MmuMapKernelMemory(&m_mmuData.PagingData.Data,
-                                 VA2PA(m_mmuData.KernelInfo.ImageBase),
-                                 &m_mmuData.KernelInfo);
+                                 (PHYSICAL_ADDRESS) (bootInfo->KernelBaseAddress),
+                                 &(m_mmuData.KernelInfo));
     if (!SUCCEEDED(status))
     {
-        LOG_FUNC_ERROR("_MmuMapRequiredMemory", status);
+        LOG_FUNC_ERROR("_MmuMapKernelMemory", status);
         return status;
     }
 
@@ -512,16 +539,16 @@ MmuInitSystem(
 _No_competing_thread_
 void
 MmuDiscardIdentityMappings(
-    void
+    IN PVOID KernelPhysicalBase,
+    IN DWORD KernelSize
     )
 {
-    PVOID pIdentityMapped = VA2PA(m_mmuData.KernelInfo.ImageBase);
     PVOID tempStack = m_mmuData.TemporaryStackBase;
 
     ASSERT( NULL != tempStack );
 
     // we must not release the physical pages
-    MmuUnmapSystemMemory(pIdentityMapped, m_mmuData.KernelInfo.Size);
+    MmuUnmapSystemMemory(KernelPhysicalBase, KernelSize);
 
     m_mmuData.TemporaryStackBase = NULL;
 
@@ -938,7 +965,7 @@ MmuLoadElf(
     status = STATUS_SUCCESS;
 
     RecRwSpinlockAcquireExclusive(&PagingData->Lock, &oldState);
-    status = _MmuMapElfInMemory(Image, ImageSize, (Elf64_Ehdr *) FileHeader, &PagingData->Data);
+    status = _MmuMapElfInMemory(Image, ImageSize, (Elf64_Ehdr *) FileHeader, &PagingData->Data, Image);
     RecRwSpinlockReleaseExclusive(&PagingData->Lock, oldState);
 
     return status;
@@ -1090,7 +1117,18 @@ MmuInitAddressSpaceForSystemProcess(
     /// TODO: I have no idea why the PE_NT_HEADER_INFO is allocated dynamically
     /// Nothing bad happens, I just don't know if we should keep this
     // DS: Now it must be allocated dynamically...
-    ExectuableLoaderInitFromPEHeader(&(pProcess->LoaderContext), &m_mmuData.KernelInfo);
+    if (m_mmuData.KernelInfo.IsPe)
+    {
+        ExectuableLoaderInitFromPEHeader(&(pProcess->LoaderContext), &(m_mmuData.KernelInfo.Header.PeHeader));
+    }
+    else
+    {
+        ExectuableLoaderInitFromElfHeader(&(pProcess->LoaderContext),
+                                          VA2PA(m_mmuData.KernelInfo.ImageBase),
+                                          m_mmuData.KernelInfo.ImageBase,
+                                          m_mmuData.KernelInfo.ImageSize,
+                                          &(m_mmuData.KernelInfo.Header.ElfHeader));
+    }
 
     MmuActivateProcessIds();
 }
@@ -1550,13 +1588,40 @@ _MmuInitPagingSystem(
 
 static
 STATUS
-_MmuRetrieveKernelInfoAndValidate(
-    IN      PVOID                   KernelBase,
-    IN      DWORD                   ImageSize,
-    OUT     PPE_NT_HEADER_INFO      KernelInfo
+_MmuElfRetrieveKernelInfoAndValidate(
+    IN PVOID KernelBase,
+    IN DWORD ImageSize,
+    OUT PKERNEL_INFO KernelInfo
     )
 {
     STATUS status;
+
+    // The ELF parser will do the checks for us
+    status = ElfRetrieveFileHeader(KernelBase, ImageSize, &(KernelInfo->Header.ElfHeader));
+
+    if (SUCCEEDED(status))
+    {
+        KernelInfo->IsPe = FALSE;
+        KernelInfo->ImageBase = KernelBase;
+        KernelInfo->ImageSize = ImageSize;
+    }
+
+    // TODO: DS Calculate image size, we know our loader does its job so it
+    // is not necessary to do this check 
+
+    return status;
+}
+
+static
+STATUS
+_MmuPeRetrieveKernelInfoAndValidate(
+    IN PVOID KernelBase,
+    IN DWORD ImageSize,
+    OUT PKERNEL_INFO KernelInfo
+    )
+{
+    STATUS status;
+    PPE_NT_HEADER_INFO kernelInfo;
     PE_DATA_DIRECTORY dataDirectory;
 
     ASSERT( NULL != KernelBase );
@@ -1564,38 +1629,39 @@ _MmuRetrieveKernelInfoAndValidate(
     ASSERT( NULL != KernelInfo );
 
     status = STATUS_SUCCESS;
+    kernelInfo = &(KernelInfo->Header.PeHeader);
     memzero(&dataDirectory, sizeof(PE_DATA_DIRECTORY));
 
     status = PeRetrieveNtHeader(KernelBase,
                                 ImageSize,
-                                KernelInfo
+                                kernelInfo
                                 );
     if (!SUCCEEDED(status))
     {
-        LOG_FUNC_ERROR("PeRetrieveNtHeader", status );
+        // LOG_FUNC_ERROR("PeRetrieveNtHeader", status );
         return status;
     }
     LOGL("PeRetrieveNtHeader succeeded\n");
 
-    if (ImageSize < KernelInfo->Size)
+    if (ImageSize < kernelInfo->Size)
     {
-        LOG_ERROR("We loaded only %u bytes and the image is %u bytes long\n", ImageSize, KernelInfo->Size );
+        LOG_ERROR("We loaded only %u bytes and the image is %u bytes long\n", ImageSize, kernelInfo->Size );
         return STATUS_IMAGE_NOT_FULLY_LOADED;
     }
 
-    if (IMAGE_FILE_MACHINE_AMD64 != KernelInfo->Machine )
+    if (IMAGE_FILE_MACHINE_AMD64 != kernelInfo->Machine )
     {
-        LOG_ERROR("Expecting a PE64 executable and received: 0x%x\n", KernelInfo->Machine );
+        LOG_ERROR("Expecting a PE64 executable and received: 0x%x\n", kernelInfo->Machine );
         return STATUS_IMAGE_NOT_64_BIT;
     }
 
-    if (IMAGE_SUBSYSTEM_NATIVE != KernelInfo->Subsystem)
+    if (IMAGE_SUBSYSTEM_NATIVE != kernelInfo->Subsystem)
     {
-        LOG_ERROR("Expecting a native sub-system executable and received: 0x%x\n", KernelInfo->Subsystem );
+        LOG_ERROR("Expecting a native sub-system executable and received: 0x%x\n", kernelInfo->Subsystem );
         return STATUS_IMAGE_SUBSYSTEM_NOT_NATIVE;
     }
 
-    status = PeRetrieveDataDirectory(KernelInfo,
+    status = PeRetrieveDataDirectory(kernelInfo,
                                      IMAGE_DIRECTORY_ENTRY_BASERELOC,
                                      &dataDirectory
                                      );
@@ -1609,6 +1675,32 @@ _MmuRetrieveKernelInfoAndValidate(
     {
         LOG_ERROR("Image has relocations, we don't support such executables!\n");
         return STATUS_IMAGE_HAS_RELOCATIONS;
+    }
+
+    if (SUCCEEDED(status))
+    {
+        KernelInfo->IsPe = TRUE;
+        KernelInfo->ImageBase = KernelBase;
+        KernelInfo->ImageSize = ImageSize;
+    }
+
+    return status;
+}
+
+static
+STATUS
+_MmuRetrieveKernelInfoAndValidate(
+    IN      PVOID                   KernelBase,
+    IN      DWORD                   ImageSize,
+    OUT     PKERNEL_INFO            KernelInfo
+    )
+{
+    STATUS status;
+
+    status = _MmuPeRetrieveKernelInfoAndValidate(KernelBase, ImageSize, KernelInfo);
+    if (!SUCCEEDED(status))
+    {
+        status = _MmuElfRetrieveKernelInfoAndValidate(KernelBase, ImageSize, KernelInfo);
     }
 
     return status;
@@ -1658,7 +1750,8 @@ _MmuMapElfInMemory(
     PVOID                   Image,
     DWORD                   ImageSize,
     Elf64_Ehdr*             FileHeader,
-    PPAGING_DATA            PagingData
+    PPAGING_DATA            PagingData,
+    PVOID                   AddressToMap
     )
 {
     STATUS status;
@@ -1716,9 +1809,9 @@ _MmuMapElfInMemory(
         //                              size,
         //                              rights);
         VmmMapMemoryInternal(PagingData,
-                             MmuGetPhysicalAddress(PtrOffset(Image, currentSegment.p_off)),
+                             (PVOID) AlignAddressLower(MmuGetPhysicalAddress(PtrOffset(Image, currentSegment.p_off)), PAGE_SIZE),
                              size,
-                             (PVOID) currentSegment.p_vaddr,
+                             (PVOID) PtrOffset(AddressToMap, AlignAddressLower(currentSegment.p_off, PAGE_SIZE)),
                              rights,
                              TRUE,
                              FALSE);
@@ -1944,7 +2037,7 @@ STATUS
 _MmuMapKernelMemory(
     IN          PPAGING_DATA            PagingData,
     IN          PHYSICAL_ADDRESS        PhysicalAddress,
-    IN          PPE_NT_HEADER_INFO      KernelInfo
+    IN          PKERNEL_INFO            KernelInfo
     )
 {
     STATUS status;
@@ -1956,7 +2049,7 @@ _MmuMapKernelMemory(
     ASSERT(IsAddressAligned(KernelInfo->ImageBase,PAGE_SIZE));
 
     status = STATUS_SUCCESS;
-    noOfFrames = AlignAddressUpper(KernelInfo->Size, PAGE_SIZE) / PAGE_SIZE;
+    noOfFrames = AlignAddressUpper(KernelInfo->ImageSize, PAGE_SIZE) / PAGE_SIZE;
 
     // Mark the kernel physical frames as reserved
     kernelPa = PmmReserveMemoryEx(noOfFrames, PhysicalAddress);
@@ -1966,20 +2059,34 @@ _MmuMapKernelMemory(
         return STATUS_PHYSICAL_MEMORY_NOT_AVAILABLE;
     }
 
-    status = _MmuMapPeInMemory(PagingData, KernelInfo, KernelInfo->ImageBase);
+    if (KernelInfo->IsPe)
+    {
+        status = _MmuMapPeInMemory(PagingData, &(KernelInfo->Header.PeHeader), KernelInfo->ImageBase);
+    }
+    else
+    {
+        status = _MmuMapElfInMemory(KernelInfo->ImageBase, KernelInfo->ImageSize, &(KernelInfo->Header.ElfHeader), PagingData, KernelInfo->ImageBase);
+    }
     if (!SUCCEEDED(status))
     {
-        LOG_FUNC_ERROR("_MmuMapPeInMemory", status);
+        LOG_FUNC_ERROR("_MmuMapKernelInMemory", status);
         LOG_ERROR("Unable to perform high VA mapping for kernel!\n");
         return status;
     }
 
     // Perform identity mapping - needed by APs
     // Will be discarded after all the APs get in 64-bit mode
-    status = _MmuMapPeInMemory(PagingData, KernelInfo, VA2PA(KernelInfo->ImageBase));
+    if (KernelInfo->IsPe)
+    {
+        status = _MmuMapPeInMemory(PagingData, &(KernelInfo->Header.PeHeader), VA2PA(KernelInfo->ImageBase));
+    }
+    else
+    {
+        status = _MmuMapElfInMemory(KernelInfo->ImageBase, KernelInfo->ImageSize, &(KernelInfo->Header.ElfHeader), PagingData, VA2PA(KernelInfo->ImageBase));
+    }
     if (!SUCCEEDED(status))
     {
-        LOG_FUNC_ERROR("_MmuMapPeInMemory", status);
+        LOG_FUNC_ERROR("_MmuMapKernelInMemory", status);
         LOG_ERROR("Unable to perform identity mapping for kernel!\n");
         return status;
     }

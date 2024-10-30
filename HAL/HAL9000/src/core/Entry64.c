@@ -14,14 +14,7 @@
 #include "print.h"
 #include "cal_annotate.h"
 #include "cal_assembly.h"
-
-//#define TST
-
-#ifdef TST
-#include "test_common
-.h"
-#include "keyboard.h"
-#endif
+#include "cal_atomic.h"
 
 int _fltused = 1;
 

@@ -33,6 +33,16 @@ ExectuableLoaderInitFromPEHeader(
     PPE_NT_HEADER_INFO HeaderInfo
     );
 
+// Initialize context from Elf header
+STATUS
+ExectuableLoaderInitFromElfHeader(
+    EXE_LOADER_CONTEXT *Context,
+    PVOID PhysicalImageBase,
+    PVOID VirtualImageBase,
+    DWORD ImageSize,
+    PVOID HeaderInfo
+    );
+
 // Get executable format
 STATUS
 ExecutableLoaderGetFormat(

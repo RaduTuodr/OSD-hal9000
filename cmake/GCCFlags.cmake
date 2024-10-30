@@ -42,13 +42,12 @@ set(GLOBAL_COMMON_FLAGS
     -fno-zero-initialized-in-bss
     -ffreestanding
     -nostdlib
-    -static
-    -Wl,-static
     -mno-red-zone
     -fshort-wchar
     -nostdinc
     -msse3
     -msse2
+    -mcmodel=large
 )
 
 set(GLOBAL_DEBUG_FLAGS 

@@ -4,7 +4,7 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
     )
 else()
     set(CMAKE_YASM_COMPILE_OBJECT 
-        "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> -f elf64 -o <OBJECT> <SOURCE>"
+        "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> -f elf64 -gdwarf -o <OBJECT> <SOURCE>"
     )
 endif()
 

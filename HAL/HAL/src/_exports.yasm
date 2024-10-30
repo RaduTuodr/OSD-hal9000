@@ -47,11 +47,11 @@ __reloadGDT:
     xor     rax,    rax
     mov     ax,     dx
     
-    push    rax
-    call    $ + 5                   ; place return EIP onto the stack
-    mov     eax,    10              ; instrux length to continue right after 'retf'
-    add     [rsp],  eax
-    retf
+    push rax
+    lea rax, [rel + $]
+    add rax, 0xe
+    push rax
+    retfq
 
     mov     ax,     r8w
     mov     fs,     ax

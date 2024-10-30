@@ -65,7 +65,8 @@ MmuInitSystem(
 _No_competing_thread_
 void
 MmuDiscardIdentityMappings(
-    void
+    IN PVOID KernelPhysicalAddres,
+    IN DWORD KernelSize
     );
 
 

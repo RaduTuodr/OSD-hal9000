@@ -6,7 +6,7 @@ ENTRY(__HalEntry)
 
 PHDRS
 {
-    headers PT_LOAD FILEHDR PHDRS ;
+    headers PT_LOAD FILEHDR PHDRS AT(0xFFFF800001000000) ;
     text PT_LOAD ;
     data PT_LOAD ;
     rodata PT_LOAD ;
@@ -15,35 +15,28 @@ PHDRS
 SECTIONS
 {
     /*
-        HAL9000 Physical Base
-        HAL will add the virtual difference
+        HAL9000 Virtual Base
+        We use the large code model so we do not get
+        relocation errors from ld
     */
-    . = 0x1000000;
+    . = 0xFFFF800001000000;
 
-    .text 0x400 : ALIGN(0x200)
+    .text 0xFFFF800001000400 : ALIGN(0x200)
     {
         *(.halboot)
         *(.text)
     } :text
 
-    .data : ALIGN(0x200)
+    .data : ALIGN(0x1000)
     {
         *(.data)
         *(.data1)
         *(.bss)
     } :data
 
-    .rodata : ALIGN(0x200)
+    .rodata : ALIGN(0x1000)
     {
         *(.rodata)
         *(.rodata1)
     } :rodata
-
-    /DISCARD/ :
-    {
-        *(.symtab)
-        *(.strtab)
-        *(.shstrtab)
-        *(.comment)
-    }
 }
