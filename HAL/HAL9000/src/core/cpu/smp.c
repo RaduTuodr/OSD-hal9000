@@ -769,7 +769,11 @@ _SmpSetupInitialApStack(
     // sizeof(PVOID) for RA
     // sizeof(PVOID) for proper alignment
     pStackTop = (pStackTop - SHADOW_STACK_SIZE - sizeof(PVOID) - sizeof(PVOID));
-    *((PQWORD)pStackTop) = (QWORD)ApInitCpu;
+#ifdef CAL_MSVC
+    *((PQWORD)pStackTop) = (QWORD) ApInitCpu;
+#else
+    *((PQWORD)pStackTop) = (QWORD) ApInitElfWrapper;
+#endif
     *((PQWORD)pStackTop + 1) = 0xDEADC0DEDEADC0DE;
     *((PQWORD)pStackTop + 2) = (QWORD)CorrespondingCpu;
 

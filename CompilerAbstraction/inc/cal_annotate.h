@@ -13,6 +13,7 @@
 #define FASTCALL __fastcall
 #define STDCALL  __stdcall
 #define MS_ABI
+#define NAKED
 
 #else
 
@@ -29,5 +30,6 @@
 #define FASTCALL
 #define STDCALL __attribute__((stdcall))
 #define MS_ABI __attribute__((ms_abi))
+#define NAKED __attribute__((naked))
 
 #endif

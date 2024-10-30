@@ -43,6 +43,7 @@ set(GLOBAL_COMMON_FLAGS
     -ffreestanding
     -nostdlib
     -mno-red-zone
+    -mgeneral-regs-only
     -fshort-wchar
     -nostdinc
     -msse3

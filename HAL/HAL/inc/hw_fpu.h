@@ -91,7 +91,6 @@ WARNING_POP
 // to make sure the compiler doesn't generate SSE instructions before
 // actually activating SSE support :)
 void
-MS_ABI
 HalActivateFpu(
     void
     );
