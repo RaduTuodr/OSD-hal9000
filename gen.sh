@@ -17,12 +17,13 @@ mmd -i bin/bootloader.img ::/EFI/BOOT
 mmd -i bin/bootloader.img ::/EFI/OS
 mmd -i bin/bootloader.img ::/EFI/MODULES
 mmd -i bin/bootloader.img ::/APPS
-# mcopy -i bin/bootloader.img ../Tests ::/EFI/MODULES
+mcopy -i bin/bootloader.img bin/Tests ::/EFI/MODULES
 mcopy -i bin/bootloader.img bin/HAL9000.bin ::/EFI/OS
 # mcopy -i bin/bootloader.img ../acpidump.efi ::/EFI/
 mcopy -i bin/bootloader.img bin/BOOTX64.EFI ::/EFI/BOOT
-# mcopy -i bin/bootloader.img bin/AppHelloWorld.exe ::/APPS
+mcopy -i bin/bootloader.img apps/AppHelloWorld/AppHelloWorld.exe ::/APPS
 # mcopy -i bin/bootloader.img bin/app ::/APPS
-# mcopy -i bin/bootloader.img bin/Test ::/APPS
+mcopy -i bin/bootloader.img bin/app ::/APPS
+mcopy -i bin/bootloader.img ../test/Test ::/APPS
 # mcopy -i bin/bootloader.img bin/elf.exe ::/APPS
-# mcopy -i bin/bootloader.img bin/HAL9000.ini ::
+mcopy -i bin/bootloader.img bin/HAL9000.ini ::

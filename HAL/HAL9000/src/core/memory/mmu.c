@@ -936,7 +936,8 @@ MmuLoadElf(
     PVOID                   Image,
     DWORD                   ImageSize,
     PVOID                   FileHeader,
-    PPAGING_LOCK_DATA       PagingData
+    PPAGING_LOCK_DATA       PagingData,
+    PVOID                   AddressToMap
     )
 {
     STATUS status;
@@ -965,7 +966,7 @@ MmuLoadElf(
     status = STATUS_SUCCESS;
 
     RecRwSpinlockAcquireExclusive(&PagingData->Lock, &oldState);
-    status = _MmuMapElfInMemory(Image, ImageSize, (Elf64_Ehdr *) FileHeader, &PagingData->Data, Image);
+    status = _MmuMapElfInMemory(Image, ImageSize, (Elf64_Ehdr *) FileHeader, &PagingData->Data, AddressToMap);
     RecRwSpinlockReleaseExclusive(&PagingData->Lock, oldState);
 
     return status;
@@ -1759,6 +1760,7 @@ _MmuMapElfInMemory(
     QWORD size;
     QWORD alignmentDifference;
     PAGE_RIGHTS rights;
+    PVOID virtualAddress;
 
     status = STATUS_SUCCESS;
     size = 0;
@@ -1804,16 +1806,25 @@ _MmuMapElfInMemory(
 
         alignmentDifference = AddressOffset(currentSegment.p_off, PAGE_SIZE);
         size = AlignAddressUpper(currentSegment.p_memsz + alignmentDifference, PAGE_SIZE);
+        
+        if (!AddressToMap)
+        {
+            virtualAddress = (PVOID) currentSegment.p_paddr;
+        }
+        else
+        {
+            virtualAddress = (PVOID) PtrOffset(AddressToMap, AlignAddressLower(currentSegment.p_off, PAGE_SIZE));
+        }
 
         // LOGL("Mapping %X -> %X, size %x with rights %X\n",
-        //                              MmuGetPhysicalAddress(PtrOffset(Image, currentSegment.p_off)),
-        //                              currentSegment.p_vaddr,
-        //                              size,
-        //                              rights);
+        //                             (PVOID) AlignAddressLower(MmuGetPhysicalAddress(PtrOffset(Image, currentSegment.p_off)), PAGE_SIZE),
+        //                             virtualAddress,
+        //                             size,
+        //                             rights);
         VmmMapMemoryInternal(PagingData,
                              (PVOID) AlignAddressLower(MmuGetPhysicalAddress(PtrOffset(Image, currentSegment.p_off)), PAGE_SIZE),
                              size,
-                             (PVOID) PtrOffset(AddressToMap, AlignAddressLower(currentSegment.p_off, PAGE_SIZE)),
+                             virtualAddress,
                              rights,
                              TRUE,
                              FALSE);

@@ -6,3 +6,4 @@ yasm/yasm_repo/*
 artifacts/*
 bootdrive/*
 *.log
+!.vscode/launch.json

@@ -344,6 +344,10 @@ MSVC_WARNING_SUPPRESS(28039)
 
     LOGL("Network stack successfully initialized\n");
 
+    EFI_TIME Time;
+    EfiRuntimeGetTime(&Time, NULL);
+    LOG("Year: %d\n", Time.Year);
+
     return status;
 }
 

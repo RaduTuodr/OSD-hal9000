@@ -295,7 +295,8 @@ MmuLoadElf(
     PVOID                   Image,
     DWORD                   ImageSize,
     PVOID                   FileHeader,
-    PPAGING_LOCK_DATA       PagingData
+    PPAGING_LOCK_DATA       PagingData,
+    PVOID                   AddressToMap
     );
 
 //******************************************************************************

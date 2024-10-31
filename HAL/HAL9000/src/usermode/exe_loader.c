@@ -397,7 +397,9 @@ ExecutableLoaderMemoryMap(
         status = MmuLoadElf(context->Image,
                             context->ImageSize,
                             &(context->Header.ElfFileHeader),
-                            PagingData);
+                            PagingData,
+                            0x0
+                            );
     }
     else
     {

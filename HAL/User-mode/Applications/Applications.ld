@@ -9,7 +9,7 @@ ENTRY(__start)
 
 PHDRS
 {
-    headers PT_LOAD FILEHDR PHDRS ;
+    headers PT_LOAD FILEHDR PHDRS AT(0x1000) ;
     text PT_LOAD ;
     data PT_LOAD ;
     rodata PT_LOAD ;
