@@ -1757,6 +1757,7 @@ _MmuMapElfInMemory(
     STATUS status;
     Elf64_Phdr currentSegment = { 0 };
     QWORD size;
+    QWORD alignmentDifference;
     PAGE_RIGHTS rights;
 
     status = STATUS_SUCCESS;
@@ -1801,7 +1802,8 @@ _MmuMapElfInMemory(
             rights |= PAGE_RIGHTS_EXECUTE;
         }
 
-        size = AlignAddressUpper(currentSegment.p_memsz, PAGE_SIZE);
+        alignmentDifference = AddressOffset(currentSegment.p_off, PAGE_SIZE);
+        size = AlignAddressUpper(currentSegment.p_memsz + alignmentDifference, PAGE_SIZE);
 
         // LOGL("Mapping %X -> %X, size %x with rights %X\n",
         //                              MmuGetPhysicalAddress(PtrOffset(Image, currentSegment.p_off)),

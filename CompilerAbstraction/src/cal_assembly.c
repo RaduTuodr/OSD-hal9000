@@ -800,7 +800,12 @@ AsmMwait(
     unsigned int Hints
     )
 {
-    __builtin_ia32_mwait(Extensions, Hints);
+    __asm__ __volatile__ (
+        "mwait"
+        :
+        : "c"(Extensions), "a"(Hints)
+        : "memory"
+    );
 }
 
 void
@@ -810,14 +815,24 @@ AsmMonitor(
     DWORD Hints
     )
 {
-    __builtin_ia32_monitor(P, Extensions, Hints);
+    __asm__ __volatile__ (
+        "monitor"
+        :
+        : "a"(P), "c"(Extensions), "d"(Hints)
+        : "memory"
+    );
 }
 
 void AsmLfence(
     void
     )
 {
-    __builtin_ia32_lfence();
+    __asm__ __volatile__ (
+        "lfence"
+        :
+        :
+        : "memory"
+    );
 }
 
 BYTE AsmVmxVmread(

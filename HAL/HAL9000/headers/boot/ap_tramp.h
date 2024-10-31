@@ -14,13 +14,7 @@ ApTrampCleanupLowerMemory(
     );
 
 void
+MS_ABI
 ApInitCpu(
     IN      struct _PCPU*   Cpu
     );
-
-#ifdef CAL_GNU
-void
-NAKED
-ApInitElfWrapper(
-    );
-#endif

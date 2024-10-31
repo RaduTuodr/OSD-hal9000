@@ -48,6 +48,9 @@ _IsrInterruptHandler(
     IN BYTE             InterruptIndex
     );
 
+#ifdef CAL_MSVC
+#else
+#endif
 
 void
 MS_ABI

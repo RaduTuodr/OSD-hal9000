@@ -80,11 +80,15 @@ SystemInit(
     PCPU* pCpu;
     DWORD BootModuleCount;
     PHYSICAL_ADDRESS BootModules;
+    PVOID kernelBaseAddress;
+    DWORD kernelSize;
 
     status = STATUS_SUCCESS;
     pCpu = NULL;
     BootModuleCount = BootInformation->BootModuleCount;
     BootModules = (PHYSICAL_ADDRESS) ((QWORD) BootInformation->BootModules);
+    kernelBaseAddress = (PVOID) BootInformation->KernelBaseAddress;
+    kernelSize = BootInformation->KernelSize;
 
     LogSystemInit(LogLevelInfo,
                   LogComponentGeneric | LogComponentInterrupt | LogComponentIo | LogComponentAcpi | LogComponentPci,
@@ -308,7 +312,7 @@ MSVC_WARNING_SUPPRESS(28039)
     LOGL("SmpCleanupLowerMemory completed\n");
 
     // After the APs have woken up we no longer need the 1:1 VA->PA mappings
-    MmuDiscardIdentityMappings((PVOID) BootInformation->KernelBaseAddress, BootInformation->KernelSize);
+    MmuDiscardIdentityMappings(kernelBaseAddress, kernelSize);
 
     LOGL("MmuDiscardIdentityMappings completed\n");
 

@@ -46,8 +46,6 @@ set(GLOBAL_COMMON_FLAGS
     -mgeneral-regs-only
     -fshort-wchar
     -nostdinc
-    -msse3
-    -msse2
     -mcmodel=large
 )
 

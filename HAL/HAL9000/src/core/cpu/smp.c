@@ -772,7 +772,7 @@ _SmpSetupInitialApStack(
 #ifdef CAL_MSVC
     *((PQWORD)pStackTop) = (QWORD) ApInitCpu;
 #else
-    *((PQWORD)pStackTop) = (QWORD) ApInitElfWrapper;
+    *((PQWORD)pStackTop) = (QWORD) ApInitCpu;
 #endif
     *((PQWORD)pStackTop + 1) = 0xDEADC0DEDEADC0DE;
     *((PQWORD)pStackTop + 2) = (QWORD)CorrespondingCpu;

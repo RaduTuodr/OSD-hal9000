@@ -54,7 +54,6 @@ __GSHandlerCheck(
 NO_RETURN
 void
 CDECL
-MS_ABI
 __report_cookie_corruption(
     IN UINT64 StackCookie
 )

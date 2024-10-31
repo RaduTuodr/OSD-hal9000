@@ -247,30 +247,8 @@ ApTrampCleanupLowerMemory(
     }
 }
 
-#ifdef CAL_GNU
-// GCC MS_ABI is broken, is generating
-// moves from XMM registers
-// But these are invalid ops, they are not enabled
-// => we need this wrapper
-void
-NAKED
-ApInitElfWrapper(
-    void
-    )
-{
-    // Load first parameter and jump to ApInitCpu
-    // Because the function is naked (i.e no prologue or epilogue)
-    // We do not touch the stack
-    __asm__ __volatile__(
-        "mov %%rcx, %%rdi; jmp *%%rax"
-        :
-        : "a"(ApInitCpu)
-        : "memory"
-    );
-}
-#endif
-
 void    
+MS_ABI
 ApInitCpu(
     IN      struct _PCPU*   Cpu
     )

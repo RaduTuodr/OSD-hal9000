@@ -499,7 +499,7 @@ cl_vsnprintf(
                 break;
             case 'c':
                 // we have a character value to print
-                temp_value = va_arg(argptr, char);
+                temp_value = va_arg(argptr, DWORD);
                 cl_strncpy(temp_str, (char*)&temp_value, sizeof(char));
                 break;
             case 's':
