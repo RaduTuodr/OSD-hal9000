@@ -69,6 +69,7 @@ else()
         -ffunction-sections
         -fshort-wchar
         -fno-zero-initialized-in-bss
+        -mcmodel=large
     )
 
     set(ACPI_LINK_FLAGS)
