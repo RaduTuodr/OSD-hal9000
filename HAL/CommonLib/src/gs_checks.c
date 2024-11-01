@@ -62,4 +62,15 @@ __report_cookie_corruption(
                 "Security cookie is 0x%X but should have been 0x%X. RA is 0x%X\n",
                 StackCookie, __security_cookie, GET_RETURN_ADDRESS);
 }
+
+NO_RETURN
+void
+__stack_chk_fail(
+    void
+    )
+{   
+    ASSERT_INFO(FALSE, "Security cookie is damaged. RA is 0x%X\n",
+                GET_RETURN_ADDRESS);
+}
+
 #endif // CL_NO_RUNTIME_CHECKS

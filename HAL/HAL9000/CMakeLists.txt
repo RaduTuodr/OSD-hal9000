@@ -112,6 +112,7 @@ else()
         -ffreestanding
         -nostdlib
         -nodefaultlibs
+        -lgcc
         # /BASE:0xFFFF800001000000
         # /ALIGN:512
         -T ${CMAKE_CURRENT_LIST_DIR}/HAL9000.ld

@@ -64,7 +64,7 @@ else()
         -Wextra
         -O1
         -MT
-        -fstack-protector-strong
+        -fstack-protector-all
         -fstack-clash-protection
         -ffunction-sections
         -fshort-wchar
