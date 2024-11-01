@@ -88,8 +88,6 @@ set(UEFI_APP_C_COMPILE_FLAGS
     -nostdlib
     -fshort-wchar
     -mno-red-zone
-    -msse3
-    -msse2
 )
 
 set(UEFI_APP_COMPILE_FLAGS
@@ -102,7 +100,7 @@ set(UEFI_APP_C_LINK_FLAGS
     -Wl,-dll
     -shared
     -e EfiEntry
-    -Wl,--subsytem
+    -Wl,--subsystem,10
     -Werror
 )
 

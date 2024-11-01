@@ -3,8 +3,14 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
         "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> -Xvc -pnasm -rnasm -f win64 -o <OBJECT> --objext=yasm.obj <SOURCE>"
     )
 else()
+    if (UEFI_BUILD)
+        set(NASM_BIN_FORMAT "-f win64")
+    else()
+        set(NASM_BIN_FORMAT "-f elf64 -gdwarf")
+    endif()
+
     set(CMAKE_YASM_COMPILE_OBJECT 
-        "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> -f elf64 -gdwarf -o <OBJECT> <SOURCE>"
+        "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> ${NASM_BIN_FORMAT} -o <OBJECT> <SOURCE>"
     )
 endif()
 

@@ -62,7 +62,7 @@ __start_os:
     lgdt [rax]
 
     ; Switch to compatibility mode
-    retf
+    retfq
 __start_os_bits32:
 [bits 32]
 

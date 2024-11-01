@@ -2,10 +2,14 @@ cmake_minimum_required(VERSION 3.30.2 FATAL_ERROR)
 
 project(UefiBootloader LANGUAGES C)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/yasm")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake")
+enable_language(YASM)
+
 include(Flags)
 
 file(GLOB_RECURSE UEFI_APP_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.c ${CMAKE_CURRENT_LIST_DIR}/src/*.yasm)
-set(UEFI_APP_INCLUDES ${CMAKE_SOURCE_DIR}/CompilerAbstraction/inc ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/include/Uefi)
+set(UEFI_APP_INCLUDES ${CMAKE_SOURCE_DIR}/../HAL/CompilerAbstraction/inc ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/include/Uefi)
 
 add_executable(BOOTX64.EFI ${UEFI_APP_SOURCES})
 target_include_directories(BOOTX64.EFI PRIVATE ${UEFI_APP_INCLUDES})

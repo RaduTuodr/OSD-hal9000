@@ -1,5 +1,8 @@
 .vscode/*
 build/*
+CompilerAbstraction/build/*
+HAL/build/*
+UefiBootloader/build/*
 tools/*
 yasm/build/*
 yasm/yasm_repo/*

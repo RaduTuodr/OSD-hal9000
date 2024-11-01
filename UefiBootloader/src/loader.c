@@ -13,7 +13,7 @@
 
 #include <cal_annotate.h>
 
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define UEFI_MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 #pragma pack(push, 1)
 
@@ -317,7 +317,7 @@ _LoadBootModules(
         BootModules[i - 2].PhysicalAddress = address;
         BootModules[i - 2].Size = pageCount * PAGE_SIZE;
         filenameLength /= sizeof(CHAR16);
-        CopyWcharAsChar(BootModules[i - 2].Name, dirEntries[i]->FileName, MIN(33, filenameLength));
+        CopyWcharAsChar(BootModules[i - 2].Name, dirEntries[i]->FileName, UEFI_MIN(33, filenameLength));
         
         PrintString(gLoader.ST, EFI_LIGHTGRAY, L"Loaded module ");
         PrintString(gLoader.ST, EFI_LIGHTGRAY, dirEntries[i]->FileName);
