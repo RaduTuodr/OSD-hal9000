@@ -15,7 +15,7 @@ set(ACPI_DEFINES
     WIN64
 )
 
-if (MSVC)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     set(ACPI_FLAGS
         /Zi 
         /Fd:$<TARGET_FILE_DIR:Acpica>/Acpica.pdb
@@ -104,7 +104,7 @@ list(APPEND ACPI_SOURCES "${ACPI_UTILITIES_SOURCES}")
 add_library(Acpica STATIC ${ACPI_SOURCES})
 
 target_include_directories(Acpica PUBLIC $<$<COMPILE_LANGUAGE:C>:${ACPI_INCLUDES}>)
-target_compile_options(Acpica PRIVATE ${GLOBAL_FLAGS} PRIVATE ${ACPI_IGNORE_WARNINGS})
+target_compile_options(Acpica PRIVATE ${ACPI_FLAGS} PRIVATE ${ACPI_IGNORE_WARNINGS})
 target_compile_definitions(Acpica PRIVATE ${ACPI_DEFINES})
 target_link_options(Acpica PRIVATE ${ACPI_LINK_FLAGS})
 

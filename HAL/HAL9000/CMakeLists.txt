@@ -26,7 +26,7 @@ set(HAL9000_YASM_INCLUDES
     ${CMAKE_CURRENT_LIST_DIR}/headers/base/yasm
 )
 
-if (MSVC)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     set(HAL9000_COMMON_FLAGS
         /fp:except-
         /wd4313

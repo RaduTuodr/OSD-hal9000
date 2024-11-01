@@ -326,7 +326,7 @@ BYTE AsmVmxVmwrite(
     QWORD FieldValue
     )
 {
-    return __vmx_vwmwrite(Field, FieldValue);
+    return __vmx_vmwrite(Field, FieldValue);
 }
 
 #else

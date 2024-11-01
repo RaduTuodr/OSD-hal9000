@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30.2 FATAL_ERROR)
 
-if (MSVC)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     set(APP_DEBUG_FLAGS
         /fp:except-
         /Gy-

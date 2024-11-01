@@ -87,7 +87,7 @@ SystemInit(
     pCpu = NULL;
     BootModuleCount = BootInformation->BootModuleCount;
     BootModules = (PHYSICAL_ADDRESS) ((QWORD) BootInformation->BootModules);
-    kernelBaseAddress = (PVOID) BootInformation->KernelBaseAddress;
+    kernelBaseAddress = (PVOID) ((QWORD) BootInformation->KernelBaseAddress);
     kernelSize = BootInformation->KernelSize;
 
     LogSystemInit(LogLevelInfo,

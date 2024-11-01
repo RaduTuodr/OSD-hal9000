@@ -38,6 +38,7 @@ set(GLOBAL_DEFINES
 
 set(GLOBAL_COMMON_FLAGS
     /FS
+    /wd4206
 )
 
 set(GLOBAL_DEBUG_FLAGS 

@@ -4,7 +4,7 @@ set(APP_HELLOWORLD_INCLUDES
     ${PROJECT_SOURCE_DIR}/Shared/common
 )
 
-if (MSVC)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     set(APP_HELLOWORLD_PDB_FLAG
         $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:AppHelloWorld.exe>/AppHelloWorld.pdb>
     )

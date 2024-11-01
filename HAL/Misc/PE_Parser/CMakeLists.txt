@@ -6,7 +6,7 @@ set(PE_PARSER_INCLUDES
     ${PROJECT_SOURCE_DIR}/CommonLib/inc
 )
 
-if (MSVC)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     set(PE_PARSER_PDB_FLAG
         $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:PE_Parser>/PE_Parser.pdb>
     )

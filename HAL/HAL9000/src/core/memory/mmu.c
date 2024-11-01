@@ -459,7 +459,7 @@ MmuInitSystem(
 
     // maps the kernel to memory
     status = _MmuMapKernelMemory(&m_mmuData.PagingData.Data,
-                                 (PHYSICAL_ADDRESS) (bootInfo->KernelBaseAddress),
+                                 (PHYSICAL_ADDRESS) ((QWORD) bootInfo->KernelBaseAddress),
                                  &(m_mmuData.KernelInfo));
     if (!SUCCEEDED(status))
     {

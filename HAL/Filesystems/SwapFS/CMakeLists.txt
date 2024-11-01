@@ -10,7 +10,7 @@ set(SWAP_FS_INCLUDES
     ${PROJECT_SOURCE_DIR}/HAL/inc
 )
 
-if (MSVC)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     set(SWAP_FS_PDB_FLAG
         $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:SwapFS>/SwapFS.pdb>
     )

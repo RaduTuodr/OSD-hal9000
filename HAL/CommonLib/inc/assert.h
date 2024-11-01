@@ -11,7 +11,7 @@ C_HEADER_START
 #ifdef CAL_MSVC
 #define SEPARATOR '\\'
 #else
-#define SEPERATOR '/'
+#define SEPARATOR '/'
 #endif
 #endif
 
@@ -40,13 +40,13 @@ typedef FUNC_AssertFunction*        PFUNC_AssertFunction;
 // #define ASSERT(Cond)                ASSERT_INFO((Cond),"")
 #define ASSERT(Cond)         if((Cond)){} else                                                                                                  \
                              {                                                                                                                 \
-                                AssertInfo( "[ASSERT][%s][%d]Condition: (" #Cond ") failed\n", cl_strrchr(__FILE__, SEPERATOR) + 1, __LINE__);      \
+                                AssertInfo( "[ASSERT][%s][%d]Condition: (" #Cond ") failed\n", cl_strrchr(__FILE__, SEPARATOR) + 1, __LINE__);      \
                              }
 #endif // ASSERT
 
 #define ASSERT_INFO(Cond,Msg,...)   if((Cond)){} else                                                                                                    \
                                     {                                                                                                                    \
-                                        AssertInfo( "[ASSERT][%s][%d]Condition: (" #Cond ") failed\n" Msg, cl_strrchr(__FILE__, SEPERATOR) + 1, __LINE__ VA_ARGS(__VA_ARGS__) );      \
+                                        AssertInfo( "[ASSERT][%s][%d]Condition: (" #Cond ") failed\n" Msg, cl_strrchr(__FILE__, SEPARATOR) + 1, __LINE__ VA_ARGS(__VA_ARGS__) );      \
                                     }
 
 #define NOT_REACHED                  MSVC_WARNING_SUPPRESS(4127) ASSERT(FALSE)

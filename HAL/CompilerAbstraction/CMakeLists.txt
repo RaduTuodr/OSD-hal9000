@@ -4,7 +4,7 @@ set(COMPILER_ABSTRACTION_INCLUDES
     ${CMAKE_SOURCE_DIR}/CompilerAbstraction/inc
 )
 
-if (MSVC)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     set(COMPILER_ABSTRACTION_PDB_FLAG
         $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:CompilerAbstraction>/CompilerAbstraction.pdb>
     )
