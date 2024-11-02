@@ -23,19 +23,19 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
 else()
       find_program(CMAKE_C_COMPILER
             NAMES "x86_64-elf-gcc"
-            HINTS ${CMAKE_SOURCE_DIR}/tools/elfgcc/bin
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/elfgcc/bin
             REQUIRED
       )
 
       find_program(CMAKE_LINKER
             NAMES "x86_64-elf-gcc"
-            HINTS ${CMAKE_SOURCE_DIR}/tools/elfgcc/bin
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/elfgcc/bin
             REQUIRED
       )
 
       find_program(CMAKE_AR
             NAMES "x86_64-elf-ar"
-            HINTS ${CMAKE_SOURCE_DIR}/tools/elfgcc/bin
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/elfgcc/bin
             REQUIRED
       )
 

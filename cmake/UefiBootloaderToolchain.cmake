@@ -6,7 +6,7 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release)
 
 set(CMAKE_C_COMPILER_WORKS 1)
 
-if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
 
       set(CMAKE_C_COMPILE_OBJECT
             "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> /c /Fo:<OBJECT> <SOURCE>"
@@ -22,20 +22,20 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
 else()
       find_program(CMAKE_C_COMPILER
-            NAMES "x86_64-w64-mingw32-gcc"
-            HINTS ${CMAKE_SOURCE_DIR}/tools/pegcc/bin
+            NAMES "x86_64-w64-mingw32-gcc" "gcc"
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/pegcc/bin
             REQUIRED
       )
 
       find_program(CMAKE_LINKER
-            NAMES "x86_64-w64-mingw32-gcc"
-            HINTS ${CMAKE_SOURCE_DIR}/tools/pegcc/bin
+            NAMES "x86_64-w64-mingw32-gcc" "gcc"
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/pegcc/bin
             REQUIRED
       )
 
       find_program(CMAKE_AR
-            NAMES "x86_64-w64-mingw32-ar"
-            HINTS ${CMAKE_SOURCE_DIR}/tools/pegcc/bin
+            NAMES "x86_64-w64-mingw32-ar" "ar"
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/pegcc/bin
             REQUIRED
       )
 
