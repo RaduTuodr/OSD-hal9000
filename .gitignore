@@ -10,3 +10,4 @@ artifacts/*
 bootdrive/*
 *.log
 !.vscode/launch.json
+temp/*

@@ -23,19 +23,19 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
 else()
       find_program(CMAKE_C_COMPILER
             NAMES "x86_64-w64-mingw32-gcc" "gcc"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/pegcc/bin
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/mingw_gcc/bin
             REQUIRED
       )
 
       find_program(CMAKE_LINKER
             NAMES "x86_64-w64-mingw32-gcc" "gcc"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/pegcc/bin
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/mingw_gcc/bin
             REQUIRED
       )
 
       find_program(CMAKE_AR
             NAMES "x86_64-w64-mingw32-ar" "ar"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/pegcc/bin
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/mingw_gcc/bin
             REQUIRED
       )
 

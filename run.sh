@@ -1,6 +1,6 @@
 #!/bin/zsh
 echo 'Starting QEMU...'
-qemu-system-x86_64 -bios artifacts/bin/OVMF.fd \
+qemu-system-x86_64 -bios tools/OVMF/OVMF.fd \
                    -m 2G \
                    -device piix3-ide,id=ide \
                    -drive id=disk,file=artifacts/bin/bootloader.img,format=raw,if=none \

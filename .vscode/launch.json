@@ -8,7 +8,7 @@
             "target": ":1234",
             "remote": true,
             "cwd": "${workspaceRoot}",
-            "gdbpath": "./tools/elfgcc/bin/x86_64-elf-gdb"
+            "gdbpath": "./tools/elf_gcc/bin/x86_64-elf-gdb"
         }
     ]
 }
