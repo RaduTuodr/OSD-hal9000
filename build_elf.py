@@ -26,13 +26,13 @@ def main():
     print('Done.')
 
     print('Separating debug information...')
-    p = subprocess.run(f'./tools/elf_gcc/bin/x86_64-elf-objcopy --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
+    p = subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
                        shell=True)
 
-    p = subprocess.run(f'./tools/elf_gcc/bin/x86_64-elf-strip --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
+    p = subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
                        shell=True)
     
-    p = subprocess.run(f'./tools/elf_gcc/bin/x86_64-elf-objcopy --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+    p = subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
                        shell=True)
     print('Done.')
 

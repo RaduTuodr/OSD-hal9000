@@ -9,6 +9,7 @@ import shutil
 import json
 import platform
 import lzma
+import requests
 
 def reporthook(count, block_size, total_size):
     global start_time
@@ -30,11 +31,10 @@ def download_lfs_file(github_url, filename, temp_dir):
     f.close()
     sha = lines[1].split()[1].replace('sha256:', '')
     size = lines[2].split()[1]
-    json_body =f'{{"operation": "download", "transfer": ["basic"], "objects": [{{"oid": "{sha}", "size": {size}}}]}}'
-    req = f"curl -X POST -H \"Accept: application/vnd.git-lfs+json\" -H \"Content-type: application/json\" -d '{json_body}' https://github.com/davidsipos1002/UefiHAL9000Tools.git/info/lfs/objects/batch"
-    get_download = subprocess.Popen(req, stdout=subprocess.PIPE, shell=True)
-    get_download.wait()
-    response_json = json.load(get_download.stdout)
+    json_body = {'operation': 'download', 'transfer': ['basic'], 'objects': [{'oid': f'{sha}', 'size': int(size)}]}
+    req_url = 'https://github.com/davidsipos1002/UefiHAL9000Tools.git/info/lfs/objects/batch'
+    response = requests.post(req_url, json=json_body, headers={'Accept': 'application/vnd.git-lfs+json'})
+    response_json = response.json()
     download_link = response_json['objects'][0]['actions']['download']['href']
     request.urlretrieve(download_link, f'temp/{filename}', reporthook=reporthook)
 
@@ -68,7 +68,7 @@ def main():
         tar_file = TarFile.open(mode='r', fileobj=xz_file)
         tar_file.extractall(f'tools/mingw_gcc')
         xz_file.close()
-        print('Done.')
+        print('\nDone.')
 
     if not os.path.exists('tools/elf_gcc'):
         print(f'Downloading {elf_archive}...')
@@ -80,7 +80,7 @@ def main():
         tar_file = TarFile.open(mode='r', fileobj=xz_file)
         tar_file.extractall(f'tools/elf_gcc')
         xz_file.close()
-        print('Done.')
+        print('\nDone.')
 
     if not os.path.exists('tools/OVMF'):
         os.makedirs('tools/OVMF', exist_ok=True)
