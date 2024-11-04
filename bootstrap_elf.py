@@ -9,7 +9,7 @@ import shutil
 import json
 import platform
 import lzma
-import requests
+# import requests
 
 def reporthook(count, block_size, total_size):
     global start_time
@@ -40,7 +40,7 @@ def download_lfs_file(github_url, filename, temp_dir):
 
 def main():
     warnings.filterwarnings('ignore')
-    github_url = 'https://raw.githubusercontent.com/davidsipos1002/UefiHAL9000Tools/master/archives'
+    github_url = 'https://raw.githubusercontent.com/davidsipos1002/UefiHAL9000Tools/master'
 
     arch = str(platform.machine()).lower()
     os_name = str(platform.system()).lower()
@@ -55,12 +55,13 @@ def main():
     
     mingw_archive = f'{arch}-{os_name}-mingw-gcc.tar.xz'
     elf_archive = f'{arch}-{os_name}-elf-gcc.tar.xz'
+    mtools_archive = f'{arch}-{os_name}-mtools.tar.xz'
 
     os.makedirs('temp', exist_ok=True)
 
     if not os.path.exists('tools/mingw_gcc'):
         print(f'Downloading {mingw_archive}...')
-        download_lfs_file(github_url, mingw_archive, 'temp')
+        request.urlretrieve(f'{github_url}/archives/{mingw_archive}', f'temp/{mingw_archive}', reporthook=reporthook)
         print('Done.')
 
         print(f'Decompressing {mingw_archive}...')
@@ -72,7 +73,7 @@ def main():
 
     if not os.path.exists('tools/elf_gcc'):
         print(f'Downloading {elf_archive}...')
-        download_lfs_file(github_url, elf_archive, 'temp')
+        request.urlretrieve(f'{github_url}/archives/{elf_archive}', f'temp/{elf_archive}', reporthook=reporthook)
         print('Done.')
 
         print(f'Decompressing {elf_archive}...')
@@ -82,12 +83,24 @@ def main():
         xz_file.close()
         print('\nDone.')
 
+    # if not os.path.exists('tools/mtools'):
+    #     print(f'Downloading {mtools_archive}...')
+    #     request.urlretrieve(f'{github_url}/archives/{mtools_archive}', f'temp/{mtools_archive}', reporthook=reporthook)
+    #     print('Done.')
+
+    #     print(f'Decompressing {mtools_archive}...')
+    #     xz_file = lzma.LZMAFile(f'temp/{mtools_archive}')
+    #     tar_file = TarFile.open(mode='r', fileobj=xz_file)
+    #     tar_file.extractall(f'tools/mtools')
+    #     xz_file.close()
+    #     print('\nDone.')
+
     if not os.path.exists('tools/OVMF'):
         os.makedirs('tools/OVMF', exist_ok=True)
         print(f'Downloading OVMF.fd...')
-        request.urlretrieve('https://github.com/davidsipos1002/UefiHAL9000Tools/raw/refs/heads/master/OVMF/OVMF.fd', f'tools/OVMF/OVMF.fd')
+        request.urlretrieve(f'{github_url}/OVMF/OVMF.fd', f'tools/OVMF/OVMF.fd')
         print('Done.')
-
+    
     shutil.rmtree('temp', ignore_errors=True)
 
 
