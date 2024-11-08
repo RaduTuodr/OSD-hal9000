@@ -33,8 +33,8 @@ def prBlack(str): print("\033[98m {}\033[00m" .format(str))
 
 def get_build_env():
     env = os.environ.copy()
-    if str(platform.system()).lower() == 'windows':
-        env['PATH'] = f'{os.path.abspath('tools/mingw_gcc/bin')}{os.pathsep}{env['PATH']}'
+    # if str(platform.system()).lower() == 'windows':
+    #     env['PATH'] = f'{os.path.abspath('tools/mingw_gcc/bin')}{os.pathsep}{env['PATH']}'
     return env
 
 def deep_clean():
@@ -75,50 +75,50 @@ def reporthook(count, block_size, total_size):
 def bootstrap():
     warnings.filterwarnings('ignore')
 
-    arch = str(platform.machine()).lower()
-    os_name = str(platform.system()).lower()
+    # arch = str(platform.machine()).lower()
+    # os_name = str(platform.system()).lower()
 
-    if arch == 'x64' or arch == 'x86_64':
-        arch = 'amd64'
-    elif arch == 'aarch64':
-        arch = 'arm64'
+    # if arch == 'x64' or arch == 'x86_64':
+    #     arch = 'amd64'
+    # elif arch == 'aarch64':
+    #     arch = 'arm64'
 
-    if os_name == 'windows':
-        arch='amd64'
+    # if os_name == 'windows':
+    #     arch='amd64'
     
-    mingw_archive = f'{arch}-{os_name}-mingw-gcc.tar.xz'
-    elf_archive = f'{arch}-{os_name}-elf-gcc.tar.xz'
+    # mingw_archive = f'{arch}-{os_name}-mingw-gcc.tar.xz'
+    # elf_archive = f'{arch}-{os_name}-elf-gcc.tar.xz'
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        if not os.path.exists('tools/mingw_gcc'):
-            prCyan(f'Downloading {mingw_archive}...')
-            request.urlretrieve(f'{tools_url}/archives/{mingw_archive}', f'{temp_dir}/{mingw_archive}', reporthook=reporthook)
-            prGreen('Done.')
+    # with tempfile.TemporaryDirectory() as temp_dir:
+        # if not os.path.exists('tools/mingw_gcc'):
+        #     prCyan(f'Downloading {mingw_archive}...')
+        #     request.urlretrieve(f'{tools_url}/archives/{mingw_archive}', f'{temp_dir}/{mingw_archive}', reporthook=reporthook)
+        #     prGreen('Done.')
 
-            prCyan(f'Decompressing {mingw_archive}...')
-            xz_file = lzma.LZMAFile(f'{temp_dir}/{mingw_archive}')
-            tar_file = TarFile.open(mode='r', fileobj=xz_file)
-            tar_file.extractall(f'tools/mingw_gcc')
-            xz_file.close()
-            prGreen('Done.')
+        #     prCyan(f'Decompressing {mingw_archive}...')
+        #     xz_file = lzma.LZMAFile(f'{temp_dir}/{mingw_archive}')
+        #     tar_file = TarFile.open(mode='r', fileobj=xz_file)
+        #     tar_file.extractall(f'tools/mingw_gcc')
+        #     xz_file.close()
+        #     prGreen('Done.')
 
-        if not os.path.exists('tools/elf_gcc'):
-            prCyan(f'Downloading {elf_archive}...')
-            request.urlretrieve(f'{tools_url}/archives/{elf_archive}', f'{temp_dir}/{elf_archive}', reporthook=reporthook)
-            prGreen('Done.')
+        # if not os.path.exists('tools/elf_gcc'):
+        #     prCyan(f'Downloading {elf_archive}...')
+            # request.urlretrieve(f'{tools_url}/archives/{elf_archive}', f'{temp_dir}/{elf_archive}', reporthook=reporthook)
+            # prGreen('Done.')
 
-            prCyan(f'Decompressing {elf_archive}...')
-            xz_file = lzma.LZMAFile(f'{temp_dir}/{elf_archive}')
-            tar_file = TarFile.open(mode='r', fileobj=xz_file)
-            tar_file.extractall(f'tools/elf_gcc')
-            xz_file.close()
-            prGreen('Done.')
+            # prCyan(f'Decompressing {elf_archive}...')
+            # xz_file = lzma.LZMAFile(f'{temp_dir}/{elf_archive}')
+            # tar_file = TarFile.open(mode='r', fileobj=xz_file)
+            # tar_file.extractall(f'tools/elf_gcc')
+            # xz_file.close()
+            # prGreen('Done.')
 
-        if not os.path.exists('tools/OVMF'):
-            os.makedirs('tools/OVMF', exist_ok=True)
-            prCyan(f'Downloading OVMF.fd...')
-            request.urlretrieve(f'{tools_url}/OVMF/OVMF.fd', f'tools/OVMF/OVMF.fd', reporthook=reporthook)
-            prGreen('Done.')
+    if not os.path.exists('tools/OVMF'):
+        os.makedirs('tools/OVMF', exist_ok=True)
+        prCyan(f'Downloading OVMF.fd...')
+        request.urlretrieve(f'{tools_url}/OVMF/OVMF.fd', f'tools/OVMF/OVMF.fd', reporthook=reporthook)
+        prGreen('Done.')
         
 def configure():
     prCyan('Configuring ImageCreator...')
@@ -260,15 +260,15 @@ def build_all(job_count):
     prGreen('Done.')
 
     prCyan('Separating debug information...')
-    subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
+    subprocess.run(f'"tools/llvm/bin/llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
                     env=get_build_env(),
                     shell=True)
 
-    subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
+    subprocess.run(f'"tools/llvm/bin/llvm-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
                     env=get_build_env(),
                     shell=True)
     
-    subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+    subprocess.run(f'"tools/llvm/bin/llvm-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
                     env=get_build_env(),
                     shell=True)
     prGreen('Done.')
@@ -303,15 +303,15 @@ def build(job_count):
     prGreen('Done.')
 
     prCyan('Separating debug information...')
-    subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
+    subprocess.run(f'"tools/llvm/bin/llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
                     env=get_build_env(),
                     shell=True)
 
-    subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
+    subprocess.run(f'"tools/llvm/bin/llvm-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
                     env=get_build_env(),
                     shell=True)
     
-    subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+    subprocess.run(f'"tools/llvm/bin/llvm-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
                     env=get_build_env(),
                     shell=True)
     prGreen('Done.')

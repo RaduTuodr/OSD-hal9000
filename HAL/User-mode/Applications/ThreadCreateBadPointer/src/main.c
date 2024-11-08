@@ -21,7 +21,7 @@ __main(
 
     __try
     {
-        UmThreadCreate((PFUNC_ThreadStart) 0x7000'3203ULL, NULL, &hThread);
+        UmThreadCreate((PFUNC_ThreadStart) 0x70003203ULL, NULL, &hThread);
 
         // wait for the process to crash
         while(&hThread)

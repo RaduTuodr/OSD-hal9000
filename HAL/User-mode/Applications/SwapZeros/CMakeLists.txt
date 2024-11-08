@@ -1,20 +1,22 @@
 cmake_minimum_required(VERSION 3.30.2 FATAL_ERROR)
 
-set(APP_INCLUDES
+set(APP_SWAPZEROS_INCLUDES
     ${PROJECT_SOURCE_DIR}/Shared/common
 )
 
-set(APP_PDB_FLAG
-    $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:SwapZeros.exe>/SwapZeros.pdb>
-)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    set(APP_SWAPZEROS_PDB_FLAG
+        $<$<COMPILE_LANGUAGE:C>:/Fd:$<TARGET_FILE_DIR:SwapZeros.exe>/SwapZeros.pdb>
+    )
+endif()
 
-file(GLOB_RECURSE APP_HELLOWORLD_SOURCES src/*.c src/*.yasm)
+file(GLOB_RECURSE APP_SWAPZEROS_SOURCES src/*.c src/*.yasm)
 
-add_executable(SwapZeros.exe ${APP_HELLOWORLD_SOURCES})
-target_include_directories(SwapZeros.exe PUBLIC $<$<COMPILE_LANGUAGE:C>:${APP_INCLUDES}>)
-target_compile_options(SwapZeros.exe PRIVATE ${APP_FLAGS} PRIVATE ${APP_PDB_FLAG})
+add_executable(SwapZeros.exe ${APP_SWAPZEROS_SOURCES})
+target_include_directories(SwapZeros.exe PUBLIC $<$<COMPILE_LANGUAGE:C>:${APP_SWAPZEROS_INCLUDES}>)
+target_compile_options(SwapZeros.exe PRIVATE ${APP_FLAGS} PRIVATE ${APP_SWAPZEROS_PDB_FLAG})
 target_compile_definitions(SwapZeros.exe PRIVATE ${GLOBAL_DEFINES} PRIVATE ${MBCS_DEFINE})
-target_link_libraries(SwapZeros.exe PRIVATE CommonLibNoLocks UsermodeLibrary)
+target_link_libraries(SwapZeros.exe PRIVATE UsermodeLibrary CommonLibNoLocks CompilerAbstraction)
 target_link_options(SwapZeros.exe PRIVATE ${APP_LINK_FLAGS})
 
 install(TARGETS SwapZeros.exe DESTINATION apps/SwapZeros)

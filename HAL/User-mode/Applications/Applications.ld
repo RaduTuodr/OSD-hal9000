@@ -39,12 +39,4 @@ SECTIONS
         *(.rodata)
         *(.rodata1)
     } :rodata
-
-    /DISCARD/ :
-    {
-        *(.symtab)
-        *(.strtab)
-        *(.shstrtab)
-        *(.comment)
-    }
 }

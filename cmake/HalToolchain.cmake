@@ -22,25 +22,25 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
 
 else()
       find_program(CMAKE_C_COMPILER
-            NAMES "x86_64-elf-gcc"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/elf_gcc/bin
+            NAMES "clang"
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/llvm/bin
             REQUIRED
       )
 
       find_program(CMAKE_LINKER
-            NAMES "x86_64-elf-gcc"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/elf_gcc/bin
+            NAMES "ld.lld"
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/llvm/bin
             REQUIRED
       )
 
       find_program(CMAKE_AR
-            NAMES "x86_64-elf-ar"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/elf_gcc/bin
+            NAMES "llvm-ar"
+            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/llvm/bin
             REQUIRED
       )
 
       set(CMAKE_C_COMPILE_OBJECT
-            "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -c -o <OBJECT> <SOURCE>"
+            "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> --target=x86_64-elf <FLAGS> -c -o <OBJECT> <SOURCE>"
       )
 
       set(CMAKE_C_LINK_EXECUTABLE

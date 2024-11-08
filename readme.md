@@ -9,11 +9,12 @@ Download and install:
 - ninja.
 - nasm (yasm cannot produce ELF from what I observed).
 - python3 and some required packages if the script fails to run.
-- a native compiler, if you are on Linux or macOS
+- llvm toolchain, in tools/llvm; more specifically you need clang, ld.lld, lld-link, lldb, llvm-objcopy, llvm-strip; llvm-readelf is strongly recommended; the simplest
+way to get clang is to download the release binaries from github and just copy-paste the contents in tools/llvm
 
 ## Bootstrap
 
-1. Run `HAL9000.py --bootstrap`, it will download the needed compilers (`x86_64-w64-mingw32-gcc` for the bootloader and `x86_64-elf-gcc` for HAL) and OVMF.
+1. Run `HAL9000.py --bootstrap`, it will download OVMF (UEFI implementation for QEMU).
 2. If it succeeds run `HAL9000.py --configure`, otherwise contact support.
 3. If it fails contact support.
 4. If it still fails go and watch 2001: A Space Odyssey.
@@ -23,8 +24,8 @@ Download and install:
 <!-- Visual Studio: 
 To build the project, open **"Developer Powershell for Visual Studio 2022"** (can be found in the start menu, under the "Visual Studio 2022" folder) and run `Build.ps1`. -->
 
-GCC:
-Run `HAL9000.py --build_all` to compile everything, prepare the debug information for GDB and generate the QEMU image.
+LLVM:
+Run `HAL9000.py --build_all` to compile everything, prepare the debug information and generate the QEMU image.
 
 Run `HAL9000.py --build` to build just HAL.
 
@@ -33,7 +34,7 @@ Run `HAL9000.py --build` to build just HAL.
 <!-- Visual Studio:
 Run using `Run.ps1`. -->
 
-GCC:
+LLVM:
 Run with `HAL9000.py --run`, use the `-d` flag if you want QEMU to wait for the debugger.
 
 ## Clean

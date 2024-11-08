@@ -54,7 +54,7 @@ set(GLOBAL_DEBUG_FLAGS
     -MP
     -O0
     -fstack-protector-all
-    -fstack-clash-protection
+    # -fstack-clash-protection
     # -Werror
     -Wall
     -Wextra
@@ -66,7 +66,7 @@ set(GLOBAL_RELEASE_FLAGS
     -MP
     -O2
     -fstack-protector-all
-    -fstack-clash-protection
+    # -fstack-clash-protection
     # -Werror
     -Wall
 )
@@ -82,12 +82,12 @@ set(GLOBAL_FLAGS
 )
 
 set(UEFI_APP_C_COMPILE_FLAGS
-    -Werror
+    # -Werror
     -nostdinc
     -ffreestanding
     -nostdlib
     -fshort-wchar
-    -mno-red-zone
+    # -mno-red-zone
 )
 
 set(UEFI_APP_COMPILE_FLAGS
@@ -95,13 +95,17 @@ set(UEFI_APP_COMPILE_FLAGS
 )
 
 set(UEFI_APP_C_LINK_FLAGS
-    -nostdlib
-    -nodefaultlibs
-    -Wl,-dll
-    -shared
-    -e EfiEntry
-    -Wl,--subsystem,10
-    -Werror
+    # -nostdlib
+    # -nodefaultlibs
+    # -Wl,-dll
+    # -shared
+    # -e EfiEntry
+    # -Wl,--subsystem,10
+    # -Werror
+    /ENTRY:EfiEntry
+    /SUBSYSTEM:EFI_APPLICATION
+    /BASE:0x400000
+
 )
 
 set(UEFI_APP_LINK_FLAGS

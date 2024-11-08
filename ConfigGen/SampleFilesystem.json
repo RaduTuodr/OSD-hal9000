@@ -1,0 +1,49 @@
+{
+    "output": "artifacts/bin/HAL9000.img",
+    "partitions": [
+        {
+            "type": "EFI",
+            "size": 65472,
+            "name": "BOOT"
+        },
+        {
+            "type": "BDP",
+            "size": 131072,
+            "name": "DATA"
+        },
+        {
+            "type": "LINUX_SWAP",
+            "size": 131072,
+            "name": "SWAP"
+        }
+    ],
+    "filesystems": [
+        {
+            "partition": "BOOT",
+            "directories": [
+                "/EFI",
+                "/EFI/BOOT",
+                "/EFI/OS",
+                "/EFI/MODULES"
+            ],
+            "files": [
+                {
+                    "source": "artifacts/bin/BOOTX64.EFI",
+                    "destination":"/EFI/BOOT/BOOTX64.EFI"
+                },
+                {
+                    "source": "artifacts/bin/HAL9000.bin",
+                    "destination": "/EFI/OS/HAL9000.bin"
+                },
+                {
+                    "source": "config/Tests",
+                    "destination": "/EFI/MODULES/Tests"
+                },
+                {
+                    "source": "config/HAL9000.ini",
+                    "destination": "/HAL9000.ini"
+                }
+            ]
+        } 
+    ]
+}

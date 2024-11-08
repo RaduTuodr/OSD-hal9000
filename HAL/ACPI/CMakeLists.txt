@@ -65,7 +65,7 @@ else()
         -O1
         -MT
         -fstack-protector-all
-        -fstack-clash-protection
+        # -fstack-clash-protection
         -ffunction-sections
         -fshort-wchar
         -fno-zero-initialized-in-bss

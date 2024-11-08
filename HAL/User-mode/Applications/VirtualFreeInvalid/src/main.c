@@ -14,7 +14,7 @@ __main(
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
-    status = SyscallVirtualFree(IntrinAddressOfReturnAddress(),
+    status = SyscallVirtualFree(IntrinAddressOfReturnAddress,
                                 0,
                                 VMM_FREE_TYPE_DECOMMIT | VMM_FREE_TYPE_RELEASE);
     if (SUCCEEDED(status))
@@ -23,7 +23,7 @@ __main(
         return status;
     }
 
-    status = SyscallVirtualFree(IntrinAddressOfReturnAddress(),
+    status = SyscallVirtualFree(IntrinAddressOfReturnAddress,
                                 0,
                                 VMM_FREE_TYPE_DECOMMIT);
     if (SUCCEEDED(status))
@@ -32,7 +32,7 @@ __main(
         return status;
     }
 
-    status = SyscallVirtualFree(IntrinAddressOfReturnAddress(),
+    status = SyscallVirtualFree(IntrinAddressOfReturnAddress,
                                 0,
                                 VMM_FREE_TYPE_RELEASE);
     if (SUCCEEDED(status))
@@ -41,7 +41,7 @@ __main(
         return status;
     }
 
-    status = SyscallVirtualFree(IntrinAddressOfReturnAddress(),
+    status = SyscallVirtualFree(IntrinAddressOfReturnAddress,
                                 0,
                                 0);
     if (SUCCEEDED(status))

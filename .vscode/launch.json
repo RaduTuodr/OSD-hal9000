@@ -1,14 +1,11 @@
 {
     "configurations": [
         {
-            "type": "gdb",
-            "request": "attach",
-            "name": "Debug kernel",
-            "executable": "artifacts/bin/HAL9000.bin",
-            "target": ":1234",
-            "remote": true,
-            "cwd": "${workspaceRoot}",
-            "gdbpath": "./tools/elf_gcc/bin/x86_64-elf-gdb"
+            "type": "lldb",
+            "request": "custom",
+            "name": "Debug HAL9000",
+            "targetCreateCommands": ["target create artifacts/bin/HAL9000.bin"],
+            "processCreateCommands": ["gdb-remote localhost:1234"]
         }
     ]
 }

@@ -6,7 +6,6 @@
 #define NO_OF_TIMES_TO_CALL_RECURSIVE_FUNCTIONS     10000
 
 // we turn all compiler optimizations off so we don't have any surprises
-PUSH_OPTIONS
 NO_OPTIMIZE
 
 static void _RecursiveFunction(DWORD TimesToCall)
@@ -31,4 +30,3 @@ __main(
 }
 
 OPTIMIZE
-POP_OPTIONS

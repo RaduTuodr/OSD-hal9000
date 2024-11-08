@@ -8,7 +8,7 @@ static QWORD m_secondaryThTid;
 
 static
 STATUS
-(CDECL _ThreadFunc)(
+(CDECL MS_ABI _ThreadFunc)(
     IN_OPT      PVOID       Context
     )
 {

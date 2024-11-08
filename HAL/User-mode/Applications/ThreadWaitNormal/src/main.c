@@ -6,7 +6,7 @@
 
 static
 STATUS
-(CDECL _ThreadFunc)(
+(CDECL MS_ABI _ThreadFunc)(
     IN_OPT      PVOID       Context
     )
 {
@@ -19,7 +19,7 @@ STATUS
 
 static
 STATUS
-(CDECL _ThreadFailFunc)(
+(CDECL MS_ABI _ThreadFailFunc)(
     IN_OPT      PVOID       Context
     )
 {

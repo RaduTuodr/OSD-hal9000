@@ -12,10 +12,11 @@
 
 #else
 
-#define PUSH_OPTIONS DO_PRAGMA(GCC push_options)
-#define POP_OPTIONS DO_PRAGMA(GCC pop_options)
+// Clang does not support them
+// #define PUSH_OPTIONS DO_PRAGMA(GCC push_options)
+// #define POP_OPTIONS DO_PRAGMA(GCC pop_options)
 
-#define NO_OPTMIZE DO_PRAGMA(GCC optimize ("O0"))
-#define OPTMIZE DO_PRAGMA(GCC optimize ("O2"))
+#define NO_OPTIMIZE DO_PRAGMA(clang optimize off)
+#define OPTIMIZE DO_PRAGMA(clang optimimize on);
 
 #endif

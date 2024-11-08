@@ -10,9 +10,9 @@
 #define CAL_X86_64
 #endif
 
-#elif defined(__GNUC__)
+#elif defined(__llvm__) || defined(__clang__)
 
-#define CAL_GNU
+#define CAL_LLVM
 
 #ifdef __x86_64__
 #define CAL_X86_64

@@ -4,7 +4,6 @@
 #include "cal_optimize.h"
 
 // we turn all compiler optimizations off so we don't have any surprises
-PUSH_OPTIONS
 NO_OPTIMIZE
 
 #define NO_OF_TIMES_TO_ALLOCATE_ALMOST_A_PAGE_OF_LOCAL_VARIABLES     10
@@ -73,4 +72,3 @@ __main(
 }
 
 OPTIMIZE
-POP_OPTIONS

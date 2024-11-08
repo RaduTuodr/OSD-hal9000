@@ -476,7 +476,7 @@ AsmInDword(
 {
     DWORD Data;
     __asm__ __volatile__ (
-        "in %1, %d0"
+        "in %1, %0"
         : "=a"(Data)
         : "d"(Port)
         : "memory"
@@ -491,7 +491,7 @@ AsmOutDword(
     )
 {
     __asm__ __volatile__ (
-        "out %d0, %1"
+        "out %0, %1"
         :
         : "a"(Data), "d"(Port)
         : "memory"
