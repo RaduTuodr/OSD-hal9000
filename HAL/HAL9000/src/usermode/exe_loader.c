@@ -269,10 +269,8 @@ ExecutableLoaderGetVirtualImageBase(
     )
 {
     _EXE_LOADER_CONTEXT *context;
-    PVOID virtualBase;
 
     context = (_EXE_LOADER_CONTEXT *) Context;
-    virtualBase = NULL;
 
     if (NULL == Context)
     {

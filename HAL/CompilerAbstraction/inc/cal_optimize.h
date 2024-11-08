@@ -17,6 +17,6 @@
 // #define POP_OPTIONS DO_PRAGMA(GCC pop_options)
 
 #define NO_OPTIMIZE DO_PRAGMA(clang optimize off)
-#define OPTIMIZE DO_PRAGMA(clang optimimize on);
+#define OPTIMIZE DO_PRAGMA(clang optimize on);
 
 #endif

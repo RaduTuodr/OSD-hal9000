@@ -49,6 +49,8 @@ typedef uint16_t WORD, *PWORD;
 
 #else
 
-#include <minwindef.h>
+#define NOMINMAX
+
+#include <Windows.h>
 
 #endif

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <optional>
 
+#define UTF_CPP_CPLUSPLUS 202002L
+
 #include <cal_types.h>
 #include <gpt.hpp>
 #include <fat.hpp>
@@ -37,7 +39,8 @@ int main(int argc, char *argv[])
             return 2;
         
         partition.LBACount = jsonPartition["size"].get<QWORD>() * 2;
-        partition.PartitionName = utf8::utf8to16(jsonPartition["name"].get<std::string>());
+        std::string partName = jsonPartition["name"].get<std::string>();
+        partition.PartitionName = utf8::utf8to16(partName);
         partitionConfig.push_back(partition);
     }
 

@@ -1,7 +1,7 @@
 #include <bootloader/acpi.h>
 
 #include <Guid/Acpi.h>
-#include <Bootloader/memory.h>
+#include <bootloader/memory.h>
 
 UINT64
 GetAcpiRsdp(

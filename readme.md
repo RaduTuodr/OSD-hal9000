@@ -4,7 +4,7 @@
 Download and install:
 
 - qemu.
-- Visual Studio 2022 (2019 should also work), if you want to build with MSVC (HAL crashes now with MSVC).
+- Visual Studio 2022 (if you are on Windows), ImageCreator needs to be built for your system (HAL crashes now with MSVC).
 - CMake 3.30.2.
 - ninja.
 - nasm (yasm cannot produce ELF from what I observed).

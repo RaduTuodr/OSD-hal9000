@@ -121,8 +121,13 @@ def bootstrap():
         prGreen('Done.')
         
 def configure():
+    if str(platform.system()).lower() == 'windows':
+        generator = '\"Visual Studio 17 2022\"'
+    else:
+        generator = '\"Ninja\"'
+    
     prCyan('Configuring ImageCreator...')
-    p = subprocess.run(f'cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release \
+    p = subprocess.run(f'cmake -S . -B build -G {generator} \
                         -DCMAKE_INSTALL_PREFIX:PATH="../tools/ImageCreator"',
                         cwd='ImageCreator',
                         env=get_build_env(),
@@ -199,8 +204,13 @@ def clean(job_count):
     prGreen('Done.')
 
 def build_all(job_count):
+    if str(platform.system()).lower() == 'windows':
+        build_type = '--config Release'
+    else:
+        build_type = ''
+
     prCyan('Building ImageCreator...')
-    p = subprocess.run(f'cmake --build build -j{job_count}',
+    p = subprocess.run(f'cmake --build build -j{job_count} {build_type}',
                         cwd='ImageCreator',
                         env=get_build_env(),
                         shell=True)
@@ -230,7 +240,7 @@ def build_all(job_count):
     prGreen('Done.')
     
     prCyan('Installing ImageCreator...')
-    p = subprocess.run(f'cmake --install build',
+    p = subprocess.run(f'cmake --install build {build_type}',
                         cwd='ImageCreator',
                         env=get_build_env(),
                         shell=True)
