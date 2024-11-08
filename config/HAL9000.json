@@ -41,7 +41,7 @@
                 },
                 {
                     "source": "config/HAL9000.ini",
-                    "destination": "/"
+                    "destination": "/HAL9000.ini"
                 }
             ]
         },

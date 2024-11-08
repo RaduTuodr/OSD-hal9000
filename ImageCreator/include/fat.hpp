@@ -32,11 +32,15 @@ class Fat
         DWORD sectorsPerCluster;
         DWORD clusterSize;
         DWORD numberOfFats;
+        DWORD firstFsInfoSec;
+        DWORD secondFsInfoSec;
         DWORD fatSize; // sectors
         std::fstream os;
         GptPartition partition;
         DWORD maxDirEntries;
         BYTE *partitionStart;
+        BYTE *firstFsInfo;
+        BYTE *secondFsInfo;
         DWORD *fat0;
         DWORD *fat1;
         DWORD nextFreeCluster;

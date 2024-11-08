@@ -4,6 +4,7 @@
 #include "disk_dispatch.h"
 #include "cal_annotate.h"
 #include "cal_seh.h"
+#include "uefi.h"
 
 static
 STATUS
@@ -20,11 +21,8 @@ _DiskRetrievePartitionsFromDisk(
 
 static
 STATUS
-_DiskRetrievePartitionsFromDiskStartingAtOffset(
+_DiskRetrievePartitionsFromGptDisk(
     INOUT   PDEVICE_OBJECT              DiskDevice,
-    IN      DWORD                       DiskOffset,
-    IN      BOOLEAN                     ExtendedPartition,
-    IN      DWORD                       FirstExtendedPartitionLBA,
     INOUT   DWORD*                      PartitionCount,
     OUT_OPT PDISK_LAYOUT_INFORMATION    DiskLayoutInformation
     );
@@ -291,10 +289,10 @@ _DiskRetrievePartitionsFromDisk(
 
     ASSERT(NULL != pDisk);
 
-    status = _DiskRetrievePartitionsFromDiskStartingAtOffset(DiskDevice, 0, FALSE, 0, &partitionCount, NULL);
+    status = _DiskRetrievePartitionsFromGptDisk(DiskDevice, &partitionCount, NULL);
     if (!SUCCEEDED(status))
     {
-        LOG_FUNC_ERROR("_DiskRetrievePartitionsFromDiskStartingAtOffset", status);
+        LOG_FUNC_ERROR("_DiskRetrievePartitionsFromGptDisk", status);
         return status;
     }
 
@@ -313,12 +311,12 @@ _DiskRetrievePartitionsFromDisk(
 
     partitionCount = 0;
 
-    LOG("Will now call _DiskRetrievePartitionsFromDiskStartingAtOffset to complete pDiskInformation structure\n");
+    LOG("Will now call _DiskRetrievePartitionsFromGptDisk to complete pDiskInformation structure\n");
 
-    status = _DiskRetrievePartitionsFromDiskStartingAtOffset(DiskDevice, 0, FALSE, 0, &partitionCount, pDiskInformation);
+    status = _DiskRetrievePartitionsFromGptDisk(DiskDevice, &partitionCount, pDiskInformation);
     if (!SUCCEEDED(status))
     {
-        LOG_FUNC_ERROR("_DiskRetrievePartitionsFromDiskStartingAtOffset", status);
+        LOG_FUNC_ERROR("_DiskRetrievePartitionsFromGptDisk", status);
         return status;
     }
     pDiskInformation->NumberOfPartitions = partitionCount;
@@ -330,6 +328,166 @@ _DiskRetrievePartitionsFromDisk(
     return status;
 }
 
+static
+STATUS
+_DiskRetrievePartitionsFromGptDisk(
+    INOUT   PDEVICE_OBJECT              DiskDevice,
+    INOUT   DWORD*                      PartitionCount,
+    OUT_OPT PDISK_LAYOUT_INFORMATION    DiskLayoutInformation
+    )
+{
+    STATUS status;
+    PBYTE pSector;
+    MASTER_BOOT_RECORD *pMbr;
+    EFI_PARTITION_TABLE_HEADER *pGptHeader;
+    WORD sectorsRead;
+    PDISK_OBJECT pDiskObject;
+    DWORD partitionCount;
+    EFI_LBA partitionEntryLba;
+    EFI_LBA sizeOfPartitionEntry;
+    QWORD sectorIndex;
+    EFI_PARTITION_ENTRY *pPartition;
+
+    LOG_FUNC_START;
+
+    ASSERT(NULL != DiskDevice);
+
+    ASSERT(NULL != PartitionCount);
+
+    status = STATUS_SUCCESS;
+    pDiskObject = IoGetDeviceExtension(DiskDevice);
+    ASSERT(NULL != pDiskObject);
+
+    __try
+    {
+        // For tha layout of a GPT disk see UEFI specification Chapter 5.
+        // Read the MBR and make sure we have a protective MBR, else we fail
+        pSector = ExAllocatePoolWithTag(PoolAllocateZeroMemory, sizeof(MASTER_BOOT_RECORD), HEAP_TEMP_TAG, 0);
+        if (NULL == pSector)
+        {
+            LOG_FUNC_ERROR_ALLOC("HeapAllocatePoolWithTag", sizeof(MASTER_BOOT_RECORD));
+            status = STATUS_HEAP_INSUFFICIENT_RESOURCES;
+            __leave;
+        }
+
+        status = _DiskRead(DiskDevice, 0, 1, pSector, &sectorsRead, FALSE);
+        if (!SUCCEEDED(status))
+        {
+            LOG_FUNC_ERROR("DiskRead", status);
+            __leave;
+        }
+        ASSERT_INFO(1 == sectorsRead, "Number of sectors read: %d\n", sectorsRead);
+
+        // Check for the MBR signature
+
+        pMbr = (MASTER_BOOT_RECORD *) pSector;
+        if (pMbr->Signature != MBR_SIGNATURE)
+        {
+            LOG_WARNING("There is no MBR signature to be found\n");
+            status = STATUS_DISK_MBR_NOT_PRESENT;
+            __leave;
+        }
+
+        // Check for the special protective partition
+        if (pMbr->Partition[0].BootIndicator ||
+            pMbr->Partition[0].OSIndicator != PARTITION_TYPE_MICROSOFT_PROTECTIVE_MBR ||
+            pMbr->Partition[0].StartingLBA[0] != 1)
+        {
+            LOG_WARNING("There is no protective MBR partition\n");
+            status = STATUS_DISK_PROTECTIVE_MBR_NOT_PRESENT;
+            __leave;
+        } 
+
+        // We can read now the GPT Header
+        status = _DiskRead(DiskDevice, 1, 1, pSector, &sectorsRead, FALSE);
+        if (!SUCCEEDED(status))
+        {
+            LOG_FUNC_ERROR("DiskRead", status);
+            __leave;
+        }
+        ASSERT_INFO(1 == sectorsRead, "Number of sectors read: %d\n", sectorsRead);
+
+        // Validate the GPT header
+        pGptHeader = (EFI_PARTITION_TABLE_HEADER *) pSector;
+        if (pGptHeader->Header.Signature != EFI_PTAB_HEADER_ID ||
+            pGptHeader->Header.Revision != EFI_GPT_REVISION || 
+            pGptHeader->Header.HeaderSize > SECTOR_SIZE)
+        {
+            LOG_WARNING("Invalid GPT header\n");
+            status = STATUS_DISK_INVALID_GPT_HEADER;
+            __leave;
+        }
+
+        // Set partition count and return if the pointer is NULL
+        *PartitionCount = pGptHeader->NumberOfPartitionEntries;
+        if (NULL == DiskLayoutInformation)
+        {
+            status = STATUS_SUCCESS;
+            __leave;
+        }
+
+        // Read the partition table and fill the layout information
+        partitionCount = pGptHeader->NumberOfPartitionEntries;
+        partitionEntryLba = pGptHeader->PartitionEntryLBA;
+        sizeOfPartitionEntry = pGptHeader->SizeOfPartitionEntry;
+        for (DWORD i = 0; i < partitionCount; i++)
+        {
+            sectorIndex = partitionEntryLba + i * (sizeOfPartitionEntry / SECTOR_SIZE);
+            // Read the partition entry. A partition entry fits in a sector.
+            status = _DiskRead(DiskDevice, sectorIndex, 1, pSector, &sectorsRead, FALSE);
+            if (!SUCCEEDED(status))
+            {
+                LOG_FUNC_ERROR("DiskRead", status);
+                __leave;
+            }
+            ASSERT_INFO(1 == sectorsRead, "Number of sectors read: %d\n", sectorsRead);
+
+            // Extract the partition information
+            pPartition = (EFI_PARTITION_ENTRY *) pSector;
+
+            EFI_GUID efiSystemPartitionGuid = EFI_PART_TYPE_EFI_SYSTEM_PART_GUID;
+            if (!memcmp(&(pPartition->PartitionTypeGUID), &efiSystemPartitionGuid, sizeof(EFI_GUID)))
+            {
+                LOG("EFI\n");
+                DiskLayoutInformation->Partitions[i].Bootable = TRUE;
+                DiskLayoutInformation->Partitions[i].PartitionType = PARTITION_TYPE_FAT_LBA;
+            }
+
+            EFI_GUID microsoftBasicDataGuid = EFI_PART_TYPE_MICROSOFT_BASIC_DATA_GUID;
+            if (!memcmp(&(pPartition->PartitionTypeGUID), &microsoftBasicDataGuid, sizeof(EFI_GUID)))
+            {
+                LOG("BSD\n");
+                DiskLayoutInformation->Partitions[i].Bootable = FALSE;
+                DiskLayoutInformation->Partitions[i].PartitionType = PARTITION_TYPE_FAT_LBA;
+            }
+
+            EFI_GUID linuxSwapGuid = EFI_PART_TYPE_LINUX_SWAP_GUID;
+            if (!memcmp(&(pPartition->PartitionTypeGUID), &linuxSwapGuid, sizeof(EFI_GUID)))
+            {
+                LOG("SWAP\n");
+                DiskLayoutInformation->Partitions[i].Bootable = FALSE;
+                DiskLayoutInformation->Partitions[i].PartitionType = PARTITION_TYPE_LINUX_SWAP;
+            }
+
+            DiskLayoutInformation->Partitions[i].OffsetInDisk = pPartition->StartingLBA;
+            DiskLayoutInformation->Partitions[i].PartitionSize = pPartition->EndingLBA - pPartition->StartingLBA + 1;
+        }
+
+        DiskLayoutInformation->NumberOfPartitions = partitionCount;
+    }
+    __finally
+    {
+        if (!pSector)
+        {
+            ExFreePoolWithTag(pSector, HEAP_TEMP_TAG);
+            pSector = NULL;
+        }
+    }
+
+    return status;
+}
+
+// DS: Leave it here just in case
 static
 STATUS
 _DiskRetrievePartitionsFromDiskStartingAtOffset(

@@ -19,8 +19,8 @@ Download and install:
 
 ## Build
 
-Visual Studio: 
-To build the project, open **"Developer Powershell for Visual Studio 2022"** (can be found in the start menu, under the "Visual Studio 2022" folder) and run `Build.ps1`.
+<!-- Visual Studio: 
+To build the project, open **"Developer Powershell for Visual Studio 2022"** (can be found in the start menu, under the "Visual Studio 2022" folder) and run `Build.ps1`. -->
 
 GCC:
 Run `HAL9000.py --build_all` to compile everything, prepare the debug information for GDB and generate the QEMU image.
@@ -29,17 +29,17 @@ Run `HAL9000.py --build` to build just HAL.
 
 ## Run
 
-Visual Studio:
-Run using `Run.ps1`.
+<!-- Visual Studio:
+Run using `Run.ps1`. -->
 
 GCC:
-Run with `HAL9000.py --run`, use the `-d` if you want QEMU to wait for the debugger.
+Run with `HAL9000.py --run`, use the `-d` flag if you want QEMU to wait for the debugger.
 
 ## Clean
 
-To clean the build directory of all projects run the `HAL9000.py --clean_all`.
+To clean the build directory of all projects run `HAL9000.py --clean_all`.
 
-To clean the build directory of HAL run the `HAL9000.py --clean`.
+To clean the build directory of HAL run `HAL9000.py --clean`.
 
 To start with a clean slate run `HAL9000.py --deep_clean` (this will delete the build directories), then you need to configure again.
 

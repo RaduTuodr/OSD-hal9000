@@ -149,6 +149,8 @@ C_HEADER_START
 // disk related errors
 #define CL_STATUS_DISK_MBR_NOT_PRESENT                     (ERROR_MASK | CUSTOMER_BIT | DISK_MASK | 0x0001UL)
 #define CL_STATUS_DISK_FULL                                (ERROR_MASK | CUSTOMER_BIT | DISK_MASK | 0x0002UL)
+#define CL_STATUS_DISK_PROTECTIVE_MBR_NOT_PRESENT          (ERROR_MASK | CUSTOMER_BIT | DISK_MASK | 0x0003UL)
+#define CL_STATUS_DISK_INVALID_GPT_HEADER                  (ERROR_MASK | CUSTOMER_BIT | DISK_MASK | 0x0004UL)
 
 // APIC errors
 #define CL_STATUS_APIC_NOT_MAPPED                          (ERROR_MASK | CUSTOMER_BIT | APIC_MASK | 0x0001UL)
@@ -320,6 +322,8 @@ typedef _Return_type_success_(SUCCEEDED(return)) DWORD  STATUS;
 // disk related errors
 #define STATUS_DISK_MBR_NOT_PRESENT                     CL_STATUS_DISK_MBR_NOT_PRESENT
 #define STATUS_DISK_FULL                                CL_STATUS_DISK_FULL
+#define STATUS_DISK_PROTECTIVE_MBR_NOT_PRESENT          CL_STATUS_DISK_PROTECTIVE_MBR_NOT_PRESENT
+#define STATUS_DISK_INVALID_GPT_HEADER                  CL_STATUS_DISK_INVALID_GPT_HEADER
 
 // APIC errors
 #define STATUS_APIC_NOT_MAPPED                          CL_STATUS_APIC_NOT_MAPPED

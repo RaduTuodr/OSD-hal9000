@@ -41,7 +41,8 @@ DWORD Fat::computeFatSizeInSectors()
 {
     DWORD tmpVal1 = static_cast<DWORD>(partition.LBACount) - reservedSectorCount;
     DWORD tmpVal2 = ((256 * sectorsPerCluster) + numberOfFats) / 2;
-    return (tmpVal1 + (tmpVal2 - 1)) / tmpVal2;
+    float sz = (tmpVal1 + (tmpVal2 - 1)) / ((float) tmpVal2);
+    return std::ceil(sz);
 }
 
 std::unique_ptr<FAT_BPB> Fat::getFatBiosParameterBlock()
@@ -163,6 +164,10 @@ void Fat::createFilesystem()
 
     // Create the root directory
     createRootDirectory();
+
+    // Set fs info sectors
+    firstFsInfoSec = 1;
+    secondFsInfoSec = 7;
 
     os.close();
 }
@@ -387,6 +392,10 @@ void Fat::openFilesystem()
     BYTE *ptr = static_cast<BYTE *>(openMemoryMappedFile(&file, destination.c_str()));
 
     partitionStart = ptr + partition.StartingLBA * SECTOR_SIZE;
+
+    firstFsInfo = partitionStart + firstFsInfoSec * SECTOR_SIZE;
+    secondFsInfo = partitionStart + secondFsInfoSec * SECTOR_SIZE;
+
     fat0 = reinterpret_cast<DWORD *>(partitionStart + reservedSectorCount * SECTOR_SIZE);
     fat1 = reinterpret_cast<DWORD *>(partitionStart + reservedSectorCount * SECTOR_SIZE + fatSize * SECTOR_SIZE);
     
@@ -405,6 +414,19 @@ void Fat::openFilesystem()
 
 void Fat::closeFilesystem()
 {
+    // We write the fs info information because we now know eveything
+    // because we created every file and directory
+
+    FSINFO *fsInfo = reinterpret_cast<FSINFO*>(firstFsInfo);
+    // Update first fs info
+    fsInfo->FSI_Free_Count = freeClusterCount;
+    fsInfo->FSI_Nxt_Free = nextFreeCluster;
+    // Update second fs info
+    fsInfo = reinterpret_cast<FSINFO*>(secondFsInfo);
+    fsInfo->FSI_Free_Count = freeClusterCount;
+    fsInfo->FSI_Nxt_Free = nextFreeCluster;
+    
+    // Now we can close the file
     closeMemoryMappedFile(&file);
 }
 
