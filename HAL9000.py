@@ -31,6 +31,12 @@ def prLightGray(str): print("\033[97m {}\033[00m" .format(str))
 
 def prBlack(str): print("\033[98m {}\033[00m" .format(str))
 
+def get_build_env():
+    env = os.environ.copy()
+    if str(platform.system()).lower() == 'windows':
+        env['PATH'] = f'{os.path.abspath('tools/mingw_gcc/bin')}{os.pathsep}{env['PATH']}'
+    return env
+
 def deep_clean():
     prCyan('Deep cleaning ImageCreator...')
     shutil.rmtree('ImageCreator/build', ignore_errors=True)
@@ -119,6 +125,7 @@ def configure():
     p = subprocess.run(f'cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release \
                         -DCMAKE_INSTALL_PREFIX:PATH="../tools/ImageCreator"',
                         cwd='ImageCreator',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error configuring ImageCreator!')
@@ -151,6 +158,7 @@ def clean_all(job_count):
     prCyan('Cleaning ImageCreator...')
     p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
                         cwd='ImageCreator',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error cleaning ImageCreator!')
@@ -189,6 +197,7 @@ def build_all(job_count):
     prCyan('Building ImageCreator...')
     p = subprocess.run(f'cmake --build build -j{job_count}',
                         cwd='ImageCreator',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error building ImageCreator!')
@@ -216,6 +225,7 @@ def build_all(job_count):
     prCyan('Installing ImageCreator...')
     p = subprocess.run(f'cmake --install build',
                         cwd='ImageCreator',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error installing ImageCreator!')

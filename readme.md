@@ -9,6 +9,7 @@ Download and install:
 - ninja.
 - nasm (yasm cannot produce ELF from what I observed).
 - python3 and some required packages if the script fails to run.
+- a native compiler, if you are on Linux or macOS
 
 ## Bootstrap
 
