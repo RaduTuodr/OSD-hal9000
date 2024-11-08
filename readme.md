@@ -8,7 +8,7 @@ Download and install:
 - CMake 3.30.2.
 - ninja.
 - nasm (yasm cannot produce ELF from what I observed).
-- python3 and some required packages if the script fails to run.
+- python3 (3.10 on Windows and macOS 3.12 also works, blame lldb) and some required packages if the script fails to run.
 - llvm toolchain, in tools/llvm; more specifically you need clang, ld.lld, lld-link, lldb, llvm-objcopy, llvm-strip; llvm-readelf is strongly recommended; the simplest
 way to get clang is to download the release binaries from github and just copy-paste the contents in tools/llvm
 
