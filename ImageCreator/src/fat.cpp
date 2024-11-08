@@ -136,6 +136,13 @@ void Fat::createRootDirectory()
     writeToFatEntry(1, 0, 0x0FFFFFF8);
     writeToFatEntry(1, 1, FAT32_EOC_MARK);
     writeToFatEntry(1, 2, FAT32_EOC_MARK);
+
+    DWORD sector = getFirstSectorOfCluster(2);
+    DIR_ENTRY reservedEntries[2];
+    std::memset(reservedEntries, 0, 2 * sizeof(DIR_ENTRY));
+    reservedEntries[0].DIR_Name[0] = FREE_ENTRY;
+    reservedEntries[1].DIR_Name[0] = FREE_ENTRY;
+    writeToSector(sector, reinterpret_cast<BYTE*>(reservedEntries), 2 * sizeof(DIR_ENTRY));
 }
 
 void Fat::createFilesystem()
@@ -410,7 +417,7 @@ void Fat::openFilesystem()
 
     rootDirectory.rawDirectory.self = NULL;
     rootDirectory.rawDirectory.cluster = 2;
-    rootDirectory.rawDirectory.entryIndex = 0;
+    rootDirectory.rawDirectory.entryIndex = 2;
 }
 
 void Fat::closeFilesystem()
