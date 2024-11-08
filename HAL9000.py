@@ -274,7 +274,7 @@ def build_all(job_count):
     prGreen('Done.')
 
     prCyan('Generating QEMU image...')
-    p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{'.exe' if str(platform.system()).lower() == 'windows' else ''}" "config/HAL9000.json"',
+    p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{".exe" if str(platform.system()).lower() == "windows" else ""}" "config/HAL9000.json"',
                         env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
@@ -317,7 +317,7 @@ def build(job_count):
     prGreen('Done.')
 
     prCyan('Generating QEMU image...')
-    p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{'.exe' if str(platform.system()).lower() == 'windows' else ''}" "config/HAL9000.json"',
+    p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{".exe" if str(platform.system()).lower() == "windows" else ""}" "config/HAL9000.json"',
                        env=get_build_env(),
                        shell=True)
     if p.returncode != 0:
@@ -345,7 +345,7 @@ def parse_qemu_options(debug):
 def run(debug):
     prCyan('Starting QEMU...')
     qemu_options = parse_qemu_options(debug)
-    subprocess.run(f'qemu-system-x86_64{'.exe' if str(platform.system()).lower() == 'windows' else ''} \
+    subprocess.run(f'qemu-system-x86_64{".exe" if str(platform.system()).lower() == "windows" else ""} \
                     {qemu_options}',
                     shell=True)
 
