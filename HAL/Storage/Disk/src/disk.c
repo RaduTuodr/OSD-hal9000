@@ -448,7 +448,6 @@ _DiskRetrievePartitionsFromGptDisk(
             EFI_GUID efiSystemPartitionGuid = EFI_PART_TYPE_EFI_SYSTEM_PART_GUID;
             if (!memcmp(&(pPartition->PartitionTypeGUID), &efiSystemPartitionGuid, sizeof(EFI_GUID)))
             {
-                LOG("EFI\n");
                 DiskLayoutInformation->Partitions[i].Bootable = TRUE;
                 DiskLayoutInformation->Partitions[i].PartitionType = PARTITION_TYPE_FAT_LBA;
             }
@@ -456,7 +455,6 @@ _DiskRetrievePartitionsFromGptDisk(
             EFI_GUID microsoftBasicDataGuid = EFI_PART_TYPE_MICROSOFT_BASIC_DATA_GUID;
             if (!memcmp(&(pPartition->PartitionTypeGUID), &microsoftBasicDataGuid, sizeof(EFI_GUID)))
             {
-                LOG("BSD\n");
                 DiskLayoutInformation->Partitions[i].Bootable = FALSE;
                 DiskLayoutInformation->Partitions[i].PartitionType = PARTITION_TYPE_FAT_LBA;
             }
@@ -464,7 +462,6 @@ _DiskRetrievePartitionsFromGptDisk(
             EFI_GUID linuxSwapGuid = EFI_PART_TYPE_LINUX_SWAP_GUID;
             if (!memcmp(&(pPartition->PartitionTypeGUID), &linuxSwapGuid, sizeof(EFI_GUID)))
             {
-                LOG("SWAP\n");
                 DiskLayoutInformation->Partitions[i].Bootable = FALSE;
                 DiskLayoutInformation->Partitions[i].PartitionType = PARTITION_TYPE_LINUX_SWAP;
             }
@@ -477,7 +474,7 @@ _DiskRetrievePartitionsFromGptDisk(
     }
     __finally
     {
-        if (!pSector)
+        if (pSector)
         {
             ExFreePoolWithTag(pSector, HEAP_TEMP_TAG);
             pSector = NULL;
