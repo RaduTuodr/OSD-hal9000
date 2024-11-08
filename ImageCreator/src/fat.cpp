@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cstring>
 #include <ctime>
+#include <cmath>
 
 struct DSKSZTOSECPERCLUS
 {

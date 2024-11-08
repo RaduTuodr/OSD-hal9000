@@ -137,6 +137,7 @@ def configure():
                         -DCMAKE_TOOLCHAIN_FILE:PATH="../cmake/UefiBootloaderToolchain.cmake" \
                         -DCMAKE_INSTALL_PREFIX:PATH="../artifacts" -DUEFI_BUILD:BOOL="TRUE" -DFORCE_ELF:BOOL="TRUE"',
                         cwd='UefiBootloader',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error configuring UefiBootloader!')
@@ -148,6 +149,7 @@ def configure():
                         -DCMAKE_TOOLCHAIN_FILE:PATH="../cmake/HalToolchain.cmake" \
                         -DCMAKE_INSTALL_PREFIX:PATH="../artifacts" -DFORCE_ELF:BOOL="TRUE"',
                         cwd='HAL',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error configuring HAL9000!')
@@ -168,6 +170,7 @@ def clean_all(job_count):
     prCyan('Cleaning UefiBootloader...')
     p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
                         cwd='UefiBootloader',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error cleaning UefiBootloader!')
@@ -177,6 +180,7 @@ def clean_all(job_count):
     prCyan('Cleaning HAL9000...')
     p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
                         cwd='HAL',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error cleaning HAL9000!')
@@ -187,6 +191,7 @@ def clean(job_count):
     prCyan('Cleaning HAL...')
     p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
                     cwd='HAL',
+                    env=get_build_env(),
                     shell=True)
     if p.returncode != 0:
         prRed('Error cleaning HAL9000!')
@@ -207,6 +212,7 @@ def build_all(job_count):
     prCyan('Building UefiBootloader...')
     p = subprocess.run(f'cmake --build build -j{job_count}',
                         cwd='UefiBootloader',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error building UefiBootloader!')
@@ -216,6 +222,7 @@ def build_all(job_count):
     prCyan('Building HAL9000...')
     p = subprocess.run(f'cmake --build build -j{job_count}',
                         cwd='HAL',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error building HAL9000!')
@@ -235,6 +242,7 @@ def build_all(job_count):
     prCyan('Installing UefiBootloader...')
     p = subprocess.run(f'cmake --install build',
                         cwd='UefiBootloader',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error installing UefiBootloader!')
@@ -244,6 +252,7 @@ def build_all(job_count):
     prCyan('Installing HAL9000...')
     p = subprocess.run(f'cmake --install build',
                     cwd='HAL',
+                    env=get_build_env(),
                     shell=True)
     if p.returncode != 0:
         prRed('Error installing HAL9000!')
@@ -252,18 +261,22 @@ def build_all(job_count):
 
     prCyan('Separating debug information...')
     subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
+                    env=get_build_env(),
                     shell=True)
 
     subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
+                    env=get_build_env(),
                     shell=True)
     
     subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+                    env=get_build_env(),
                     shell=True)
     prGreen('Done.')
 
     prCyan('Generating QEMU image...')
     p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{'.exe' if str(platform.system()).lower() == 'windows' else ''}" "config/HAL9000.json"',
-                       shell=True)
+                        env=get_build_env(),
+                        shell=True)
     if p.returncode != 0:
         prRed('Error generating QEMU image!')
     prGreen('Done.')
@@ -272,6 +285,7 @@ def build(job_count):
     prCyan('Building HAL9000...')
     p = subprocess.run(f'cmake --build build -j{job_count}',
                     cwd='HAL',
+                    env=get_build_env(),
                     shell=True)
     if p.returncode != 0:
         prRed('Error building HAL9000!')
@@ -281,6 +295,7 @@ def build(job_count):
     prCyan('Installing HAL9000...')
     p = subprocess.run(f'cmake --install build',
                         cwd='HAL',
+                        env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
         prRed('Error installing HAL9000!')
@@ -289,17 +304,21 @@ def build(job_count):
 
     prCyan('Separating debug information...')
     subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
+                    env=get_build_env(),
                     shell=True)
 
     subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
+                    env=get_build_env(),
                     shell=True)
     
     subprocess.run(f'"tools/elf_gcc/bin/x86_64-elf-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+                    env=get_build_env(),
                     shell=True)
     prGreen('Done.')
 
     prCyan('Generating QEMU image...')
     p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{'.exe' if str(platform.system()).lower() == 'windows' else ''}" "config/HAL9000.json"',
+                       env=get_build_env(),
                        shell=True)
     if p.returncode != 0:
         prRed('Error generating QEMU image!')
