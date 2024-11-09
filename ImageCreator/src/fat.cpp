@@ -503,10 +503,15 @@ std::pair<DWORD, DWORD> Fat::writeFile(std::string const& sourcePath)
         bytesToWrite -= clusterSize;
         currentCluster = fat0[currentCluster];
     }
-
-    assert(fat0[currentCluster] == FAT32_EOC_MARK);
-    ptr = getPointerToCluster(currentCluster);
-    in.read(reinterpret_cast<char*>(ptr), bytesToWrite);
+ 
+    if (bytesToWrite)
+    {
+        assert(fat0[currentCluster] == FAT32_EOC_MARK);
+        ptr = getPointerToCluster(currentCluster);
+        in.read(reinterpret_cast<char*>(ptr), bytesToWrite);
+    }
+    else
+        assert(currentCluster == FAT32_EOC_MARK);
 
     in.close();
     return std::make_pair(firstCluster, fileSize);
