@@ -91,7 +91,7 @@ SystemInit(
     kernelSize = BootInformation->KernelSize;
 
     LogSystemInit(LogLevelInfo,
-                  LogComponentGeneric | LogComponentInterrupt | LogComponentIo | LogComponentAcpi | LogComponentPci,
+                  LogComponentInterrupt | LogComponentIo | LogComponentAcpi | LogComponentUserMode,
                   TRUE
                   );
 
