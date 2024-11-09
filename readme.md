@@ -9,8 +9,9 @@ Download and install:
 - ninja, it must in your PATH.
 - nasm (yasm cannot produce ELF from what I observed), it must be in your PATH.
 - python3 (3.10 on Windows and macOS 3.12 also works, blame lldb on Windows it searches for python310.dll) and some required packages if the script fails to run.
-- llvm toolchain, in tools/llvm; more specifically you need clang, ld.lld, lld-link, lldb, llvm-objcopy, llvm-strip; llvm-readelf and llvm-addr2line are strongly recommended; the simplest
+- llvm toolchain, in tools/llvm (it might work if you have it in your PATH); more specifically you need clang, ld.lld, lld-link, lldb, llvm-objcopy, llvm-strip; llvm-readelf and llvm-addr2line are strongly recommended; the simplest
 way to get clang is to download the release binaries from github and just copy-paste the contents in tools/llvm
+- CodeLLDB, Visual Studio Code extension for debugging; a launch.json is already provided
 
 ## Bootstrap
 
