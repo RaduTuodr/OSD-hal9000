@@ -217,7 +217,8 @@ STATUS
 _MmuInitializeHeap(
     OUT         PMMU_HEAP_DATA          Heap,
     IN          DWORD                   HeapBaseSize,
-    IN          WORD                    HeapPercentageSize
+    IN          WORD                    HeapPercentageSize,
+    IN          BOOLEAN                 HeapMemoryNotLazy
     );
 
 static
@@ -508,7 +509,8 @@ MmuInitSystem(
     // The heap from which all the kernel allocations come from
     status = _MmuInitializeHeap(&m_mmuData.Heaps[MmuHeapIndexNormal],
                                 HEAP_NORMAL_BASE_MEMORY,
-                                HEAP_NORMAL_PERCENTAGE
+                                HEAP_NORMAL_PERCENTAGE,
+                                TRUE
                                 );
     if (!SUCCEEDED(status))
     {
@@ -524,7 +526,8 @@ MmuInitSystem(
     /// the physical frames of memory
     status = _MmuInitializeHeap(&m_mmuData.Heaps[MmuHeapIndexSpecial],
                                 HEAP_SPECIAL_BASE_MEMORY,
-                                HEAP_SPECIAL_PERCENTAGE
+                                HEAP_SPECIAL_PERCENTAGE,
+                                TRUE
                                 );
     if (!SUCCEEDED(status))
     {
@@ -2157,17 +2160,20 @@ STATUS
 _MmuInitializeHeap(
     OUT         PMMU_HEAP_DATA          Heap,
     IN          DWORD                   HeapBaseSize,
-    IN          WORD                    HeapPercentageSize
+    IN          WORD                    HeapPercentageSize,
+    IN          BOOLEAN                 HeapMemoryNotLazy
     )
 {
     STATUS status;
     DWORD framesForHeapStructures;
     QWORD heapSize;
     PVOID heapBaseAddress;
+    VMM_ALLOC_TYPE allocType;
 
     ASSERT( NULL != Heap );
 
     status = STATUS_SUCCESS;
+    allocType = VMM_ALLOC_TYPE_RESERVE | VMM_ALLOC_TYPE_COMMIT;
 
     // calculate number of frames used by the heap
     framesForHeapStructures = _MmuCalculateReservedFrames(HeapBaseSize,
@@ -2180,9 +2186,11 @@ _MmuInitializeHeap(
 
     LOG("Total size reserved for heap: %U bytes ( %U KB )\n", heapSize, heapSize / KB_SIZE);
 
+    allocType |= HeapMemoryNotLazy ? VMM_ALLOC_TYPE_NOT_LAZY : 0;
+
     heapBaseAddress = VmmAllocRegion(NULL,
         heapSize,
-        VMM_ALLOC_TYPE_RESERVE | VMM_ALLOC_TYPE_COMMIT,
+        allocType,
         PAGE_RIGHTS_READWRITE
     );
     if (heapBaseAddress == NULL)
