@@ -2,13 +2,7 @@ import sys
 import os
 import argparse
 import shutil
-import time
-from urllib import request
-import warnings
 import platform
-import tempfile
-from tarfile import TarFile
-import lzma
 import subprocess
 import multiprocessing
 import json
@@ -56,31 +50,9 @@ def deep_clean():
 
     prYellow('Configure must be run now!')
 
-def reporthook(count, block_size, total_size):
-    global start_time
-    if count == 0:
-        start_time = time.time()
-        return
-    duration = time.time() - start_time
-    progress_size = int(count * block_size)
-    if duration:
-        speed = int(progress_size / (1024 * duration))
-    else:
-        speed = 0
-    percent = int(count * block_size * 100 / total_size)
-    sys.stdout.write('\r   \033[97m %d%%, %d MB, %d KB/s, %d seconds passed \033[00m' %
-                    (percent, progress_size / (1024 * 1024), speed, duration))
-    sys.stdout.flush()
-
 def bootstrap():
-    warnings.filterwarnings('ignore')
+    None
 
-    if not os.path.exists('tools/OVMF'):
-        os.makedirs('tools/OVMF', exist_ok=True)
-        prCyan(f'Downloading OVMF.fd...')
-        request.urlretrieve(f'{tools_url}/OVMF/OVMF.fd', f'tools/OVMF/OVMF.fd', reporthook=reporthook)
-        prGreen('Done.')
-        
 def configure():
     if str(platform.system()).lower() == 'windows':
         generator = '\"Visual Studio 17 2022\"'
@@ -123,6 +95,17 @@ def configure():
         return
     prGreen('Done.')
 
+def clean_hal(job_count):
+    prCyan('Cleaning HAL9000...')
+    p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
+                        cwd='HAL',
+                        env=get_build_env(),
+                        shell=True)
+    if p.returncode != 0:
+        prRed('Error cleaning HAL9000!')
+        return
+    prGreen('Done.')
+
 def clean_all(job_count):
     prCyan('Cleaning ImageCreator...')
     p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
@@ -144,25 +127,51 @@ def clean_all(job_count):
         return
     prGreen('Done.')
 
-    prCyan('Cleaning HAL9000...')
-    p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
+    clean_hal(job_count)
+
+def build_hal(job_count):
+    prCyan('Building HAL9000...')
+    p = subprocess.run(f'cmake --build build -j{job_count}',
                         cwd='HAL',
                         env=get_build_env(),
                         shell=True)
     if p.returncode != 0:
-        prRed('Error cleaning HAL9000!')
+        prRed('Error building HAL9000!')
         return
     prGreen('Done.')
 
-def clean(job_count):
-    prCyan('Cleaning HAL...')
-    p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
+def install_hal():
+    prCyan('Installing HAL9000...')
+    p = subprocess.run(f'cmake --install build',
                     cwd='HAL',
                     env=get_build_env(),
                     shell=True)
     if p.returncode != 0:
-        prRed('Error cleaning HAL9000!')
+        prRed('Error installing HAL9000!')
         return
+    prGreen('Done.')
+
+def generate_qemu_image():
+    prCyan('Separating debug information...')
+    subprocess.run(f'"llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
+                    env=get_build_env(),
+                    shell=True)
+
+    subprocess.run(f'"llvm-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
+                    env=get_build_env(),
+                    shell=True)
+    
+    subprocess.run(f'"llvm-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+                    env=get_build_env(),
+                    shell=True)
+    prGreen('Done.')
+
+    prCyan('Generating QEMU image...')
+    p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{".exe" if str(platform.system()).lower() == "windows" else ""}" "config/HAL9000.json"',
+                        env=get_build_env(),
+                        shell=True)
+    if p.returncode != 0:
+        prRed('Error generating QEMU image!')
     prGreen('Done.')
 
 def build_all(job_count):
@@ -191,15 +200,7 @@ def build_all(job_count):
         return
     prGreen('Done.')
 
-    prCyan('Building HAL9000...')
-    p = subprocess.run(f'cmake --build build -j{job_count}',
-                        cwd='HAL',
-                        env=get_build_env(),
-                        shell=True)
-    if p.returncode != 0:
-        prRed('Error building HAL9000!')
-        return
-    prGreen('Done.')
+    build_hal(job_count)
     
     prCyan('Installing ImageCreator...')
     p = subprocess.run(f'cmake --install build {build_type}',
@@ -221,80 +222,16 @@ def build_all(job_count):
         return
     prGreen('Done.')
 
-    prCyan('Installing HAL9000...')
-    p = subprocess.run(f'cmake --install build',
-                    cwd='HAL',
-                    env=get_build_env(),
-                    shell=True)
-    if p.returncode != 0:
-        prRed('Error installing HAL9000!')
-        return
-    prGreen('Done.')
+    install_hal()
 
-    prCyan('Separating debug information...')
-    subprocess.run(f'"llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
-                    env=get_build_env(),
-                    shell=True)
-
-    subprocess.run(f'"llvm-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
-                    env=get_build_env(),
-                    shell=True)
-    
-    subprocess.run(f'"llvm-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
-                    env=get_build_env(),
-                    shell=True)
-    prGreen('Done.')
-
-    prCyan('Generating QEMU image...')
-    p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{".exe" if str(platform.system()).lower() == "windows" else ""}" "config/HAL9000.json"',
-                        env=get_build_env(),
-                        shell=True)
-    if p.returncode != 0:
-        prRed('Error generating QEMU image!')
-    prGreen('Done.')
+    generate_qemu_image()
 
 def build(job_count):
-    prCyan('Building HAL9000...')
-    p = subprocess.run(f'cmake --build build -j{job_count}',
-                    cwd='HAL',
-                    env=get_build_env(),
-                    shell=True)
-    if p.returncode != 0:
-        prRed('Error building HAL9000!')
-        return
-    prGreen('Done.') 
+    build_hal(job_count)
 
-    prCyan('Installing HAL9000...')
-    p = subprocess.run(f'cmake --install build',
-                        cwd='HAL',
-                        env=get_build_env(),
-                        shell=True)
-    if p.returncode != 0:
-        prRed('Error installing HAL9000!')
-        return
-    prGreen('Done.')
+    install_hal() 
 
-    prCyan('Separating debug information...')
-    subprocess.run(f'"llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
-                    env=get_build_env(),
-                    shell=True)
-
-    subprocess.run(f'"llvm-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
-                    env=get_build_env(),
-                    shell=True)
-    
-    subprocess.run(f'"llvm-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
-                    env=get_build_env(),
-                    shell=True)
-    prGreen('Done.')
-
-    prCyan('Generating QEMU image...')
-    p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{".exe" if str(platform.system()).lower() == "windows" else ""}" "config/HAL9000.json"',
-                       env=get_build_env(),
-                       shell=True)
-    if p.returncode != 0:
-        prRed('Error generating QEMU image!')
-    prGreen('Done.')
+    generate_qemu_image()
 
 def parse_qemu_options(debug):
     f = open('config/QEMU.json', 'r')
@@ -392,7 +329,7 @@ def main():
         return
 
     if args['clean']:
-        clean(args['j'])
+        clean_hal(args['j'])
         return
     
     if args['build_all']:
