@@ -2,6 +2,8 @@ set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 
+include(${CMAKE_CURRENT_LIST_DIR}/LLVMHints.cmake)
+
 # Set C compile commands
 
 set(CMAKE_C_COMPILER_WORKS 1)
@@ -23,19 +25,19 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT FORCE_ELF)
 else()
       find_program(CMAKE_C_COMPILER
             NAMES "clang"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/llvm/bin
+            HINTS ${LLVM_HINTS}
             REQUIRED
       )
 
       find_program(CMAKE_LINKER
             NAMES "ld.lld"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/llvm/bin
+            HINTS ${LLVM_HINTS}
             REQUIRED
       )
 
       find_program(CMAKE_AR
             NAMES "llvm-ar"
-            HINTS ${CMAKE_CURRENT_LIST_DIR}/../tools/llvm/bin
+            HINTS ${LLVM_HINTS}
             REQUIRED
       )
 
