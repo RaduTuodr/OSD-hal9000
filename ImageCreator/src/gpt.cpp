@@ -1,16 +1,33 @@
 #include <gpt.hpp>
 
 #include <cstring>
+#include <iostream>
+#include <memory>
+#include <cstring>
+#include <cstdlib>
 
 #include <crc32.hpp>
-#include <guid.hpp>
 
 GptDisk::GptDisk(std::string const& outputPath) : os(outputPath, std::ios::out | std::ios::in | std::ios::binary) {}
 
-EFI_GUID GptDisk::generateUuid()
+EFI_GUID GptDisk::convertGuidFromString(std::string const& guid)
 {
-    xg::Guid guid = xg::newGuid();
-    std::array<UINT8, 16> byteArray = guid.bytes();
+    std::array<UINT8, 16> byteArray;
+    int byteNdx = 0;
+    char byteString[2] = { guid[0] };
+
+    for (int i = 0; i < guid.length(); i+=2)
+    {
+        if (guid[i] == '-')
+        {
+            i--;
+            continue;
+        }
+        
+        byteString[0] = guid[i];
+        byteString[1] = guid[i + 1];
+        byteArray[byteNdx++] = std::stoul(byteString, nullptr, 16); 
+    }
 
     EFI_GUID uuid;
     uuid.Data1 = (byteArray[0] << 24) | (byteArray[1] << 16) | (byteArray[2] << 8) | byteArray[3];
@@ -28,7 +45,7 @@ EFI_GUID GptDisk::generateUuid()
     return uuid;
 }
 
-void GptDisk::configureDisk(std::vector<ConfigurationParitition> const& config)
+void GptDisk::configureDisk(std::string const& diskId, std::vector<ConfigurationParitition> const& config)
 {
     // Our GPT Disk Layout
     // LBA 0: Protective MBR
@@ -46,7 +63,7 @@ void GptDisk::configureDisk(std::vector<ConfigurationParitition> const& config)
     // LBA Secondary GPT Header
 
     // Generate GPT Disk ID
-    diskId = generateUuid();
+    auto diskGuid = convertGuidFromString(diskId);
 
     // Set the sizes
     gptHeaderSize = SECTOR_SIZE;
@@ -63,7 +80,7 @@ void GptDisk::configureDisk(std::vector<ConfigurationParitition> const& config)
     for (auto const& part : config)
     {
         gptPartition.Type = part.Type;
-        gptPartition.PartitionId = generateUuid();
+        gptPartition.PartitionId = convertGuidFromString(part.PartitionId);
         gptPartition.LBACount = part.LBACount;
         gptPartition.StartingLBA = currentLba;
         currentLba += gptPartition.LBACount - 1;

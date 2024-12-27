@@ -264,7 +264,7 @@ static DWORD CrcLookupTable[256] =
     0x2D02EF8D
 };
 
-DWORD computeCrc32(BYTE *Data, DWORD Length)
+DWORD computeCrc32(BYTE* Data, DWORD Length)
 {
     DWORD        Crc;
     QWORD        Index;

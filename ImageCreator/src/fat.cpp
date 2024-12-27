@@ -36,7 +36,7 @@ DSKSZTOSECPERCLUS DskTableFAT32[] = {
     {0xFFFFFFFF, 64} /* disks greater than 32GB, 32k cluster */
 };
 
-Fat::Fat(std::string const &outputPath, GptPartition const &partition) : destination(outputPath), os(outputPath, std::ios::out | std::ios::in | std::ios::binary), partition(partition) {}
+Fat::Fat(std::string const &outputPath, GptPartition const& partition) : destination(outputPath), os(outputPath, std::ios::out | std::ios::in | std::ios::binary), partition(partition) {}
 
 DWORD Fat::computeFatSizeInSectors()
 {
@@ -202,7 +202,7 @@ std::pair<FATDATE, FATTIME> Fat::getCurrentDateAndTime()
     return std::make_pair(date, time);
 }
 
-static bool getShortName(std::string const& name, std::string &shortName)
+static bool getShortName(std::string const& name, std::string& shortName)
 {
     size_t length = name.length();
     size_t dotindx = name.find('.');
@@ -259,7 +259,7 @@ static bool getShortName(std::string const& name, std::string &shortName)
     return isLongName;
 }
 
-static BYTE getShortNameChecksum(BYTE const *shortName)
+static BYTE getShortNameChecksum(BYTE const* shortName)
 {
     SHORT nameLen;
     BYTE sum = 0;
@@ -270,7 +270,7 @@ static BYTE getShortNameChecksum(BYTE const *shortName)
     return sum;
 }
 
-std::unique_ptr<BYTE[]> Fat::getDirectoryEntry(std::string const& name, bool directory, DWORD firstCluster, DWORD size, std::optional<std::pair<FATDATE, FATTIME>> const& dateTime, DWORD &bufferSize)
+std::unique_ptr<BYTE[]> Fat::getDirectoryEntry(std::string const& name, bool directory, DWORD firstCluster, DWORD size, std::optional<std::pair<FATDATE, FATTIME>> const& dateTime, DWORD& bufferSize)
 {
     bufferSize = 0;
     if (name.length() > 255)
@@ -517,7 +517,7 @@ std::pair<DWORD, DWORD> Fat::writeFile(std::string const& sourcePath)
     return std::make_pair(firstCluster, fileSize);
 }
 
-bool Fat::writeDirectoryEntries(FatRawDirectory &directory, std::unique_ptr<BYTE[]> &entryBuffer, DWORD entryBufferSize)
+bool Fat::writeDirectoryEntries(FatRawDirectory& directory, std::unique_ptr<BYTE[]>& entryBuffer, DWORD entryBufferSize)
 {
     DWORD newDirectoryEntryCount = entryBufferSize / sizeof(DIR_ENTRY);
     DWORD newDirEntriesIndx = 0;
@@ -543,7 +543,7 @@ bool Fat::writeDirectoryEntries(FatRawDirectory &directory, std::unique_ptr<BYTE
     return true;
 }
 
-bool Fat::createRawFile(FatRawDirectory &directory, std::string const& filename, std::string const& sourcePath)
+bool Fat::createRawFile(FatRawDirectory& directory, std::string const& filename, std::string const& sourcePath)
 {
     auto loadedFile = writeFile(sourcePath); 
     if (loadedFile.first == UINT32_MAX)
@@ -557,7 +557,7 @@ bool Fat::createRawFile(FatRawDirectory &directory, std::string const& filename,
     return writeDirectoryEntries(directory, entryBuffer, entryBufferSize);
 }
 
-std::optional<Fat::FatRawDirectory> Fat::createRawDirectory(FatRawDirectory &parent, std::string const& directoryName)
+std::optional<Fat::FatRawDirectory> Fat::createRawDirectory(FatRawDirectory& parent, std::string const& directoryName)
 {
     // Prepare . and .. for the new directory
     DWORD newCluster = allocateClusters(UINT32_MAX, 1);  

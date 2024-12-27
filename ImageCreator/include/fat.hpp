@@ -54,20 +54,20 @@ class Fat
         std::unique_ptr<FSINFO> getFatFsInfo();
         DWORD getFirstSectorOfCluster(DWORD cluster);
         void writeToFatEntry(DWORD fatTable, DWORD fatEntry, DWORD value);
-        void writeToSector(DWORD sector, BYTE* buffer, DWORD size);
+        void writeToSector(DWORD sector, BYTE *buffer, DWORD size);
         void createRootDirectory();
         std::pair<FATDATE, FATTIME> getCurrentDateAndTime();
-        std::unique_ptr<BYTE[]> getDirectoryEntry(std::string const& name, bool directory, DWORD firstCluster, DWORD size, std::optional<std::pair<FATDATE, FATTIME>> const& dateTime, DWORD &bufferSize);
+        std::unique_ptr<BYTE[]> getDirectoryEntry(std::string const& name, bool directory, DWORD firstCluster, DWORD size, std::optional<std::pair<FATDATE, FATTIME>> const& dateTime, DWORD& bufferSize);
         DWORD allocateClusters(DWORD previousCluster, DWORD clusterCount);
         BYTE *getPointerToCluster(DWORD cluster);
         std::pair<DWORD, DWORD> writeFile(std::string const& sourcePath);
-        bool writeDirectoryEntries(FatRawDirectory &directory, std::unique_ptr<BYTE[]> &entryBuffer, DWORD entryBufferSize);
-        bool createRawFile(FatRawDirectory &directory, std::string const& filename, std::string const& sourcePath);
-        std::optional<FatRawDirectory> createRawDirectory(FatRawDirectory &parent, std::string const& directoryName);
+        bool writeDirectoryEntries(FatRawDirectory &directory, std::unique_ptr<BYTE[]>& entryBuffer, DWORD entryBufferSize);
+        bool createRawFile(FatRawDirectory& directory, std::string const& filename, std::string const& sourcePath);
+        std::optional<FatRawDirectory> createRawDirectory(FatRawDirectory& parent, std::string const& directoryName);
         FatDirectory* findDirectory(std::string const& path);
 
     public:
-        Fat(std::string const &outputPath, GptPartition const &partition);
+        Fat(std::string const &outputPath, GptPartition const& partition);
 
         void createFilesystem();
         void openFilesystem();

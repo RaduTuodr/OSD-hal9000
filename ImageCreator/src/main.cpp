@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     in.close();   
 
     std::string outputImagePath = jsonConfig["output"];
+    std::string diskId = jsonConfig["disk"];
 
     // Create the partition config
     std::vector<ConfigurationParitition> partitionConfig;
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
         partition.LBACount = jsonPartition["size"].get<QWORD>() * 2;
         std::string partName = jsonPartition["name"].get<std::string>();
         partition.PartitionName = utf8::utf8to16(partName);
+        partition.PartitionId = jsonPartition["id"].get<std::string>();
         partitionConfig.push_back(partition);
     }
 
@@ -48,7 +50,7 @@ int main(int argc, char *argv[])
     f.close();
 
     GptDisk gptDisk(outputImagePath);
-    gptDisk.configureDisk(partitionConfig);
+    gptDisk.configureDisk(diskId, partitionConfig);
     gptDisk.createDisk(); 
 
     for (auto const &jsonFilesystem : jsonConfig["filesystems"])

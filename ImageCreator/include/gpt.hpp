@@ -16,6 +16,7 @@ typedef struct
     EFI_GUID Type; 
     QWORD LBACount;
     std::u16string PartitionName;
+    std::string PartitionId;
 } ConfigurationParitition;
 
 typedef struct
@@ -46,7 +47,7 @@ class GptDisk
         DWORD partitionEntrySize;
         bool diskCreated;
 
-        EFI_GUID generateUuid();
+        EFI_GUID convertGuidFromString(std::string const& guid);
         std::unique_ptr<MASTER_BOOT_RECORD> getGptProtectiveMbr();
         std::unique_ptr<EFI_PARTITION_ENTRY> getEfiPartitionEntry(GptPartition const& partition);
         std::unique_ptr<EFI_PARTITION_TABLE_HEADER> getInitialEfiPartitionTableHeader();
@@ -55,7 +56,7 @@ class GptDisk
     public:
         GptDisk(std::string const& outputPath);
 
-        void configureDisk(std::vector<ConfigurationParitition> const& config);
+        void configureDisk(std::string const& diskId, std::vector<ConfigurationParitition> const& config);
         void createDisk();
         std::optional<GptPartition> getPartition(std::u16string const& partitionName);
         std::optional<QWORD> getDiskSize();
