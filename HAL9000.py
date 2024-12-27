@@ -7,7 +7,13 @@ import subprocess
 import multiprocessing
 import json
 
-tools_url = 'https://raw.githubusercontent.com/davidsipos1002/UefiHAL9000Tools/master'
+HOMEBREW_PACKAGES = [
+    'qemu',
+    'cmake',
+    'ninja',
+    'nasm',
+    'llvm',
+]
 
 def prRed(str): print("\033[91m {}\033[00m" .format(str))
 
@@ -50,8 +56,49 @@ def deep_clean():
 
     prYellow('Configure must be run now!')
 
+def run_cmd_with_echo_and_wait(cmd):
+    prYellow(f'Will run: {cmd}. Press any key to continue.')
+    input()
+    p = subprocess.run(cmd, shell=True)
+    return p.returncode == 0
+
+def bootstrap_generic(pkg_manager_cmd, packages):
+    prYellow('The following packages will be installed:')
+    for package in packages:
+        prLightGray(package)
+
+    for package in packages:
+        prCyan(f'Installing {package}...')
+        if not run_cmd_with_echo_and_wait(f'{pkg_manager_cmd} {package}'):
+            prRed('Error installing {package}!')
+            return False
+        prGreen('Done.')
+    
+    return True
+
+def bootstrap_darwin():
+    prCyan('Bootrapping for macOS')
+    
+    prCyan('Checking for Homebrew...')
+    p = subprocess.run('which brew',
+                       shell=True,
+                       stderr=subprocess.DEVNULL,
+                       stdout = subprocess.DEVNULL)
+    if p.returncode != 0:
+        prRed('Homebrew not found. Install Homebrew to continue.')
+        return False
+    prGreen('Done.')
+
+    return bootstrap_generic('brew install', HOMEBREW_PACKAGES)
+
 def bootstrap():
-    None
+    if (platform.system()).lower() == 'darwin':
+        result = bootstrap_darwin()
+
+    if result:
+       prGreen('Successful bootstrap!')
+    else:
+       prRed('Failed bootstrap!')
 
 def configure():
     if str(platform.system()).lower() == 'windows':
