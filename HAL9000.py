@@ -275,15 +275,15 @@ def build(job_count):
     prGreen('Done.')
 
     prCyan('Separating debug information...')
-    subprocess.run(f'"tools/llvm/bin/llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
+    subprocess.run(f'"llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
                     env=get_build_env(),
                     shell=True)
 
-    subprocess.run(f'"tools/llvm/bin/llvm-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
+    subprocess.run(f'"llvm-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
                     env=get_build_env(),
                     shell=True)
     
-    subprocess.run(f'"tools/llvm/bin/llvm-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+    subprocess.run(f'"llvm-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
                     env=get_build_env(),
                     shell=True)
     prGreen('Done.')
