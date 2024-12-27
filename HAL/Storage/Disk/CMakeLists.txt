@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.28.3 FATAL_ERROR)
 
 set(DISK_INCLUDES
     ${CMAKE_SOURCE_DIR}/CompilerAbstraction/inc

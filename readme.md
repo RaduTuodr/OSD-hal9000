@@ -5,7 +5,7 @@ Download and install:
 
 - qemu, it must be in your PATH.
 - Visual Studio 2022 (if you are on Windows), ImageCreator needs to be built for your system (HAL crashes now with MSVC).
-- CMake 3.30.2 or higher.
+- CMake 3.28.3 or higher.
 - ninja, it must in your PATH.
 - nasm (yasm cannot produce ELF from what I observed), it must be in your PATH.
 - python3 (3.10 on Windows and macOS 3.12 also works, blame lldb on Windows it searches for python310.dll) and some required packages if the script fails to run.
