@@ -7,12 +7,39 @@ import subprocess
 import multiprocessing
 import json
 
+if str(platform.system()).lower() == 'linux':
+    import distro
+
 HOMEBREW_PACKAGES = [
     'qemu',
     'cmake',
     'ninja',
     'nasm',
     'llvm',
+]
+
+APT_PACKAGES = [
+    'qemu-system',
+    'cmake',
+    'ninja-build',
+    'nasm',
+    'llvm',
+    'clang',
+    'clang-tools',
+    'lld',
+    'lldb'
+]
+
+DNF_PACKAGES = [
+    'qemu',
+    'cmake',
+    'ninja-build',
+    'nasm',
+    'llvm',
+    'clang',
+    'clang-tools-extra',
+    'lld',
+    'lldb'
 ]
 
 def prRed(str): print("\033[91m {}\033[00m" .format(str))
@@ -91,9 +118,26 @@ def bootstrap_darwin():
 
     return bootstrap_generic('brew install', HOMEBREW_PACKAGES)
 
+def bootstrap_linux():
+    distro_id = distro.id().lower()
+    if distro_id == 'ubuntu':
+        pkg_manager_cmd = 'sudo apt-get install -y'
+        packages = APT_PACKAGES
+    elif distro_id == 'fedora':
+        pkg_manager_cmd = 'sudo dnf install -y'
+        packages = DNF_PACKAGES
+    else:
+        prRed(f'HAL was not tested on {distro_id}!. \
+               You need to install the packages manually.')
+        return False
+
+    return bootstrap_generic(pkg_manager_cmd, packages)
+
 def bootstrap():
-    if (platform.system()).lower() == 'darwin':
+    if str(platform.system()).lower() == 'darwin':
         result = bootstrap_darwin()
+    elif str(platform.system()).lower() == 'linux':
+        result = bootstrap_linux()
 
     if result:
        prGreen('Successful bootstrap!')
