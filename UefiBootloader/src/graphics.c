@@ -1,4 +1,4 @@
-#include <bootloader/graphics.h>
+#include <Bootloader/graphics.h>
 
 EFI_GRAPHICS_OUTPUT_PROTOCOL*
 GetGraphicsProtocol(

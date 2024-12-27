@@ -75,45 +75,6 @@ def reporthook(count, block_size, total_size):
 def bootstrap():
     warnings.filterwarnings('ignore')
 
-    # arch = str(platform.machine()).lower()
-    # os_name = str(platform.system()).lower()
-
-    # if arch == 'x64' or arch == 'x86_64':
-    #     arch = 'amd64'
-    # elif arch == 'aarch64':
-    #     arch = 'arm64'
-
-    # if os_name == 'windows':
-    #     arch='amd64'
-    
-    # mingw_archive = f'{arch}-{os_name}-mingw-gcc.tar.xz'
-    # elf_archive = f'{arch}-{os_name}-elf-gcc.tar.xz'
-
-    # with tempfile.TemporaryDirectory() as temp_dir:
-        # if not os.path.exists('tools/mingw_gcc'):
-        #     prCyan(f'Downloading {mingw_archive}...')
-        #     request.urlretrieve(f'{tools_url}/archives/{mingw_archive}', f'{temp_dir}/{mingw_archive}', reporthook=reporthook)
-        #     prGreen('Done.')
-
-        #     prCyan(f'Decompressing {mingw_archive}...')
-        #     xz_file = lzma.LZMAFile(f'{temp_dir}/{mingw_archive}')
-        #     tar_file = TarFile.open(mode='r', fileobj=xz_file)
-        #     tar_file.extractall(f'tools/mingw_gcc')
-        #     xz_file.close()
-        #     prGreen('Done.')
-
-        # if not os.path.exists('tools/elf_gcc'):
-        #     prCyan(f'Downloading {elf_archive}...')
-            # request.urlretrieve(f'{tools_url}/archives/{elf_archive}', f'{temp_dir}/{elf_archive}', reporthook=reporthook)
-            # prGreen('Done.')
-
-            # prCyan(f'Decompressing {elf_archive}...')
-            # xz_file = lzma.LZMAFile(f'{temp_dir}/{elf_archive}')
-            # tar_file = TarFile.open(mode='r', fileobj=xz_file)
-            # tar_file.extractall(f'tools/elf_gcc')
-            # xz_file.close()
-            # prGreen('Done.')
-
     if not os.path.exists('tools/OVMF'):
         os.makedirs('tools/OVMF', exist_ok=True)
         prCyan(f'Downloading OVMF.fd...')
@@ -128,7 +89,8 @@ def configure():
     
     prCyan('Configuring ImageCreator...')
     p = subprocess.run(f'cmake -S . -B build -G {generator} \
-                        -DCMAKE_INSTALL_PREFIX:PATH="../tools/ImageCreator"',
+                        -DCMAKE_INSTALL_PREFIX:PATH="../tools/ImageCreator" \
+                        -DCMAKE_TOOLCHAIN_FILE:PATH="../cmake/ImageCreatorToolchain.cmake"',
                         cwd='ImageCreator',
                         env=get_build_env(),
                         shell=True)

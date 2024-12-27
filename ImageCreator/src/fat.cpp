@@ -1,5 +1,6 @@
 #include <fat.hpp>
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <cassert>

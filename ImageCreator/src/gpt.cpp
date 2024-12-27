@@ -1,5 +1,7 @@
 #include <gpt.hpp>
 
+#include <algorithm>
+#include <array>
 #include <cstring>
 #include <iostream>
 #include <memory>
