@@ -11,15 +11,20 @@ def main():
     data_filesys['directories'] = ['/Applications']
     data_filesys['files'] = []
     app_dir = 'artifacts/apps'
+    apps = []
     for dirname in os.listdir(app_dir):
         curr_appdir = os.path.join(app_dir, dirname)
         if os.path.isdir(curr_appdir):
-            curr_appexe = f'{dirname}.exe'
-            curr_appexe_path = os.path.join(curr_appdir, curr_appexe)
-            data_filesys['files'].append({
-                'source': curr_appexe_path,
-                'destination': f'/Applications/{curr_appexe}'
-            })
+            apps.append(dirname)
+    apps.sort() 
+    for app in apps:
+        curr_appdir = os.path.join(app_dir, app)
+        curr_appexe = f'{app}.exe'
+        curr_appexe_path = os.path.join(curr_appdir, curr_appexe)
+        data_filesys['files'].append({
+            'source': curr_appexe_path,
+            'destination': f'/Applications/{curr_appexe}'
+        })
     base_json['filesystems'].append(data_filesys)
     f = open('config/HAL9000.json', 'w')
     f.truncate()

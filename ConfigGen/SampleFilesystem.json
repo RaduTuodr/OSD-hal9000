@@ -1,20 +1,24 @@
 {
     "output": "artifacts/bin/HAL9000.img",
+    "disk": "0439d2b9-9dfd-49dd-b0b9-c8cc0db50e46",
     "partitions": [
         {
             "type": "EFI",
             "size": 65472,
-            "name": "BOOT"
+            "name": "BOOT",
+            "id": "35cf0283-b418-4ee3-86ea-e7a1d23d728e"
         },
         {
             "type": "BDP",
             "size": 131072,
-            "name": "DATA"
+            "name": "DATA",
+            "id": "5bd299d7-fd05-4cbb-8de4-e7ce4505b32e"
         },
         {
             "type": "LINUX_SWAP",
             "size": 131072,
-            "name": "SWAP"
+            "name": "SWAP",
+            "id": "9a0f888b-11ce-401f-a304-3f47b00a8e65"
         }
     ],
     "filesystems": [

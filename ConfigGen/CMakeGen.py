@@ -1,6 +1,8 @@
 import os
 import sys
 
+# NOTE: DOES NOT WORK WITH CURRENT DIRECTORY LAYOUT!!!
+
 def main():
     i = 0
     app_dir = os.path.abspath('HAL/User-mode/Applications')
