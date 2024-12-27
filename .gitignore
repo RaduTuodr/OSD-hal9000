@@ -11,3 +11,4 @@ bootdrive/*
 *.log
 !.vscode/launch.json
 temp/*
+!tools/OVMF/OVMF.fd
