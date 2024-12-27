@@ -48,6 +48,7 @@ class Fat
         BYTE *dataStart;
         MemoryMappedFile file;
         FatDirectory rootDirectory;
+        std::unordered_map<std::string, int> nameMap;
 
         DWORD computeFatSizeInSectors();
         std::unique_ptr<FAT_BPB> getFatBiosParameterBlock();
@@ -57,6 +58,7 @@ class Fat
         void writeToSector(DWORD sector, BYTE *buffer, DWORD size);
         void createRootDirectory();
         std::pair<FATDATE, FATTIME> getCurrentDateAndTime();
+        bool getShortName(std::string const& name, std::string& shortName);
         std::unique_ptr<BYTE[]> getDirectoryEntry(std::string const& name, bool directory, DWORD firstCluster, DWORD size, std::optional<std::pair<FATDATE, FATTIME>> const& dateTime, DWORD& bufferSize);
         DWORD allocateClusters(DWORD previousCluster, DWORD clusterCount);
         BYTE *getPointerToCluster(DWORD cluster);

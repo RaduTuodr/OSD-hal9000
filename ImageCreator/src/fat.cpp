@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cassert>
 #include <sstream>
+#include <cctype>
 #include <cstring>
 #include <ctime>
 #include <cmath>
@@ -202,7 +203,35 @@ std::pair<FATDATE, FATTIME> Fat::getCurrentDateAndTime()
     return std::make_pair(date, time);
 }
 
-static bool getShortName(std::string const& name, std::string& shortName)
+static std::string toLower(std::string const& s)
+{
+    std::string ret = s;
+
+    std::transform(ret.begin(), ret.end(), ret.begin(),
+        [] (unsigned char c) { return std::tolower(c); }
+    );
+
+    return ret;
+}
+
+static int getDigitCount(int n) 
+{
+    if (n < 10) return 1;
+    if (n < 100) return 2;
+    if (n < 1000) return 3;
+    if (n < 10000) return 4;
+    if (n < 100000) return 5;
+    if (n < 1000000) return 6;
+    if (n < 10000000) return 7;
+    if (n < 100000000) return 8;
+    if (n < 1000000000) return 9;
+
+    return 10;
+}
+
+// NOTE: this is not perfect it has bugs, I think
+// For HAL9000 it is enough we do not need something fancier.
+bool Fat::getShortName(std::string const& name, std::string& shortName)
 {
     size_t length = name.length();
     size_t dotindx = name.find('.');
@@ -226,19 +255,6 @@ static bool getShortName(std::string const& name, std::string& shortName)
     }
     
     std::string temp = "           ";
-    if (dotlength)
-    {
-        int i = dotindx + 1;
-        int j = 8;
-        while(dotlength)
-        {
-            temp[j] = name[i];
-            i++;
-            j++;
-            dotlength--;
-        }
-    }
-    
     if (namelen)
     {
         int i = 0;
@@ -252,9 +268,42 @@ static bool getShortName(std::string const& name, std::string& shortName)
         {
             temp[6] = '~';
             temp[7] = '1';
+
+            int ndx = 1;
+            std::string key = toLower(temp);
+            if (nameMap.find(toLower(temp)) != nameMap.end())
+                ndx = nameMap[key];
+            nameMap[key] = ndx + 1;
+            
+            int digitCount = getDigitCount(ndx);
+            assert(digitCount <= 3);
+
+            int ndxNdx = 8 - digitCount;
+            temp[ndxNdx - 1] = '~';
+
+            int pow = 1;
+            for (int i = 1; i < digitCount; pow *= 10, i++);
+            while (pow > 0)
+            {
+                temp[ndxNdx++] = '0' + (ndx / pow) % 10;
+                pow /= 10;
+            }
         }
     }
     
+    if (dotlength)
+    {
+        int i = dotindx + 1;
+        int j = 8;
+        while(dotlength)
+        {
+            temp[j] = name[i];
+            i++;
+            j++;
+            dotlength--;
+        }
+    }
+
     shortName = temp;
     return isLongName;
 }
