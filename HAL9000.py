@@ -42,6 +42,14 @@ DNF_PACKAGES = [
     'lldb'
 ]
 
+WINGET_PACKAGES = [
+    'SoftwareFreedomConsvervancy.QEMU',
+    'Kitware.CMake',
+    'Ninja-build.Ninja',
+    'NASM.NASM',
+    'LLVM.LLVM'
+]
+
 def prRed(str): print("\033[91m {}\033[00m" .format(str))
 
 def prGreen(str): print("\033[92m {}\033[00m" .format(str))
@@ -142,6 +150,8 @@ def bootstrap():
         result = bootstrap_darwin()
     elif plat_system == 'linux':
         result = bootstrap_linux()
+    elif plat_system == 'windows':
+        result = bootstrap_generic('winget install', WINGET_PACKAGES)
 
     if result:
        prGreen('Successful bootstrap!')
@@ -149,10 +159,6 @@ def bootstrap():
        prRed('Failed bootstrap!')
 
 def configure():
-    # if str(platform.system()).lower() == 'windows':
-    #     generator = '\"Visual Studio 17 2022\"'
-    # else:
-    #     generator = '\"Ninja\"'
     generator = '\"Ninja\"'
     
     prCyan('Configuring ImageCreator...')
