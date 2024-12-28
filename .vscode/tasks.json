@@ -1,0 +1,136 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Help",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--help"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Deep clean",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--deep_clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Bootstrap",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--bootstrap"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Configure",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--configure"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean all",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--clean_all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build all",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--build_all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--run"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run for debugging",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--run",
+                "-d"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+    ]
+}

@@ -10,5 +10,6 @@ artifacts/*
 bootdrive/*
 *.log
 !.vscode/launch.json
+!.vscode/tasks.json
 temp/*
 !tools/OVMF/OVMF.fd
