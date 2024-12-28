@@ -4,8 +4,15 @@
             "type": "lldb",
             "request": "custom",
             "name": "Debug HAL9000",
-            "targetCreateCommands": ["target create artifacts/bin/HAL9000.bin"],
-            "processCreateCommands": ["gdb-remote localhost:1234"]
+            "targetCreateCommands": [
+                "target create artifacts/bin/HAL9000.bin"
+            ],
+            "processCreateCommands": [
+                "gdb-remote localhost:1234"
+            ],
+            "initCommands": [
+                "command script import HalDbg/hal_dbg.py"
+            ]
         }
     ]
 }

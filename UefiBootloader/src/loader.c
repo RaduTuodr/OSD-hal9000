@@ -542,7 +542,7 @@ StartOperatingSystem(
 {
     PrintString(gLoader.ST, EFI_GREEN, L"To start the Operating System, press any key\r\n");
     PrintString(gLoader.ST, EFI_LIGHTGRAY, L"...\r\n");
-    WaitForKeyPress(gLoader.ST);
+    // WaitForKeyPress(gLoader.ST);
 
     SetGraphicsMode(gLoader.GOP, gLoader.GopModeIndex);
     _ExitBootServices();
