@@ -12,4 +12,7 @@ def __lldb_init_module(debugger, internal_dict):
     print('Adding command list_processes')
     debugger.HandleCommand('command script add -f hal_dbg.hal_processes.list_processes list_processes')
 
+    print('Adding command list_running_threads')
+    debugger.HandleCommand('command script add -f hal_dbg.hal_threads.list_running_threads list_running_threads')
+
     print('Loaded HAL9000 module.')
