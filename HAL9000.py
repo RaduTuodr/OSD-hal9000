@@ -60,8 +60,11 @@ def prBlack(str): print("\033[98m {}\033[00m" .format(str))
 
 def get_build_env():
     env = os.environ.copy()
-    if str(platform.system()).lower() == 'darwin':
-        env['PATH'] = f'/opt/homebrew/opt/llvm/bin{os.pathsep}/usr/local/opt/llvm/bin{os.pathsep}{os.path.abspath('tools/llvm/bin')}{os.pathsep}{env['PATH']}'
+    plat_system = str(platform.system()).lower()
+    if plat_system == 'darwin':
+        env['PATH'] = f'/opt/homebrew/opt/llvm/bin{os.pathsep}/usr/local/opt/llvm/bin{os.pathsep}{os.path.abspath("tools/llvm/bin")}{os.pathsep}{env["PATH"]}'
+    elif plat_system == 'windows':
+        env['PATH'] = f'{os.path.join(os.getenv("LOCALAPPDATA"), "bin", "NASM")}{os.pathsep}{env["PATH"]}'
     return env
 
 def deep_clean():
@@ -134,9 +137,10 @@ def bootstrap_linux():
     return bootstrap_generic(pkg_manager_cmd, packages)
 
 def bootstrap():
-    if str(platform.system()).lower() == 'darwin':
+    plat_system = str(platform.system()).lower()
+    if plat_system == 'darwin':
         result = bootstrap_darwin()
-    elif str(platform.system()).lower() == 'linux':
+    elif plat_system == 'linux':
         result = bootstrap_linux()
 
     if result:
@@ -145,10 +149,11 @@ def bootstrap():
        prRed('Failed bootstrap!')
 
 def configure():
-    if str(platform.system()).lower() == 'windows':
-        generator = '\"Visual Studio 17 2022\"'
-    else:
-        generator = '\"Ninja\"'
+    # if str(platform.system()).lower() == 'windows':
+    #     generator = '\"Visual Studio 17 2022\"'
+    # else:
+    #     generator = '\"Ninja\"'
+    generator = '\"Ninja\"'
     
     prCyan('Configuring ImageCreator...')
     p = subprocess.run(f'cmake -S . -B build -G {generator} \
