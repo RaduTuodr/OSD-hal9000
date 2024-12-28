@@ -43,7 +43,7 @@ DNF_PACKAGES = [
 ]
 
 WINGET_PACKAGES = [
-    'SoftwareFreedomConsvervancy.QEMU',
+    'SoftwareFreedomConservancy.QEMU',
     'Kitware.CMake',
     'Ninja-build.Ninja',
     'NASM.NASM',
@@ -100,15 +100,15 @@ def run_cmd_with_echo_and_wait(cmd):
     p = subprocess.run(cmd, shell=True)
     return p.returncode == 0
 
-def bootstrap_generic(pkg_manager_cmd, packages):
+def bootstrap_generic(pkg_manager_cmd, packages, ignore=False):
     prYellow('The following packages will be installed:')
     for package in packages:
         prLightGray(package)
 
     for package in packages:
         prCyan(f'Installing {package}...')
-        if not run_cmd_with_echo_and_wait(f'{pkg_manager_cmd} {package}'):
-            prRed('Error installing {package}!')
+        if not run_cmd_with_echo_and_wait(f'{pkg_manager_cmd} {package}') and not ignore:
+            prRed(f'Error installing {package}!')
             return False
         prGreen('Done.')
     
@@ -151,7 +151,7 @@ def bootstrap():
     elif plat_system == 'linux':
         result = bootstrap_linux()
     elif plat_system == 'windows':
-        result = bootstrap_generic('winget install', WINGET_PACKAGES)
+        result = bootstrap_generic('winget install', WINGET_PACKAGES, True)
 
     if result:
        prGreen('Successful bootstrap!')
