@@ -11,6 +11,7 @@ Repository structure:
     - `Tests` &rarr; the boot module used for running commands after `HAL` boots.
 - `ConfigGen` &rarr; scripts used to generate some of the configuration files.
 - `HAL` &rarr; `HAL's` source code.
+- `HalDbg` &rarr; `python` scripts for the custom commands.
 - `ImageCreator` &rarr; sources of the program which generates the disk image.
 - `tools`:
     - `OVMF` &rarr; `UEFI` firmware implementation for `QEMU`, built using `EDK2`.
