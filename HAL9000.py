@@ -374,7 +374,7 @@ def main():
                         action='store_true',
                         default=False)
     parser.add_argument('--bootstrap',
-                        help='Bootstrap HAL9000, use it when setting up a new project',
+                        help='Bootstrap HAL9000, it will install the required packages',
                         action='store_true',
                         default=False)
     parser.add_argument('--configure',
