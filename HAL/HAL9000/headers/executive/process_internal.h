@@ -16,6 +16,7 @@ typedef struct _PROCESS
     // The PIDs will also be used for the CR3 PCID
     PID                             Id;
 
+    // DO NOT CHANGE THE NAME OF THIS FIELD
     char*                           ProcessName;
 
     // Command line related

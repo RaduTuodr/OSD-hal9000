@@ -22,10 +22,12 @@ typedef struct _PROCESS_SYSTEM_DATA
 
     PPROCESS        SystemProcess;
 
+    // DO NOT CHANGE THE NAME OF THIS FIELD
     LIST_ENTRY      ProcessList;
     MUTEX           ProcessListLock;
 } PROCESS_SYSTEM_DATA, *PPROCESS_SYSTEM_DATA;
 
+// DO NOT CHANGE THE NAME OF THIS VARIABLE
 static PROCESS_SYSTEM_DATA m_processData;
 
 static

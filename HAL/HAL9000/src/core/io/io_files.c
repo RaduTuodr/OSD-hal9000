@@ -4,6 +4,7 @@
 #include "iomu.h"
 #include "cal_annotate.h"
 #include "cal_seh.h"
+#include "debug.h"
 
 #include "strutils.h"
 
@@ -195,6 +196,10 @@ IoCreateFile(
             IoFreeIrp(pIrp);
             pIrp = NULL;
         }
+        if (SUCCEEDED(status))
+        {
+            NotifyDebugger();
+        }
     }
 
     return status;
@@ -247,6 +252,10 @@ IoCloseFile(
         {
             IoFreeIrp(pIrp);
             pIrp = NULL;
+        }
+        if (SUCCEEDED(status))
+        {
+            NotifyDebugger();
         }
     }
 

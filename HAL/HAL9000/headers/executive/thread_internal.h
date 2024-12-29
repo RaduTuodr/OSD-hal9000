@@ -37,6 +37,7 @@ typedef struct _THREAD
 
     struct _THREAD          *Self;
 
+    // DO NOT CHANGE THE NAME OF THESE FIELDS
     TID                     Id;
     char*                   Name;
 
@@ -55,6 +56,7 @@ typedef struct _THREAD
     LOCK                    BlockLock;
 
     // List of all the threads in the system (including those blocked or dying)
+    // DO NOT CHANGE THE NAME OF THIS FIELD
     LIST_ENTRY              AllList;
 
     // List of the threads ready to run
