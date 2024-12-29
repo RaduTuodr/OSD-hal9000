@@ -28,6 +28,8 @@ Repository structure:
 - `list_running_threads`
 - `list_file_objects`
 - `dump_file_object`
+- `list_cpus`
+- `dump_cpu`
 
 Run `help <command>` in `lldb` to see description.
 

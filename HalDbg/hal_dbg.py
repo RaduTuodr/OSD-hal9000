@@ -6,6 +6,7 @@ import hal_processes
 import hal_notify
 import hal_utils
 import hal_files
+import hal_cpus
 
 def __lldb_init_module(debugger, internal_dict):
     print('Loading HAL9000 module...')
@@ -38,5 +39,11 @@ def __lldb_init_module(debugger, internal_dict):
 
     print('Adding command dump_file_object')
     hal_utils.add_class_command(debugger, 'hal_dbg.hal_files.DumpFileObjectCommand', 'dump_file_object')
+    
+    print('Adding command list_cpus')
+    hal_utils.add_class_command(debugger, 'hal_dbg.hal_cpus.ListCpusCommand', 'list_cpus')
+
+    print('Adding command dump_cpu')
+    hal_utils.add_class_command(debugger, 'hal_dbg.hal_cpus.DumpCpuCommand', 'dump_cpu')
 
     print('Loaded HAL9000 module.')

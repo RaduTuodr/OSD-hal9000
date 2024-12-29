@@ -63,11 +63,8 @@ class ListFileObjectsCommand(ParsedCommand):
 
 class DumpFileObjectCommand(ParsedCommand):
     def setup_command_definition(self):
-        try:
-            parser = self.get_parser()
-            parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
-        except Exception as e:
-            print(e)
+        parser = self.get_parser()
+        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
 
     def get_short_help(self):
         return "Dump file object based on address."

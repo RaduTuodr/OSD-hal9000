@@ -8,6 +8,7 @@ PROCESS_TYPE = None
 PFILE_OBJECT_TYPE = None
 FILE_OBJECT_TYPE = None
 FILE_OBJECT_FLAGS_TYPE = None
+PCPU_TYPE = None
 
 _hal_commands = None
 
@@ -20,6 +21,7 @@ def init(debugger):
    global PFILE_OBJECT_TYPE
    global FILE_OBJECT_TYPE
    global FILE_OBJECT_FLAGS_TYPE
+   global PCPU_TYPE
    global _hal_commands
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
@@ -30,6 +32,7 @@ def init(debugger):
    PFILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('PFILE_OBJECT')
    FILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT')
    FILE_OBJECT_FLAGS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT_FLAGS')
+   PCPU_TYPE = DEBUGGER_TARGET.FindFirstType('struct _PCPU')
 
    _hal_commands = []
 
@@ -98,6 +101,10 @@ def get_field_as_unsigned(object, field):
 def get_current_thread(frame):
    thread_addr = frame.FindRegister('fs_base').GetValueAsAddress()
    return get_value_from_address(THREAD_TYPE, thread_addr)
+
+def get_current_cpu(frame): 
+   pcpu_addr = frame.FindRegister('gs_base').GetValueAsAddress()
+   return get_value_from_address(PCPU_TYPE, pcpu_addr)
 
 def get_process_from_thread(thread):
    proc_addr = get_field_as_address(thread, 'Process')

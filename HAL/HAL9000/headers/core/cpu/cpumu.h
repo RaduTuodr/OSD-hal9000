@@ -29,6 +29,7 @@ typedef struct _THREADING_DATA
 
 typedef struct _PCPU
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     struct _PCPU                *Self;
 
     PVOID                       StackTop;
