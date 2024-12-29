@@ -11,8 +11,7 @@ def list_threads(debugger, command, exe_cxt, result, internal_dict):
     def list_callback(list_entry):
         thread = hal_utils.containing_record(target, list_entry, hal_utils.THREAD_TYPE, 'AllList') 
         thread_name = hal_utils.get_thread_name(process, thread)
-        proc_addr = thread.GetChildMemberWithName('Process').GetValueAsAddress()
-        proc = hal_utils.get_value_from_address(target, hal_utils.PROCESS_TYPE, proc_addr) 
+        proc = hal_utils.get_process_from_thread(target, thread)
         proc_name = hal_utils.get_process_name(process, proc)
         print(f'Name: {thread_name}, Process: {proc_name}')
 
@@ -30,7 +29,6 @@ def list_running_threads(debugger, command, exe_cxt, result, internal_dict):
         frame = core.GetSelectedFrame()
         thread = hal_utils.get_current_thread(target, frame) 
         thread_name = hal_utils.get_thread_name(process, thread)
-        proc_addr = thread.GetChildMemberWithName('Process').GetValueAsAddress()
-        proc = hal_utils.get_value_from_address(target, hal_utils.PROCESS_TYPE, proc_addr) 
+        proc = hal_utils.get_process_from_thread(target, thread)
         proc_name = hal_utils.get_process_name(process, proc)
         print(f'Core {i}: Name: {thread_name}, Process: {proc_name}')

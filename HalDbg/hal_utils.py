@@ -49,6 +49,10 @@ def get_current_thread(target, frame):
    thread_addr = frame.FindRegister('fs_base').GetValueAsAddress()
    return get_value_from_address(target, THREAD_TYPE, thread_addr)
 
+def get_process_from_thread(target, thread):
+   proc_addr = thread.GetChildMemberWithName('Process').GetValueAsAddress()
+   return get_value_from_address(target, PROCESS_TYPE, proc_addr) 
+
 def get_thread_name(proc, thread):
    name_addr = thread.GetChildMemberWithName('Name').GetValueAsAddress()
    return proc.ReadCStringFromMemory(name_addr, 256, lldb.SBError())
