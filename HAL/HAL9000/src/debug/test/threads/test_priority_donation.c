@@ -193,6 +193,7 @@ STATUS
     __finally
     {
         MutexRelease(&synchContext.Mutex);
+        MutexDestroy(&synchContext.Mutex);
 
         ExFreePoolWithTag((PVOID)synchContext.SynchronizationContext.Array, HEAP_TEST_TAG);
 
@@ -352,6 +353,7 @@ STATUS
             if (!bReleasedMutexes[i])
             {
                 MutexRelease(&contexes[i].Mutex);
+                MutexDestroy(&contexes[i].Mutex);
                 bReleasedMutexes[i] = TRUE;
             }
 
@@ -501,6 +503,8 @@ STATUS
                 ExFreePoolWithTag((PVOID)pDonationChainData[i].ThreadContext.SynchronizationContext.Array, HEAP_TEST_TAG);
 
                 CheckinQueueUninit(&pDonationChainData[i].ThreadContext.SynchronizationContext);
+
+                MutexDestroy(&pDonationChainData[i].ThreadMutex);
             }
             // free this also for 0
             ExFreePoolWithTag((PVOID)pDonationChainData[0].ThreadContext.SynchronizationContext.Array, HEAP_TEST_TAG);

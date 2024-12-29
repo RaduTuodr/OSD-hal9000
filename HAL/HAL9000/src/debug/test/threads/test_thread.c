@@ -20,7 +20,7 @@ const THREAD_TEST THREADS_TEST[] =
 {
     // Tests just for fun
     { "ThreadYield", TestThreadYield, NULL, NULL, NULL, NULL, FALSE, FALSE },
-    { "Mutex", TestMutexes, TestPrepareMutex, (PVOID) FALSE, NULL, NULL, FALSE, FALSE },
+    { "Mutex", TestMutexes, TestPrepareMutex, (PVOID) FALSE, NULL, TestThreadPostFinishMutex, FALSE, FALSE },
     { "CpuIntense", TestCpuIntense, NULL, NULL, NULL, NULL, FALSE, FALSE },
 
     // Actual tests used for validating the project

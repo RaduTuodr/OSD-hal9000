@@ -46,6 +46,9 @@ def __lldb_init_module(debugger, internal_dict):
         HalCommand('hal_dbg.hal_vmm.DumpVmmReservationSpaceCommand',
                    HalCommandType.HalCommandTypeClass,
                    'dump_vmm_reservation_space'),
+        HalCommand('hal_dbg.hal_sync.ListMutexesCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'list_mutexes'),
         HalCommand('hal_dbg.hal_sync.DumpMutexCommand',
                    HalCommandType.HalCommandTypeClass,
                    'dump_mutex'),
@@ -69,5 +72,7 @@ def __lldb_init_module(debugger, internal_dict):
     print('Registering file notification handlers')
     hal_notify.register_notification('IoCreateFile', hal_files.on_file_create)
     hal_notify.register_notification('IoCloseFile', hal_files.on_file_close)
+    hal_notify.register_notification('MutexInit', hal_sync.on_mutex_init)
+    hal_notify.register_notification('MutexDestroy', hal_sync.on_mutex_destroy)
 
     print('Loaded HAL9000 module.')

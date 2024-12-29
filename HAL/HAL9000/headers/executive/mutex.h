@@ -24,7 +24,7 @@ typedef struct _MUTEX
 // Parameter:    IN BOOLEAN Recursive - if TRUE the mutex may be acquired
 //               several times by the same thread, else only once.
 // NOTE:         A recursive mutex must be released as many times as it has been
-//               acquired.
+//               acquired. It notifies the debugger.
 //******************************************************************************
 _No_competing_thread_
 void
@@ -59,5 +59,18 @@ RELEASES_EXCL_AND_REENTRANT_LOCK(*Mutex)
 REQUIRES_EXCL_LOCK(*Mutex)
 void
 MutexRelease(
+    INOUT       PMUTEX      Mutex
+    );
+
+//******************************************************************************
+// Function:     MutexDestroy
+// Description:  Destroys a mutex.
+// Returns:      void
+// Parameter:    INOUT PMUTEX Mutex
+// NOTE:         It should be called to notify the debugger.
+//******************************************************************************
+_No_competing_thread_
+void
+MutexDestroy(
     INOUT       PMUTEX      Mutex
     );

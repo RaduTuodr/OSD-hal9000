@@ -1,6 +1,7 @@
 #include "HAL9000.h"
 #include "thread_internal.h"
 #include "mutex.h"
+#include "debug.h"
 
 #define MUTEX_MAX_RECURSIVITY_DEPTH         MAX_BYTE
 
@@ -20,6 +21,8 @@ MutexInit(
     InitializeListHead(&Mutex->WaitingList);
 
     Mutex->MaxRecursivityDepth = Recursive ? MUTEX_MAX_RECURSIVITY_DEPTH : 1;
+
+    NotifyDebugger();
 }
 
 ACQUIRES_EXCL_AND_REENTRANT_LOCK(*Mutex)
@@ -110,4 +113,15 @@ MutexRelease(
     _Analysis_assume_lock_released_(*Mutex);
 
     LockRelease(&Mutex->MutexLock, oldState);
+}
+
+_No_competing_thread_
+void
+MutexDestroy(
+    INOUT       PMUTEX      Mutex
+    )
+{
+    memzero(Mutex, sizeof(MUTEX));
+
+    NotifyDebugger();
 }

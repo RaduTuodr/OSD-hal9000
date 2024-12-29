@@ -18,6 +18,14 @@ EX_EVENT_TYPE = None
 
 _hal_commands = None
 
+class FrameLocation:
+   def __init__(self, function, line_entry, arguments):
+      self.function = function
+      self.line_entry = line_entry
+      self.arguments = []
+      for arg in arguments:
+         self.arguments.append(str(arg))
+
 class HalCommandType(Enum):
    HalCommandTypeClass = 1,
    HalCommandTypeFunction = 2

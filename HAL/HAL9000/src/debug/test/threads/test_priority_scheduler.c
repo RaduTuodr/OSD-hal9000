@@ -153,6 +153,8 @@ void
 
     CheckinQueueUninit(&pContext->SynchronizationContext);
 
+    MutexDestroy(&pContext->Mutex);
+
     // This Context is freed outside in TestThreadFunctionality!!!!
     //ExFreePoolWithTag((PVOID)pContext, HEAP_TEST_TAG);
 

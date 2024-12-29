@@ -2,6 +2,59 @@ import lldb
 from lldb.plugins.parsed_cmd import ParsedCommand
 
 import hal_utils
+from hal_utils import FrameLocation
+
+_mutexes = {}
+
+class Mutex:
+    def __init__(self, frame_location):
+        self.frame_location = frame_location
+
+def on_mutex_init(core, frame):
+    global _mutexes
+
+    mutex_ptr = frame.FindVariable('Mutex').GetValueAsAddress()
+
+    loc = None
+    if core.GetNumFrames() >= 3:
+        creator = core.GetFrameAtIndex(2)
+        loc = FrameLocation(creator.GetDisplayFunctionName(),
+                            creator.GetLineEntry(),
+                            []) # Do not store too much
+                            # creator.arguments) 
+
+    _mutexes[mutex_ptr] = Mutex(loc)
+
+def on_mutex_destroy(core, frame):
+    global _mutexes
+
+    mutex_ptr = frame.FindVariable('Mutex').GetValueAsAddress()
+
+    if mutex_ptr in _mutexes:
+        _mutexes.pop(mutex_ptr)
+
+class ListMutexesCommand(ParsedCommand):
+    def setup_command_definition(self):
+        None
+
+    def get_short_help(self):
+        return 'List all mutexes.'        
+
+    def get_flags(self):
+        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
+    
+    def __call__(self, debugger, args_array, exe_cxt, result):
+        global _mutexes
+
+        print('Mutexes:')
+        for key, value in _mutexes.items():
+            print(f'Mutex {hex(key)}')
+            if value.frame_location:
+                function = value.frame_location.function
+                filename = value.frame_location.line_entry.GetFileSpec().basename
+                line = value.frame_location.line_entry.GetLine()
+                col = value.frame_location.line_entry.GetColumn()
+                print(f'  Init location: {function} at {filename}:{line}:{col}')
 
 class DumpMutexCommand(ParsedCommand):
     def setup_command_definition(self):
