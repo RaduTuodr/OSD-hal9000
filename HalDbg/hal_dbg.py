@@ -52,6 +52,9 @@ def __lldb_init_module(debugger, internal_dict):
         HalCommand('hal_dbg.hal_sync.DumpMutexCommand',
                    HalCommandType.HalCommandTypeClass,
                    'dump_mutex'),
+        HalCommand('hal_dbg.hal_sync.ListExEventsCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'list_ex_events'),
         HalCommand('hal_dbg.hal_sync.DumpExEventCommand',
                    HalCommandType.HalCommandTypeClass,
                    'dump_ex_event'),
@@ -69,10 +72,11 @@ def __lldb_init_module(debugger, internal_dict):
     debugger.HandleCommand('breakpoint set -n NotifyDebugger')
     debugger.HandleCommand('breakpoint command add -F hal_dbg.hal_notify.receive_notification')
 
-    print('Registering file notification handlers')
     hal_notify.register_notification('IoCreateFile', hal_files.on_file_create)
     hal_notify.register_notification('IoCloseFile', hal_files.on_file_close)
     hal_notify.register_notification('MutexInit', hal_sync.on_mutex_init)
     hal_notify.register_notification('MutexDestroy', hal_sync.on_mutex_destroy)
+    hal_notify.register_notification('ExEventInit', hal_sync.on_ex_event_init)
+    hal_notify.register_notification('ExEventDestroy', hal_sync.on_ex_event_destroy)
 
     print('Loaded HAL9000 module.')

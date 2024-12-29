@@ -33,6 +33,7 @@ Repository structure:
 - `dump_vmm_reservation_space`
 - `list_mutexes`
 - `dump_mutex`
+- `list_ex_events`
 - `dump_ex_event`
 - `list_cpus`
 - `dump_cpu`

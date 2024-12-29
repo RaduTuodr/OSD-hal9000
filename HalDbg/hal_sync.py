@@ -5,8 +5,13 @@ import hal_utils
 from hal_utils import FrameLocation
 
 _mutexes = {}
+_ex_events = {}
 
 class Mutex:
+    def __init__(self, frame_location):
+        self.frame_location = frame_location
+
+class ExEvent:
     def __init__(self, frame_location):
         self.frame_location = frame_location
 
@@ -76,7 +81,7 @@ class DumpMutexCommand(ParsedCommand):
 
         mutex = hal_utils.get_value_from_address(hal_utils.MUTEX_TYPE,
                                                     addr)
-        waiting_list = hal_utils.get_field_as_address(mutex, 'WaitingList')
+        waiting_list = hal_utils.get_field(mutex, 'WaitingList')
 
         def list_callback(list_entry):
             thread = hal_utils.containing_record(list_entry, hal_utils.THREAD_TYPE, 'ReadyList') 
@@ -91,6 +96,52 @@ class DumpMutexCommand(ParsedCommand):
         print(mutex)
         print(f'Waiting list: ')
         hal_utils.traverse_list(waiting_list, list_callback)
+
+def on_ex_event_init(core, frame):
+    global _ex_events
+
+    event_ptr = frame.FindVariable('Event').GetValueAsAddress()
+
+    loc = None
+    if core.GetNumFrames() >= 3:
+        creator = core.GetFrameAtIndex(2)
+        loc = FrameLocation(creator.GetDisplayFunctionName(),
+                            creator.GetLineEntry(),
+                            []) # Do not store too much
+                            # creator.arguments) 
+
+    _ex_events[event_ptr] = ExEvent(loc)
+
+def on_ex_event_destroy(core, frame):
+    global _ex_events
+
+    event_ptr = frame.FindVariable('Event').GetValueAsAddress()
+
+    if event_ptr in _ex_events:
+        _ex_events.pop(event_ptr)
+
+class ListExEventsCommand(ParsedCommand):
+    def setup_command_definition(self):
+        None
+
+    def get_short_help(self):
+        return 'List all executive events.'        
+
+    def get_flags(self):
+        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
+    
+    def __call__(self, debugger, args_array, exe_cxt, result):
+        global _ex_events
+
+        print('EX Events:')
+        for key, value in _ex_events.items():
+            print(f'EX Event {hex(key)}')
+            if value.frame_location:
+                function = value.frame_location.function
+                filename = value.frame_location.line_entry.GetFileSpec().basename
+                line = value.frame_location.line_entry.GetLine()
+                col = value.frame_location.line_entry.GetColumn()
+                print(f'  Init location: {function} at {filename}:{line}:{col}')
 
 class DumpExEventCommand(ParsedCommand):
     def setup_command_definition(self):
@@ -112,7 +163,7 @@ class DumpExEventCommand(ParsedCommand):
 
         ex_event = hal_utils.get_value_from_address(hal_utils.EX_EVENT_TYPE,
                                                     addr)
-        waiting_list = hal_utils.get_field_as_address(ex_event, 'WaitingList')
+        waiting_list = hal_utils.get_field(ex_event, 'WaitingList')
 
         def list_callback(list_entry):
             thread = hal_utils.containing_record(list_entry, hal_utils.THREAD_TYPE, 'ReadyList') 
