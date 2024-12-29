@@ -22,6 +22,7 @@ Repository structure:
 
 ## Debugger commands
 
+- `hal_commands`
 - `list_threads`
 - `list_processes`
 - `list_running_threads`

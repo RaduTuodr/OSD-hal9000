@@ -1,4 +1,5 @@
 import lldb
+from lldb.plugins.parsed_cmd import ParsedCommand
 
 import hal_threads
 import hal_processes
@@ -12,14 +13,17 @@ def __lldb_init_module(debugger, internal_dict):
     print('Initializing hal_utils')
     hal_utils.init(debugger)
 
+    print('Adding command hal_commands')
+    hal_utils.add_function_command(debugger, 'hal_dbg.hal_utils.hal_commands', 'hal_commands')
+
     print('Adding command list_threads')
-    debugger.HandleCommand('command script add -c hal_dbg.hal_threads.ListThreadsCommand list_threads')
+    hal_utils.add_class_command(debugger, 'hal_dbg.hal_threads.ListThreadsCommand', 'list_threads')
 
     print('Adding command list_processes')
-    debugger.HandleCommand('command script add -c hal_dbg.hal_processes.ListProcessesCommand list_processes')
+    hal_utils.add_class_command(debugger, 'hal_dbg.hal_processes.ListProcessesCommand', 'list_processes')
 
     print('Adding command list_running_threads')
-    debugger.HandleCommand('command script add -c hal_dbg.hal_threads.ListRunningThreadsCommand list_running_threads')
+    hal_utils.add_class_command(debugger, 'hal_dbg.hal_threads.ListRunningThreadsCommand', 'list_running_threads')
 
     print('Setting notification breakpoint')
     debugger.HandleCommand('breakpoint set -n NotifyDebugger')
@@ -30,9 +34,9 @@ def __lldb_init_module(debugger, internal_dict):
     hal_notify.register_notification('IoCloseFile', hal_files.on_file_close)
 
     print('Adding command list_file_objects')
-    debugger.HandleCommand('command script add -c hal_dbg.hal_files.ListFileObjectsCommand list_file_objects')
+    hal_utils.add_class_command(debugger, 'hal_dbg.hal_files.ListFileObjectsCommand', 'list_file_objects')
 
     print('Adding command dump_file_object')
-    debugger.HandleCommand('command script add -c hal_dbg.hal_files.DumpFileObjectCommand dump_file_object')
+    hal_utils.add_class_command(debugger, 'hal_dbg.hal_files.DumpFileObjectCommand', 'dump_file_object')
 
     print('Loaded HAL9000 module.')

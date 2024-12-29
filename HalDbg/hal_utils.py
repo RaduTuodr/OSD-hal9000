@@ -9,6 +9,8 @@ PFILE_OBJECT_TYPE = None
 FILE_OBJECT_TYPE = None
 FILE_OBJECT_FLAGS_TYPE = None
 
+_hal_commands = None
+
 def init(debugger):
    global DEBUGGER_TARGET
    global DEBUGGER_PROCESS
@@ -18,6 +20,7 @@ def init(debugger):
    global PFILE_OBJECT_TYPE
    global FILE_OBJECT_TYPE
    global FILE_OBJECT_FLAGS_TYPE
+   global _hal_commands
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
    DEBUGGER_PROCESS = DEBUGGER_TARGET.GetProcess()
@@ -27,6 +30,21 @@ def init(debugger):
    PFILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('PFILE_OBJECT')
    FILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT')
    FILE_OBJECT_FLAGS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT_FLAGS')
+
+   _hal_commands = []
+
+def add_function_command(debugger, function, cmd_name):
+   debugger.HandleCommand(f'command script add -f {function} {cmd_name}')
+   _hal_commands.append(cmd_name)
+
+def add_class_command(debugger, clazz, cmd_name):
+   debugger.HandleCommand(f'command script add -c {clazz} {cmd_name}')
+   _hal_commands.append(cmd_name)
+
+def hal_commands(debugger, command, exe_ctx, result, internal_dict):
+   """List all commands for HAL9000."""
+   for cmd in _hal_commands:
+      print(cmd)
 
 def traverse_list(list_head_value, callback):
    list_head = list_head_value.GetAddress().GetLoadAddress(DEBUGGER_TARGET)
