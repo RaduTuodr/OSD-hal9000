@@ -2,6 +2,7 @@
 
 typedef struct _FILE_OBJECT_FLAGS
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     // if set => IoManager will update file offset
     DWORD                   Asynchronous     :    1;
 
@@ -18,6 +19,7 @@ typedef struct _FILE_OBJECT_FLAGS
 
 typedef struct _FILE_OBJECT
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     // file system to which it belongs
     struct _DEVICE_OBJECT*  FileSystemDevice;
     FILE_OBJECT_FLAGS       Flags;
@@ -26,7 +28,6 @@ typedef struct _FILE_OBJECT
     /// filesystem to keep internal structure
     PVOID                   FsContext2;
 
-    // DO NOT CHANGE THE NAME OF THIS FIELD
     char*                   FileName;
     struct _FILE_OBJECT*    RelatedFileObject;
 

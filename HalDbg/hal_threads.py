@@ -14,8 +14,8 @@ class ListThreadsCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_cxt, result):
-        thread_data = hal_utils.DEBUGGER_TARGET.FindFirstGlobalVariable('m_threadSystemData')
-        all_threads_list = thread_data.GetChildMemberWithName('AllThreadsList')
+        thread_data = hal_utils.find_global_variable('m_threadSystemData')
+        all_threads_list = hal_utils.get_field(thread_data, 'AllThreadsList')
 
         def list_callback(list_entry):
             thread = hal_utils.containing_record(list_entry, hal_utils.THREAD_TYPE, 'AllList') 

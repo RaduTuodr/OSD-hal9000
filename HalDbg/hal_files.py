@@ -28,10 +28,7 @@ def on_file_create(core, frame):
         file_obj_addr)
     
     file_name_addr = file_name_param.GetValueAsAddress()
-    file_name = hal_utils.DEBUGGER_PROCESS.ReadCStringFromMemory(
-        file_name_addr,
-        256,
-        lldb.SBError())
+    file_name = hal_utils.get_c_string(file_name_addr, 256) 
 
     thread = hal_utils.get_current_thread(core.GetSelectedFrame())
     process = hal_utils.get_process_from_thread(thread)
@@ -79,4 +76,14 @@ class DumpFileObjectCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_ctx, result):
-        print(args_array)
+        try:
+            addr = int(args_array, base=16)
+        except ValueError:
+            print('Invalid hexadecimal address!')
+            return
+
+        file_obj = hal_utils.get_value_from_address(hal_utils.FILE_OBJECT_TYPE,
+                                                    addr)
+
+        print(f'File object: {hex(addr)}')
+        print(file_obj)

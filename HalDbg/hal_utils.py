@@ -7,6 +7,7 @@ THREAD_TYPE = None
 PROCESS_TYPE = None
 PFILE_OBJECT_TYPE = None
 FILE_OBJECT_TYPE = None
+FILE_OBJECT_FLAGS_TYPE = None
 
 def init(debugger):
    global DEBUGGER_TARGET
@@ -16,6 +17,7 @@ def init(debugger):
    global PROCESS_TYPE
    global PFILE_OBJECT_TYPE
    global FILE_OBJECT_TYPE
+   global FILE_OBJECT_FLAGS_TYPE
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
    DEBUGGER_PROCESS = DEBUGGER_TARGET.GetProcess()
@@ -24,10 +26,7 @@ def init(debugger):
    PROCESS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _PROCESS')
    PFILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('PFILE_OBJECT')
    FILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT')
-
-def get_value_from_address(type, address):
-   addr = lldb.SBAddress(address, DEBUGGER_TARGET)
-   return DEBUGGER_TARGET.CreateValueFromAddress('Value', addr, type)
+   FILE_OBJECT_FLAGS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT_FLAGS')
 
 def traverse_list(list_head_value, callback):
    list_head = list_head_value.GetAddress().GetLoadAddress(DEBUGGER_TARGET)
@@ -56,25 +55,44 @@ def containing_record(list_entry, type, field_name):
 
    return get_value_from_address(type, list_entry_addr)
 
+def find_global_variable(name):
+   return DEBUGGER_TARGET.FindFirstGlobalVariable(name)
+
+def get_value_from_address(type, address):
+   addr = lldb.SBAddress(address, DEBUGGER_TARGET)
+   return DEBUGGER_TARGET.CreateValueFromAddress('Value', addr, type)
+
+def get_address_of_value(value):
+   return value.GetAddress().GetLoadAddress(DEBUGGER_TARGET)
+
+def get_c_string(addr, max_length):
+   return DEBUGGER_PROCESS.ReadCStringFromMemory(addr, max_length, lldb.SBError())
+
+def get_field(object, field):
+   return object.GetChildMemberWithName(field)
+
+def get_field_as_address(object, field):
+   return object.GetChildMemberWithName(field).GetValueAsAddress()
+
+def get_field_as_unsigned(object, field):
+   return object.GetChildMemberWithName(field).GetValueAsUnsigned()
+
 def get_current_thread(frame):
    thread_addr = frame.FindRegister('fs_base').GetValueAsAddress()
    return get_value_from_address(THREAD_TYPE, thread_addr)
 
 def get_process_from_thread(thread):
-   proc_addr = thread.GetChildMemberWithName('Process').GetValueAsAddress()
+   proc_addr = get_field_as_address(thread, 'Process')
    return get_value_from_address(PROCESS_TYPE, proc_addr) 
 
 def get_thread_name(thread):
-   name_addr = thread.GetChildMemberWithName('Name').GetValueAsAddress()
-   return DEBUGGER_PROCESS.ReadCStringFromMemory(name_addr, 256, lldb.SBError())
+   name_addr = get_field_as_address(thread, 'Name')
+   return get_c_string(name_addr, 256)
 
 def get_process_name(process):
-   name_addr = process.GetChildMemberWithName('ProcessName').GetValueAsAddress()
-   return DEBUGGER_PROCESS.ReadCStringFromMemory(name_addr, 256, lldb.SBError())
+   name_addr = get_field_as_address(process, 'ProcessName')
+   return get_c_string(name_addr, 256)
 
 def get_file_name(file_object):
-   name_addr = file_object.GetChildMemberWithName('FileName').GetValueAsAddress()
-   return DEBUGGER_PROCESS.ReadCStringFromMemory(name_addr, 256, lldb.SBError())
-
-def get_address_of_value(value):
-   return value.GetAddress().GetLoadAddress(DEBUGGER_TARGET)
+   name_addr = get_field_as_address(file_object, 'FileName')
+   return get_c_string(name_addr, 256)

@@ -26,6 +26,7 @@ Repository structure:
 - `list_processes`
 - `list_running_threads`
 - `list_file_objects`
+- `dump_file_object`
 
 Run `help <command>` in `lldb` to see description.
 
