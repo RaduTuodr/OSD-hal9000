@@ -36,6 +36,7 @@ typedef struct _PROCESS
 
     LOCK                            ThreadListLock;
 
+    // DO NOT CHANGE THE NAME OF THIS FIELD
     _Guarded_by_(ThreadListLock)
     LIST_ENTRY                      ThreadList;
 

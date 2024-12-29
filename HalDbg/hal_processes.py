@@ -25,3 +25,36 @@ class ListProcessesCommand(ParsedCommand):
 
         print('Processes:')
         hal_utils.traverse_list(all_proc_list, list_callback)
+
+class DumpProcessCommand(ParsedCommand):
+    def setup_command_definition(self):
+        parser = self.get_parser()
+        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+
+    def get_short_help(self):
+        return "Dump process based on address."
+
+    def get_flags(self):
+        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
+    
+    def __call__(self, debugger, args_array, exe_ctx, result):
+        try:
+            addr = int(args_array, base=16)
+        except ValueError:
+            print('Invalid hexadecimal address!')
+            return
+        
+        process = hal_utils.get_value_from_address(hal_utils.PROCESS_TYPE,
+                                                    addr)
+        thread_list = hal_utils.get_field(process, 'ThreadList')
+
+        def list_callback(list_entry):
+            thread = hal_utils.containing_record(list_entry, hal_utils.THREAD_TYPE, 'ProcessList') 
+            thread_addr = hal_utils.get_address_of_value(thread)
+            thread_name = hal_utils.get_thread_name(thread)
+            print(f'Thread {hex(thread_addr)}: {thread_name}')
+
+        print(f'Process: {hex(addr)}')
+        print(process)
+        print('Threads of the process:')
+        hal_utils.traverse_list(thread_list, list_callback)

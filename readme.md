@@ -24,7 +24,9 @@ Repository structure:
 
 - `hal_commands`
 - `list_threads`
+- `dump_thread`
 - `list_processes`
+- `dump_process`
 - `list_running_threads`
 - `list_file_objects`
 - `dump_file_object`

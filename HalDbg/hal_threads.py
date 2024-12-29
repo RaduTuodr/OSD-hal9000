@@ -53,3 +53,27 @@ class ListRunningThreadsCommand(ParsedCommand):
             proc_addr = hal_utils.get_address_of_value(proc)
             proc_name = hal_utils.get_process_name(proc)
             print(f'Core {i}: Thread {hex(thread_addr)}: {thread_name}; Process {hex(proc_addr)}: {proc_name}')
+
+class DumpThreadCommand(ParsedCommand):
+    def setup_command_definition(self):
+        parser = self.get_parser()
+        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+
+    def get_short_help(self):
+        return 'Dump thread based on address.'        
+    
+    def get_flags(self):
+        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
+    
+    def __call__(self, debugger, args_array, exe_ctx, result):
+        try:
+            addr = int(args_array, base=16)
+        except ValueError:
+            print('Invalid hexadecimal address!')
+            return
+
+        thread = hal_utils.get_value_from_address(hal_utils.THREAD_TYPE,
+                                                    addr)
+
+        print(f'Thread: {hex(addr)}')
+        print(thread)

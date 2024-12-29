@@ -33,11 +33,11 @@ typedef DWORD           THREAD_FLAGS;
 
 typedef struct _THREAD
 {
+    // DO NOT CHANGE THE NAME OF THESE FIELDS
     REF_COUNT               RefCnt;
 
     struct _THREAD          *Self;
 
-    // DO NOT CHANGE THE NAME OF THESE FIELDS
     TID                     Id;
     char*                   Name;
 
