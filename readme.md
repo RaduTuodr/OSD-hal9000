@@ -20,6 +20,12 @@ Repository structure:
 - `yasm` &rarr; not used anymore.
 - `HAL9000.py` &rarr; utility script. 
 
+## Debugger commands
+
+- list_threads
+- list_processes
+- list_running_threads
+
 ## Prerequisites
 
 Install `Visual Studio Code` and the `CodeLLDB` extensions.
