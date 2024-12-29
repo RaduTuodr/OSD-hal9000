@@ -1,5 +1,7 @@
 import lldb
 
+import hal_utils
+
 _notifications = {}
 
 def register_notification(function_name, callback):
@@ -13,11 +15,9 @@ def register_notification(function_name, callback):
 def receive_notification(frame, bp_loc, internal_dict):
     global _notifications
     thread = frame.GetThread()
-    process = thread.GetProcess()
-    target = process.GetTarget()
 
     if thread.GetNumFrames() <= 1:
-        process.Continue()
+        hal_utils.DEBUGGER_PROCESS.Continue()
 
     notifier_frame = thread.GetFrameAtIndex(1)
     function_name = notifier_frame.GetFunctionName()
@@ -29,7 +29,7 @@ def receive_notification(frame, bp_loc, internal_dict):
     for name, callback in _notifications.items():
         if function_name == name:
             print(f'Handling notification {function_name}')
-            callback(target, process, thread, notifier_frame) 
+            callback(thread, notifier_frame) 
             break
 
-    process.Continue()
+    hal_utils.DEBUGGER_PROCESS.Continue()
