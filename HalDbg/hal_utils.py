@@ -75,3 +75,6 @@ def get_process_name(process):
 def get_file_name(file_object):
    name_addr = file_object.GetChildMemberWithName('FileName').GetValueAsAddress()
    return DEBUGGER_PROCESS.ReadCStringFromMemory(name_addr, 256, lldb.SBError())
+
+def get_address_of_value(value):
+   return value.GetAddress().GetLoadAddress(DEBUGGER_TARGET)

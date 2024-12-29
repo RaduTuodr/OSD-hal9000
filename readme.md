@@ -22,10 +22,12 @@ Repository structure:
 
 ## Debugger commands
 
-- list_threads
-- list_processes
-- list_running_threads
-- list_file_objects
+- `list_threads`
+- `list_processes`
+- `list_running_threads`
+- `list_file_objects`
+
+Run `help <command>` in `lldb` to see description.
 
 ## Prerequisites
 

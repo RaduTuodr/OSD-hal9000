@@ -46,8 +46,10 @@ def on_file_close(core, frame):
         _file_objects.pop(file_obj_addr)
 
 def list_file_objects(debugger, command, exe_cxt, result, internal_dict):
+    """List all file objects"""
     global _file_objects
 
     print('File objects:')
     for key, value in _file_objects.items():
-        print(f'Address: {hex(key)}, FileName: {value.file_name}, Process: {value.process_name}')
+        proc_addr = hal_utils.get_address_of_value(value.process)
+        print(f'File object {hex(key)}: FileName: {value.file_name}; Process {hex(proc_addr)}: {value.process_name}')
