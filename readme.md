@@ -30,6 +30,7 @@ Repository structure:
 - `list_running_threads`
 - `list_file_objects`
 - `dump_file_object`
+- `dump_vmm_reservation_space`
 - `list_cpus`
 - `dump_cpu`
 

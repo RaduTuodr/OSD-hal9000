@@ -10,6 +10,9 @@ PFILE_OBJECT_TYPE = None
 FILE_OBJECT_TYPE = None
 FILE_OBJECT_FLAGS_TYPE = None
 PCPU_TYPE = None
+VMM_RESERVATION_SPACE_TYPE = None
+VMM_RESERVATION_TYPE = None
+VMM_RESERVATION_STATE_TYPE = None
 
 _hal_commands = None
 
@@ -33,6 +36,9 @@ def init(debugger):
    global FILE_OBJECT_TYPE
    global FILE_OBJECT_FLAGS_TYPE
    global PCPU_TYPE
+   global VMM_RESERVATION_SPACE_TYPE
+   global VMM_RESERVATION_TYPE
+   global VMM_RESERVATION_STATE_TYPE
    global _hal_commands
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
@@ -43,6 +49,9 @@ def init(debugger):
    PFILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('PFILE_OBJECT')
    FILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT')
    FILE_OBJECT_FLAGS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT_FLAGS')
+   VMM_RESERVATION_SPACE_TYPE = DEBUGGER_TARGET.FindFirstType('struct _VMM_RESERVATION_SPACE')
+   VMM_RESERVATION_TYPE = DEBUGGER_TARGET.FindFirstType('struct _VMM_RESERVATION')
+   VMM_RESERVATION_STATE_TYPE = DEBUGGER_TARGET.FindFirstType('enum _VMM_RESERVATION_STATE')
    PCPU_TYPE = DEBUGGER_TARGET.FindFirstType('struct _PCPU')
 
    _hal_commands = []
@@ -140,3 +149,9 @@ def get_process_name(process):
 def get_file_name(file_object):
    name_addr = get_field_as_address(file_object, 'FileName')
    return get_c_string(name_addr, 256)
+
+def get_enum_member_value_as_unsigned(enum_type, member):
+   for enum_member in enum_type.GetEnumMembers():
+      if member == enum_member.GetName():
+         return enum_member.GetValueAsUnsigned()
+   return None

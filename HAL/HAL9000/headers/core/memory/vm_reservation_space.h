@@ -9,6 +9,7 @@ typedef struct _FILE_OBJECT *PFILE_OBJECT;
 
 typedef struct _VMM_RESERVATION_SPACE
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     // Because we have an effectively infinite virtual address space
     // we will never decrement this pointer and the virtual addresses
     // allocated will be strictly monotonically increasing

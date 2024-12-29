@@ -8,6 +8,7 @@
 
 typedef enum _VMM_RESERVATION_STATE
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     VmmReservationStateFree     = 0x0,
     VmmReservationStateUsed     = 0x1,
     VmmReservationStateLast     = 0x2,
@@ -18,6 +19,7 @@ typedef enum _VMM_RESERVATION_STATE
 // reserved memory and the committed memory.
 typedef struct _VMM_RESERVATION
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     // Starting addresses of the virtual memory allocation
     PVOID                   StartVa;
 

@@ -7,6 +7,7 @@ import hal_notify
 import hal_utils
 import hal_files
 import hal_cpus
+import hal_vmm
 from hal_utils import HalCommandType
 from hal_utils import HalCommand
 
@@ -41,6 +42,9 @@ def __lldb_init_module(debugger, internal_dict):
         HalCommand('hal_dbg.hal_files.DumpFileObjectCommand',
                    HalCommandType.HalCommandTypeClass,
                    'dump_file_object'),
+        HalCommand('hal_dbg.hal_vmm.DumpVmmReservationSpaceCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'dump_vmm_reservation_space'),
         HalCommand('hal_dbg.hal_cpus.ListCpusCommand',
                    HalCommandType.HalCommandTypeClass,
                    'list_cpus'),
