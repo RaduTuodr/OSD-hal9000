@@ -3,7 +3,7 @@ import lldb
 import hal_utils
 
 def list_threads(debugger, command, exe_cxt, result, internal_dict):
-    """List all threads"""
+    """List all threads."""
     thread_data = hal_utils.DEBUGGER_TARGET.FindFirstGlobalVariable('m_threadSystemData')
     all_threads_list = thread_data.GetChildMemberWithName('AllThreadsList')
 
@@ -20,7 +20,7 @@ def list_threads(debugger, command, exe_cxt, result, internal_dict):
     hal_utils.traverse_list(all_threads_list, list_callback)
 
 def list_running_threads(debugger, command, exe_cxt, result, internal_dict):
-    """List running threads"""
+    """List running threads."""
     core_count = hal_utils.DEBUGGER_PROCESS.GetNumThreads()
 
     print('Running threads:')

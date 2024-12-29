@@ -1,4 +1,5 @@
 import lldb
+from lldb.plugins.parsed_cmd import ParsedCommand
 
 import hal_utils
 
@@ -46,10 +47,27 @@ def on_file_close(core, frame):
         _file_objects.pop(file_obj_addr)
 
 def list_file_objects(debugger, command, exe_cxt, result, internal_dict):
-    """List all file objects"""
+    """List all file objects."""
     global _file_objects
 
     print('File objects:')
     for key, value in _file_objects.items():
         proc_addr = hal_utils.get_address_of_value(value.process)
         print(f'File object {hex(key)}: FileName: {value.file_name}; Process {hex(proc_addr)}: {value.process_name}')
+
+class DumpFileObjectCommand(ParsedCommand):
+    def setup_command_definition(self):
+        try:
+            parser = self.get_parser()
+            parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+        except Exception as e:
+            print(e)
+
+    def get_short_help(self):
+        return "Dump file object based on address."
+
+    def get_flags(self):
+        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
+    
+    def __call__(self, debugger, args_array, exe_ctx, result):
+        print(args_array)

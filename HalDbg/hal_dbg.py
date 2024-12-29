@@ -32,4 +32,7 @@ def __lldb_init_module(debugger, internal_dict):
     print('Adding command list_file_objects')
     debugger.HandleCommand('command script add -f hal_dbg.hal_files.list_file_objects list_file_objects')
 
+    print('Adding command dump_file_object')
+    debugger.HandleCommand('command script add -c hal_dbg.hal_files.DumpFileObjectCommand dump_file_object')
+
     print('Loaded HAL9000 module.')

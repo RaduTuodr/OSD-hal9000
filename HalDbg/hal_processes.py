@@ -3,7 +3,7 @@ import lldb
 import hal_utils
 
 def list_processes(debugger, command, exe_cxt, result, internal_dict):
-    """List all processes"""
+    """List all processes."""
     proc_data = hal_utils.DEBUGGER_TARGET.FindFirstGlobalVariable('m_processData')
     all_proc_list = proc_data.GetChildMemberWithName('ProcessList')
 
