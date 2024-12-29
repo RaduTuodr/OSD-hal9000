@@ -5,6 +5,8 @@ DEBUGGER_PROCESS = None
 LIST_ENTRY = None
 THREAD_TYPE = None
 PROCESS_TYPE = None
+PFILE_OBJECT_TYPE = None
+FILE_OBJECT_TYPE = None
 
 def init(debugger):
    global DEBUGGER_TARGET
@@ -12,12 +14,16 @@ def init(debugger):
    global LIST_ENTRY
    global THREAD_TYPE
    global PROCESS_TYPE
+   global PFILE_OBJECT_TYPE
+   global FILE_OBJECT_TYPE
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
    DEBUGGER_PROCESS = DEBUGGER_TARGET.GetProcess()
-   LIST_ENTRY = DEBUGGER_TARGET.FindFirstType('LIST_ENTRY')
-   THREAD_TYPE = DEBUGGER_TARGET.FindFirstType('THREAD')
-   PROCESS_TYPE = DEBUGGER_TARGET.FindFirstType('PROCESS')
+   LIST_ENTRY = DEBUGGER_TARGET.FindFirstType('struct _LIST_ENTRY')
+   THREAD_TYPE = DEBUGGER_TARGET.FindFirstType('struct _THREAD')
+   PROCESS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _PROCESS')
+   PFILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('PFILE_OBJECT')
+   FILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT')
 
 def get_value_from_address(type, address):
    addr = lldb.SBAddress(address, DEBUGGER_TARGET)
@@ -63,5 +69,9 @@ def get_thread_name(thread):
    return DEBUGGER_PROCESS.ReadCStringFromMemory(name_addr, 256, lldb.SBError())
 
 def get_process_name(process):
-   proc_name_addr = process.GetChildMemberWithName('ProcessName').GetValueAsAddress()
-   return DEBUGGER_PROCESS.ReadCStringFromMemory(proc_name_addr, 256, lldb.SBError())
+   name_addr = process.GetChildMemberWithName('ProcessName').GetValueAsAddress()
+   return DEBUGGER_PROCESS.ReadCStringFromMemory(name_addr, 256, lldb.SBError())
+
+def get_file_name(file_object):
+   name_addr = file_object.GetChildMemberWithName('FileName').GetValueAsAddress()
+   return DEBUGGER_PROCESS.ReadCStringFromMemory(name_addr, 256, lldb.SBError())

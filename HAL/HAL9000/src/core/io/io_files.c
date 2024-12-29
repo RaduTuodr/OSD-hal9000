@@ -189,16 +189,13 @@ IoCreateFile(
 
             // complete file handle
             *Handle = pStackLocation->FileObject;
+            NotifyDebugger();
         }
 
         if (NULL != pIrp)
         {
             IoFreeIrp(pIrp);
             pIrp = NULL;
-        }
-        if (SUCCEEDED(status))
-        {
-            NotifyDebugger();
         }
     }
 

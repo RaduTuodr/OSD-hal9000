@@ -25,6 +25,7 @@ Repository structure:
 - list_threads
 - list_processes
 - list_running_threads
+- list_file_objects
 
 ## Prerequisites
 

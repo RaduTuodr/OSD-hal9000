@@ -26,6 +26,7 @@ typedef struct _FILE_OBJECT
     /// filesystem to keep internal structure
     PVOID                   FsContext2;
 
+    // DO NOT CHANGE THE NAME OF THIS FIELD
     char*                   FileName;
     struct _FILE_OBJECT*    RelatedFileObject;
 
