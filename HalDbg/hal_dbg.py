@@ -7,6 +7,8 @@ import hal_notify
 import hal_utils
 import hal_files
 import hal_cpus
+from hal_utils import HalCommandType
+from hal_utils import HalCommand
 
 def __lldb_init_module(debugger, internal_dict):
     print('Loading HAL9000 module...')
@@ -14,17 +16,34 @@ def __lldb_init_module(debugger, internal_dict):
     print('Initializing hal_utils')
     hal_utils.init(debugger)
 
-    print('Adding command hal_commands')
-    hal_utils.add_function_command(debugger, 'hal_dbg.hal_utils.hal_commands', 'hal_commands')
+    commands = [
+        HalCommand('hal_dbg.hal_utils.hal_commands', 
+                   HalCommandType.HalCommandTypeFunction, 
+                   'hal_commands'),
+        HalCommand('hal_dbg.hal_threads.ListThreadsCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'list_threads'),
+        HalCommand('hal_dbg.hal_processes.ListProcessesCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'list_processes'),
+        HalCommand('hal_dbg.hal_threads.ListRunningThreadsCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'list_running_threads'),
+        HalCommand('hal_dbg.hal_files.ListFileObjectsCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'list_file_objects'),
+        HalCommand('hal_dbg.hal_files.DumpFileObjectCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'dump_file_object'),
+        HalCommand('hal_dbg.hal_cpus.ListCpusCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'list_cpus'),
+        HalCommand('hal_dbg.hal_cpus.DumpCpuCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'dump_cpu')
+    ]
 
-    print('Adding command list_threads')
-    hal_utils.add_class_command(debugger, 'hal_dbg.hal_threads.ListThreadsCommand', 'list_threads')
-
-    print('Adding command list_processes')
-    hal_utils.add_class_command(debugger, 'hal_dbg.hal_processes.ListProcessesCommand', 'list_processes')
-
-    print('Adding command list_running_threads')
-    hal_utils.add_class_command(debugger, 'hal_dbg.hal_threads.ListRunningThreadsCommand', 'list_running_threads')
+    hal_utils.add_commands(debugger, commands)
 
     print('Setting notification breakpoint')
     debugger.HandleCommand('breakpoint set -n NotifyDebugger')
@@ -33,17 +52,5 @@ def __lldb_init_module(debugger, internal_dict):
     print('Registering file notification handlers')
     hal_notify.register_notification('IoCreateFile', hal_files.on_file_create)
     hal_notify.register_notification('IoCloseFile', hal_files.on_file_close)
-
-    print('Adding command list_file_objects')
-    hal_utils.add_class_command(debugger, 'hal_dbg.hal_files.ListFileObjectsCommand', 'list_file_objects')
-
-    print('Adding command dump_file_object')
-    hal_utils.add_class_command(debugger, 'hal_dbg.hal_files.DumpFileObjectCommand', 'dump_file_object')
-    
-    print('Adding command list_cpus')
-    hal_utils.add_class_command(debugger, 'hal_dbg.hal_cpus.ListCpusCommand', 'list_cpus')
-
-    print('Adding command dump_cpu')
-    hal_utils.add_class_command(debugger, 'hal_dbg.hal_cpus.DumpCpuCommand', 'dump_cpu')
 
     print('Loaded HAL9000 module.')

@@ -1,4 +1,5 @@
 import lldb
+from enum import Enum
 
 DEBUGGER_TARGET = None
 DEBUGGER_PROCESS = None
@@ -11,6 +12,16 @@ FILE_OBJECT_FLAGS_TYPE = None
 PCPU_TYPE = None
 
 _hal_commands = None
+
+class HalCommandType(Enum):
+   HalCommandTypeClass = 1,
+   HalCommandTypeFunction = 2
+
+class HalCommand:
+   def __init__(self, impl, type, name):
+      self.impl = impl
+      self.type = type
+      self.name = name
 
 def init(debugger):
    global DEBUGGER_TARGET
@@ -36,18 +47,26 @@ def init(debugger):
 
    _hal_commands = []
 
-def add_function_command(debugger, function, cmd_name):
-   debugger.HandleCommand(f'command script add -f {function} {cmd_name}')
-   _hal_commands.append(cmd_name)
+def add_function_command(debugger, cmd):
+   debugger.HandleCommand(f'command script add -f {cmd.impl} {cmd.name}')
+   _hal_commands.append(cmd)
 
-def add_class_command(debugger, clazz, cmd_name):
-   debugger.HandleCommand(f'command script add -c {clazz} {cmd_name}')
-   _hal_commands.append(cmd_name)
+def add_class_command(debugger, cmd):
+   debugger.HandleCommand(f'command script add -c {cmd.impl} {cmd.name}')
+   _hal_commands.append(cmd)
+
+def add_commands(debugger, commands):
+   for cmd in commands:
+      print(f'Adding command {cmd.name}')
+      if cmd.type == HalCommandType.HalCommandTypeFunction:
+            add_function_command(debugger, cmd)
+      elif cmd.type == HalCommandType.HalCommandTypeClass:
+            add_class_command(debugger, cmd)
 
 def hal_commands(debugger, command, exe_ctx, result, internal_dict):
    """List all commands for HAL9000."""
    for cmd in _hal_commands:
-      print(cmd)
+      print(cmd.name)
 
 def traverse_list(list_head_value, callback):
    list_head = list_head_value.GetAddress().GetLoadAddress(DEBUGGER_TARGET)
