@@ -3,9 +3,13 @@ import lldb
 import hal_threads
 import hal_processes
 import hal_notify
+import hal_utils
 
 def __lldb_init_module(debugger, internal_dict):
     print('Loading HAL9000 module...')
+
+    print('Initializing hal_utils')
+    hal_utils.init(debugger)
 
     print('Adding command list_threads')
     debugger.HandleCommand('command script add -f hal_dbg.hal_threads.list_threads list_threads')
