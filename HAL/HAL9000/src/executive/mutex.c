@@ -121,6 +121,8 @@ MutexDestroy(
     INOUT       PMUTEX      Mutex
     )
 {
+    ASSERT(Mutex != NULL);
+
     memzero(Mutex, sizeof(MUTEX));
 
     NotifyDebugger();

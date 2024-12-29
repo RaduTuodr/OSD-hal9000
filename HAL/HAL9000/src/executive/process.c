@@ -735,6 +735,8 @@ _ProcessDestroy(
     RemoveEntryList(&Process->NextProcess);
     MutexRelease(&m_processData.ProcessListLock);
 
+    ExEventDestroy(&Process->TerminationEvt);
+
     if (NULL != Process->FullCommandLine)
     {
         ExFreePoolWithTag(Process->FullCommandLine, HEAP_PROCESS_TAG);

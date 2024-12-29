@@ -266,6 +266,8 @@ void
 
     CheckinQueueUninit(&pContext->SynchronizationContext);
 
+    ExEventDestroy(&pContext->WakeupEvent);
+
     // This Context is freed outside in TestThreadFunctionality!!!!
     //ExFreePoolWithTag((PVOID)pContext, HEAP_TEST_TAG);
 

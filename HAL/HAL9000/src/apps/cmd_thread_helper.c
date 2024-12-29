@@ -632,6 +632,12 @@ void
                                      &status);
         }
 
+        // Destroy the executive events
+        for (DWORD i = 0; i < ioBound; ++i)
+        {
+            ExEventDestroy(&pCtx[i+cpuBound].Event);
+        }
+
         // List the threads statistics
         CmdListThreads(0);
 

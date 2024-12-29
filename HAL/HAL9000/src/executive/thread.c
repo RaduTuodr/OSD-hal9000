@@ -264,6 +264,8 @@ ThreadSystemInitIdleForCurrentCPU(
     ExEventWaitForSignal(&idleStarted);
     LOG_TRACE_THREAD("Received idle thread signal\n");
 
+    ExEventDestroy(&idleStarted);
+
     LOG_FUNC_END_THREAD;
 
     return status;
@@ -1215,6 +1217,8 @@ _ThreadDestroy(
     }
 
     ProcessRemoveThreadFromList(pThread);
+    
+    ExEventDestroy(&pThread->TerminationEvt);
 
     if (NULL != pThread->Name)
     {

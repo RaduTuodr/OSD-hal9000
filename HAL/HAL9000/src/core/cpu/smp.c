@@ -346,6 +346,7 @@ SmpWakeupAps(
         LOGL("APs were signaled\n");
 
         ExEventWaitForSignal(&m_smpData.ApStartupEvent);
+        ExEventDestroy(&m_smpData.ApStartupEvent);
 
         LOGL("Aps have waken UP\n");
     }

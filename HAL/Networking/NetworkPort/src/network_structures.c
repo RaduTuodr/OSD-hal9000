@@ -186,12 +186,15 @@ NetworkPortDeviceUninit(
         pMiniportDevice = NULL;
     }
 
+    ExEventDestroy(&PortDevice->RxData.Buffers.FramesListNotEmptyEvent);
     if (NULL != PortDevice->RxData.Buffers.Buffers)
     {
         ExFreePoolWithTag(PortDevice->RxData.Buffers.Buffers, HEAP_PORT_TAG);
         PortDevice->RxData.Buffers.Buffers = NULL;
     }
 
+    ExEventDestroy(&PortDevice->TxData.Buffers.FramesListNotEmptyEvent);
+    ExEventDestroy(&PortDevice->TxData.DescriptorsAvailable);
     if (NULL != PortDevice->TxData.Buffers.Buffers)
     {
         ExFreePoolWithTag(PortDevice->TxData.Buffers.Buffers, HEAP_PORT_TAG);

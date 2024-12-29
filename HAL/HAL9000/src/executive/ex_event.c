@@ -2,6 +2,7 @@
 #include "ex_event.h"
 #include "thread_internal.h"
 #include "cal_atomic.h"
+#include "debug.h"
 
 #include "cpumu.h"
 
@@ -27,6 +28,8 @@ ExEventInit(
 
     Event->EventType = EventType;
     AtomicExchange8(&Event->Signaled, Signaled );
+
+    NotifyDebugger();
 
     return STATUS_SUCCESS;
 }
@@ -113,4 +116,16 @@ ExEventWaitForSignal(
     }
 
     CpuIntrSetState(oldState);
+}
+
+void
+ExEventDestroy(
+    INOUT     EX_EVENT*     Event
+    )
+{
+    ASSERT(Event != NULL);
+
+    memzero(Event, sizeof(EX_EVENT));
+
+    NotifyDebugger();
 }

@@ -24,6 +24,7 @@ typedef struct _EX_EVENT
 // Function:     ExEventInit
 // Description:  Initializes an executive event. As in the case of primitive
 //               events, these may be notification or synchronization events.
+//               It notifies the debugger.
 // Returns:      STATUS
 // Parameter:    OUT EX_EVENT * Event
 // Parameter:    IN EX_EVT_TYPE EventType
@@ -70,4 +71,16 @@ ExEventClearSignal(
 void
 ExEventWaitForSignal(
     INOUT   EX_EVENT*      Event
+    );
+
+//******************************************************************************
+// Function:     ExEventDestroy
+// Description:  Destroys an executive event. It should be called
+//               to notify the debugger.
+// Returns:      void
+// Parameter:    INOUT EX_EVENT * Event
+//******************************************************************************
+void
+ExEventDestroy(
+    INOUT     EX_EVENT*     Event
     );
