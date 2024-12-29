@@ -46,14 +46,23 @@ def on_file_close(core, frame):
     if file_obj_addr in _file_objects:
         _file_objects.pop(file_obj_addr)
 
-def list_file_objects(debugger, command, exe_cxt, result, internal_dict):
-    """List all file objects."""
-    global _file_objects
+class ListFileObjectsCommand(ParsedCommand):
+    def setup_command_definition(self):
+        None
 
-    print('File objects:')
-    for key, value in _file_objects.items():
-        proc_addr = hal_utils.get_address_of_value(value.process)
-        print(f'File object {hex(key)}: FileName: {value.file_name}; Process {hex(proc_addr)}: {value.process_name}')
+    def get_short_help(self):
+        return 'List all file objects.'        
+
+    def get_flags(self):
+        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
+    
+    def __call__(self, debugger, args_array, exe_cxt, result):
+        global _file_objects
+
+        print('File objects:')
+        for key, value in _file_objects.items():
+            proc_addr = hal_utils.get_address_of_value(value.process)
+            print(f'File object {hex(key)}: FileName: {value.file_name}; Process {hex(proc_addr)}: {value.process_name}')
 
 class DumpFileObjectCommand(ParsedCommand):
     def setup_command_definition(self):

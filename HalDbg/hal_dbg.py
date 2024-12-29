@@ -13,13 +13,13 @@ def __lldb_init_module(debugger, internal_dict):
     hal_utils.init(debugger)
 
     print('Adding command list_threads')
-    debugger.HandleCommand('command script add -f hal_dbg.hal_threads.list_threads list_threads')
+    debugger.HandleCommand('command script add -c hal_dbg.hal_threads.ListThreadsCommand list_threads')
 
     print('Adding command list_processes')
-    debugger.HandleCommand('command script add -f hal_dbg.hal_processes.list_processes list_processes')
+    debugger.HandleCommand('command script add -c hal_dbg.hal_processes.ListProcessesCommand list_processes')
 
     print('Adding command list_running_threads')
-    debugger.HandleCommand('command script add -f hal_dbg.hal_threads.list_running_threads list_running_threads')
+    debugger.HandleCommand('command script add -c hal_dbg.hal_threads.ListRunningThreadsCommand list_running_threads')
 
     print('Setting notification breakpoint')
     debugger.HandleCommand('breakpoint set -n NotifyDebugger')
@@ -30,7 +30,7 @@ def __lldb_init_module(debugger, internal_dict):
     hal_notify.register_notification('IoCloseFile', hal_files.on_file_close)
 
     print('Adding command list_file_objects')
-    debugger.HandleCommand('command script add -f hal_dbg.hal_files.list_file_objects list_file_objects')
+    debugger.HandleCommand('command script add -c hal_dbg.hal_files.ListFileObjectsCommand list_file_objects')
 
     print('Adding command dump_file_object')
     debugger.HandleCommand('command script add -c hal_dbg.hal_files.DumpFileObjectCommand dump_file_object')
