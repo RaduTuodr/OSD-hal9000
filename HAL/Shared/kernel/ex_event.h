@@ -13,6 +13,7 @@ typedef enum _EX_EVT_TYPE
 
 typedef struct _EX_EVENT
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     LOCK                EventLock;
     LIST_ENTRY          WaitingList;
     EX_EVT_TYPE         EventType;

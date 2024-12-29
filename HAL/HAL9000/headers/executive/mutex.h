@@ -5,6 +5,7 @@
 
 typedef struct _MUTEX
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     LOCK                MutexLock;
 
     BYTE                CurrentRecursivityDepth;

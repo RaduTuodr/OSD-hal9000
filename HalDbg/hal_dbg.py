@@ -8,6 +8,7 @@ import hal_utils
 import hal_files
 import hal_cpus
 import hal_vmm
+import hal_sync
 from hal_utils import HalCommandType
 from hal_utils import HalCommand
 
@@ -45,6 +46,12 @@ def __lldb_init_module(debugger, internal_dict):
         HalCommand('hal_dbg.hal_vmm.DumpVmmReservationSpaceCommand',
                    HalCommandType.HalCommandTypeClass,
                    'dump_vmm_reservation_space'),
+        HalCommand('hal_dbg.hal_sync.DumpMutexCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'dump_mutex'),
+        HalCommand('hal_dbg.hal_sync.DumpExEventCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'dump_ex_event'),
         HalCommand('hal_dbg.hal_cpus.ListCpusCommand',
                    HalCommandType.HalCommandTypeClass,
                    'list_cpus'),

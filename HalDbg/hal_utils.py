@@ -13,6 +13,8 @@ PCPU_TYPE = None
 VMM_RESERVATION_SPACE_TYPE = None
 VMM_RESERVATION_TYPE = None
 VMM_RESERVATION_STATE_TYPE = None
+MUTEX_TYPE = None
+EX_EVENT_TYPE = None
 
 _hal_commands = None
 
@@ -39,6 +41,8 @@ def init(debugger):
    global VMM_RESERVATION_SPACE_TYPE
    global VMM_RESERVATION_TYPE
    global VMM_RESERVATION_STATE_TYPE
+   global MUTEX_TYPE
+   global EX_EVENT_TYPE
    global _hal_commands
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
@@ -49,10 +53,12 @@ def init(debugger):
    PFILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('PFILE_OBJECT')
    FILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT')
    FILE_OBJECT_FLAGS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT_FLAGS')
+   PCPU_TYPE = DEBUGGER_TARGET.FindFirstType('struct _PCPU')
    VMM_RESERVATION_SPACE_TYPE = DEBUGGER_TARGET.FindFirstType('struct _VMM_RESERVATION_SPACE')
    VMM_RESERVATION_TYPE = DEBUGGER_TARGET.FindFirstType('struct _VMM_RESERVATION')
    VMM_RESERVATION_STATE_TYPE = DEBUGGER_TARGET.FindFirstType('enum _VMM_RESERVATION_STATE')
-   PCPU_TYPE = DEBUGGER_TARGET.FindFirstType('struct _PCPU')
+   MUTEX_TYPE = DEBUGGER_TARGET.FindFirstType('struct _MUTEX')
+   EX_EVENT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _EX_EVENT')
 
    _hal_commands = []
 
