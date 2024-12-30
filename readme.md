@@ -32,6 +32,7 @@ Repository structure:
 - `dump_file_object`
 - `dump_vmm_reservation_space`
 - `dump_vmm_reservation`
+- `list_locks`
 - `list_mutexes`
 - `dump_mutex`
 - `list_ex_events`

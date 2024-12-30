@@ -385,4 +385,6 @@ void
                          pCtx->WakeupTids[i], ThreadPriorityMaximum, 0);
         }
     }
+
+    LockDestroy(&pCtx->Lock);
 }

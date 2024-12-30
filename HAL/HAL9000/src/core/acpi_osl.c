@@ -178,6 +178,7 @@ AcpiOsDeleteLock (
 
     LOG_FUNC_START;
 
+    LockDestroy((PLOCK) Handle);
     ExFreePoolWithTag(Handle, HEAP_ACPICA_TAG);
 
     LOG_FUNC_END;

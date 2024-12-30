@@ -1526,6 +1526,8 @@ _MmuDestroyPagingTables(
                            NULL
                            );
 
+    RecRwSpinlockDestroy(&PagingTables->Lock);
+
     ExFreePoolWithTag(PagingTables, HEAP_PROCESS_TAG);
 }
 

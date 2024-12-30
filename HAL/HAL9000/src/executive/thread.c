@@ -1219,6 +1219,7 @@ _ThreadDestroy(
     ProcessRemoveThreadFromList(pThread);
     
     ExEventDestroy(&pThread->TerminationEvt);
+    LockDestroy(&pThread->BlockLock);
 
     if (NULL != pThread->Name)
     {

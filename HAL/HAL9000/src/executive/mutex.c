@@ -123,6 +123,7 @@ MutexDestroy(
 {
     ASSERT(Mutex != NULL);
 
+    LockDestroy(&Mutex->MutexLock);
     memzero(Mutex, sizeof(MUTEX));
 
     NotifyDebugger();

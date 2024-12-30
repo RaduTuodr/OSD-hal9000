@@ -736,6 +736,7 @@ _ProcessDestroy(
     MutexRelease(&m_processData.ProcessListLock);
 
     ExEventDestroy(&Process->TerminationEvt);
+    LockDestroy(&Process->ThreadListLock);
 
     if (NULL != Process->FullCommandLine)
     {

@@ -187,6 +187,7 @@ NetworkPortDeviceUninit(
     }
 
     ExEventDestroy(&PortDevice->RxData.Buffers.FramesListNotEmptyEvent);
+    LockDestroy(&PortDevice->RxData.Buffers.FramesLock);
     if (NULL != PortDevice->RxData.Buffers.Buffers)
     {
         ExFreePoolWithTag(PortDevice->RxData.Buffers.Buffers, HEAP_PORT_TAG);
@@ -195,6 +196,7 @@ NetworkPortDeviceUninit(
 
     ExEventDestroy(&PortDevice->TxData.Buffers.FramesListNotEmptyEvent);
     ExEventDestroy(&PortDevice->TxData.DescriptorsAvailable);
+    LockDestroy(&PortDevice->TxData.Buffers.FramesLock);
     if (NULL != PortDevice->TxData.Buffers.Buffers)
     {
         ExFreePoolWithTag(PortDevice->TxData.Buffers.Buffers, HEAP_PORT_TAG);

@@ -3,6 +3,7 @@
 #include "cal_atomic.h"
 #include "cal_assembly.h"
 #include "cal_intrin.h"
+#include "debug.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
 
@@ -16,6 +17,8 @@ MonitorLockInit(
     memzero(Lock, sizeof(MONITOR_LOCK));
 
     AtomicExchange8(&Lock->Lock.State, LOCK_FREE);
+
+    NotifyDebugger();
 }
 
 void

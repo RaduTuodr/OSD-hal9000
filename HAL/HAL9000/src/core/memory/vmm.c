@@ -978,6 +978,8 @@ VmmDestroyVirtualAddressSpace(
         ReservationSpace->ReservationList = NULL;
     }
 
+    RwSpinlockDestroy(&ReservationSpace->ReservationLock);
+
     ExFreePoolWithTag(ReservationSpace, HEAP_PROCESS_TAG);
 }
 

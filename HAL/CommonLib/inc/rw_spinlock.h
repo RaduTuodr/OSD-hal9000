@@ -4,6 +4,7 @@ C_HEADER_START
 #pragma pack(push,16)
 typedef struct _RW_SPINLOCK
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     volatile WORD   WaitingWriters;
     volatile WORD   ActiveWriter;
     volatile WORD   ActiveReaders;
@@ -41,4 +42,9 @@ RwSpinlockRelease(
 
 #define RwSpinlockReleaseShared(Lck,Intr)      RwSpinlockRelease((Lck),(Intr),FALSE)
 #define RwSpinlockReleaseExclusive(Lck,Intr)   RwSpinlockRelease((Lck),(Intr),TRUE)
+
+void
+RwSpinlockDestroy(
+    INOUT   RW_SPINLOCK     *Spinlock
+    );
 C_HEADER_END

@@ -205,8 +205,9 @@ def clean_hal(job_count):
                         shell=True)
     if p.returncode != 0:
         prRed('Error cleaning HAL9000!')
-        return
+        return False
     prGreen('Done.')
+    return True
 
 def clean_all(job_count):
     prCyan('Cleaning ImageCreator...')
@@ -239,8 +240,9 @@ def build_hal(job_count):
                         shell=True)
     if p.returncode != 0:
         prRed('Error building HAL9000!')
-        return
+        return False
     prGreen('Done.')
+    return True
 
 def install_hal():
     prCyan('Installing HAL9000...')
@@ -250,8 +252,9 @@ def install_hal():
                     shell=True)
     if p.returncode != 0:
         prRed('Error installing HAL9000!')
-        return
+        return False
     prGreen('Done.')
+    return True
 
 def generate_qemu_image():
     prCyan('Separating debug information...')
@@ -274,7 +277,9 @@ def generate_qemu_image():
                         shell=True)
     if p.returncode != 0:
         prRed('Error generating QEMU image!')
+        return False
     prGreen('Done.')
+    return True
 
 def build_all(job_count):
     if str(platform.system()).lower() == 'windows':
@@ -302,7 +307,8 @@ def build_all(job_count):
         return
     prGreen('Done.')
 
-    build_hal(job_count)
+    if not build_hal(job_count):
+        return
     
     prCyan('Installing ImageCreator...')
     p = subprocess.run(f'cmake --install build {build_type}',
@@ -324,16 +330,21 @@ def build_all(job_count):
         return
     prGreen('Done.')
 
-    install_hal()
+    if not install_hal():
+        return
 
-    generate_qemu_image()
+    if not generate_qemu_image():
+        return
 
 def build(job_count):
-    build_hal(job_count)
+    if not build_hal(job_count):
+        return
 
-    install_hal() 
+    if not install_hal():
+        return
 
-    generate_qemu_image()
+    if not generate_qemu_image():
+        return
 
 def parse_qemu_options(debug):
     f = open('config/QEMU.json', 'r')

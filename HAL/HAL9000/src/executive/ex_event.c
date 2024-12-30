@@ -125,6 +125,7 @@ ExEventDestroy(
 {
     ASSERT(Event != NULL);
 
+    LockDestroy(&Event->EventLock);
     memzero(Event, sizeof(EX_EVENT));
 
     NotifyDebugger();

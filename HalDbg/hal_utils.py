@@ -16,6 +16,10 @@ VMM_RESERVATION_STATE_TYPE = None
 MUTEX_TYPE = None
 EX_EVENT_TYPE = None
 BITMAP_TYPE = None
+SPINLOCK_TYPE = None
+MONITOR_LOCK_TYPE = None
+RW_SPINLOCK_TYPE = None
+REC_RW_SPINLOCK_TYPE = None
 
 _hal_commands = None
 
@@ -29,7 +33,8 @@ class FrameLocation:
 
 class HalCommandType(Enum):
    HalCommandTypeClass = 1,
-   HalCommandTypeFunction = 2
+   HalCommandTypeParsed = 2,
+   HalCommandTypeFunction = 3
 
 class HalCommand:
    def __init__(self, impl, type, name):
@@ -53,6 +58,10 @@ def init(debugger):
    global MUTEX_TYPE
    global EX_EVENT_TYPE
    global BITMAP_TYPE
+   global SPINLOCK_TYPE
+   global MONITOR_LOCK_TYPE
+   global RW_SPINLOCK_TYPE
+   global REC_RW_SPINLOCK_TYPE
    global _hal_commands
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
@@ -70,6 +79,10 @@ def init(debugger):
    MUTEX_TYPE = DEBUGGER_TARGET.FindFirstType('struct _MUTEX')
    EX_EVENT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _EX_EVENT')
    BITMAP_TYPE = DEBUGGER_TARGET.FindFirstType('struct _BITMAP')
+   SPINLOCK_TYPE = DEBUGGER_TARGET.FindFirstType('struct _SPINLOCK')
+   MONITOR_LOCK_TYPE = DEBUGGER_TARGET.FindFirstType('struct _MONITOR_LOCK')
+   RW_SPINLOCK_TYPE = DEBUGGER_TARGET.FindFirstType('struct _RW_SPINLOCK')
+   REC_RW_SPINLOCK_TYPE = DEBUGGER_TARGET.FindFirstType('struct _REC_RW_SPINLOCK')
 
    _hal_commands = []
 
@@ -81,6 +94,10 @@ def add_class_command(debugger, cmd):
    debugger.HandleCommand(f'command script add -c {cmd.impl} {cmd.name}')
    _hal_commands.append(cmd)
 
+def add_parsed_command(debugger, cmd):
+   debugger.HandleCommand(f'command script add -p -c {cmd.impl} {cmd.name}')
+   _hal_commands.append(cmd)
+
 def add_commands(debugger, commands):
    for cmd in commands:
       print(f'Adding command {cmd.name}')
@@ -88,6 +105,8 @@ def add_commands(debugger, commands):
             add_function_command(debugger, cmd)
       elif cmd.type == HalCommandType.HalCommandTypeClass:
             add_class_command(debugger, cmd)
+      elif cmd.type == HalCommandType.HalCommandTypeParsed:
+            add_parsed_command(debugger, cmd)
 
 def hal_commands(debugger, command, exe_ctx, result, internal_dict):
    """List all commands for HAL9000."""

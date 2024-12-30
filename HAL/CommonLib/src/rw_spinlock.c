@@ -2,6 +2,7 @@
 #include "lock_common.h"
 #include "cal_atomic.h"
 #include "cal_assembly.h"
+#include "debug.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
 
@@ -13,6 +14,8 @@ RwSpinlockInit(
     ASSERT( NULL != Spinlock );
 
     memzero( Spinlock, sizeof(RW_SPINLOCK));
+
+    NotifyDebugger();
 }
 
 REQUIRES_NOT_HELD_LOCK(*Spinlock)
@@ -100,6 +103,18 @@ RwSpinlockRelease(
     }
 
     CpuIntrSetState(IntrState);
+}
+
+void
+RwSpinlockDestroy(
+    INOUT   RW_SPINLOCK     *Spinlock
+    )
+{
+    ASSERT(Spinlock != NULL);
+
+    memzero(Spinlock, sizeof(RW_SPINLOCK));
+
+    NotifyDebugger();
 }
 
 #endif // _COMMONLIB_NO_LOCKS_

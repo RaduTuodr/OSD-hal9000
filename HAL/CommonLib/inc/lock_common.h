@@ -101,6 +101,14 @@ RELEASES_EXCL_AND_NON_REENTRANT_LOCK(*Lock)
 
 typedef FUNC_LockRelease*       PFUNC_LockRelease;
 
+typedef
+void
+(CDECL FUNC_LockDestroy)(
+    INOUT       PLOCK           Lock       
+    );
+
+typedef FUNC_LockDestroy*       PFUNC_LockDestroy;
+
 extern PFUNC_LockInit           LockInit;
 
 extern PFUNC_LockAcquire        LockAcquire;
@@ -110,6 +118,8 @@ extern PFUNC_LockTryAcquire     LockTryAcquire;
 extern PFUNC_LockRelease        LockRelease;
 
 extern PFUNC_LockIsOwner        LockIsOwner;
+
+extern PFUNC_LockDestroy        LockDestroy;
 
 void
 LockSystemInit(

@@ -6,6 +6,7 @@ C_HEADER_START
 #pragma pack(push,16)
 typedef struct _REC_RW_SPINLOCK
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     RW_SPINLOCK     RwSpinlock;
 
     // we don't use BYTE because we want to conserve memory,
@@ -57,4 +58,9 @@ RecRwSpinlockRelease(
 
 #define RecRwSpinlockReleaseShared(Lck,Intr)      RecRwSpinlockRelease((Lck),(Intr),FALSE)
 #define RecRwSpinlockReleaseExclusive(Lck,Intr)   RecRwSpinlockRelease((Lck),(Intr),TRUE)
+
+void
+RecRwSpinlockDestroy(
+    INOUT   REC_RW_SPINLOCK     *Spinlock
+    );
 C_HEADER_END

@@ -49,6 +49,9 @@ def __lldb_init_module(debugger, internal_dict):
         HalCommand('hal_dbg.hal_vmm.DumpVmmReservationCommand',
                    HalCommandType.HalCommandTypeClass,
                    'dump_vmm_reservation'),
+        HalCommand('hal_dbg.hal_sync.ListLocksCommand',
+                   HalCommandType.HalCommandTypeParsed,
+                   'list_locks'),
         HalCommand('hal_dbg.hal_sync.ListMutexesCommand',
                    HalCommandType.HalCommandTypeClass,
                    'list_mutexes'),
@@ -81,5 +84,12 @@ def __lldb_init_module(debugger, internal_dict):
     hal_notify.register_notification('MutexDestroy', hal_sync.on_mutex_destroy)
     hal_notify.register_notification('ExEventInit', hal_sync.on_ex_event_init)
     hal_notify.register_notification('ExEventDestroy', hal_sync.on_ex_event_destroy)
+    hal_notify.register_notification('SpinlockInit', hal_sync.on_spinlock_init)
+    hal_notify.register_notification('MonitorLockInit', hal_sync.on_monlock_init)
+    hal_notify.register_notification('_LockDestroy', hal_sync.on_lock_destroy)
+    hal_notify.register_notification('RwSpinlockInit', hal_sync.on_rw_spinlock_init)
+    hal_notify.register_notification('RwSpinlockDestroy', hal_sync.on_rw_spinlock_destroy)
+    hal_notify.register_notification('RecRwSpinlockInit', hal_sync.on_rec_rw_spinlock_init)
+    hal_notify.register_notification('RecRwSpinlockDestroy', hal_sync.on_rec_rw_spinlock_destroy)
 
     print('Loaded HAL9000 module.')
