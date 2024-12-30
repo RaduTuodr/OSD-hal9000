@@ -15,6 +15,7 @@ VMM_RESERVATION_TYPE = None
 VMM_RESERVATION_STATE_TYPE = None
 MUTEX_TYPE = None
 EX_EVENT_TYPE = None
+BITMAP_TYPE = None
 
 _hal_commands = None
 
@@ -51,6 +52,7 @@ def init(debugger):
    global VMM_RESERVATION_STATE_TYPE
    global MUTEX_TYPE
    global EX_EVENT_TYPE
+   global BITMAP_TYPE
    global _hal_commands
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
@@ -67,6 +69,7 @@ def init(debugger):
    VMM_RESERVATION_STATE_TYPE = DEBUGGER_TARGET.FindFirstType('enum _VMM_RESERVATION_STATE')
    MUTEX_TYPE = DEBUGGER_TARGET.FindFirstType('struct _MUTEX')
    EX_EVENT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _EX_EVENT')
+   BITMAP_TYPE = DEBUGGER_TARGET.FindFirstType('struct _BITMAP')
 
    _hal_commands = []
 

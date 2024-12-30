@@ -5,6 +5,7 @@ C_HEADER_START
 #pragma pack(push,16)
 typedef struct _BITMAP
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     // contains the actual bitmap
     PBYTE                   BitmapBuffer;
 

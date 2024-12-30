@@ -178,4 +178,3 @@ class DumpExEventCommand(ParsedCommand):
         print(ex_event)
         print(f'Waiting list: ')
         hal_utils.traverse_list(waiting_list, list_callback)
-
