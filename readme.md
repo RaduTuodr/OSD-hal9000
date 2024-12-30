@@ -13,6 +13,7 @@ Repository structure:
 - `HAL` &rarr; `HAL's` source code.
 - `HalDbg` &rarr; `python` scripts for the custom commands.
 - `ImageCreator` &rarr; sources of the program which generates the disk image.
+- `tests` &rarr; contains files required for verifying test results
 - `tools`:
     - `OVMF` &rarr; `UEFI` firmware implementation for `QEMU`, built using `EDK2`.
     - `ImageCreator` &rarr; will contain the executable of `ImageCreator`.

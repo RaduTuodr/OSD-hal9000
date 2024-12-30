@@ -1,0 +1,582 @@
+{
+    "config": {
+        "params": {
+            "thread_count": 16
+        },
+        "types": [
+            {
+                "name": "simple",
+                "command": "/test @@TEST@@ @@thread_count@@"
+            },
+            {
+                "name": "process",
+                "command": "/proctest @@TEST@@"
+            }
+        ],
+        "module_header": [
+            "/log ON",
+            "/loglevel 0",
+            "/logcomp 8000"
+        ],
+        "module_trailer": [
+            "/shutdown"
+        ]
+    },
+    "modules": {
+        "Threads": {
+            "PriorityDonation": [
+                {
+                    "name": "TestThreadPriorityDonationChain",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadPriorityDonationLower",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadPriorityDonationMulti",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadPriorityDonationMultiInverted",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadPriorityDonationMultiThreads",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadPriorityDonationMultiThreadsInverted",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadPriorityDonationNest",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadPriorityDonationOnce",
+                    "type": "simple",
+                    "condition": "pass"
+                }
+            ],
+            "PriorityScheduler": [
+                {
+                    "name": "TestThreadPriorityMutex",
+                    "type": "simple",
+                    "condition": "script"
+                },
+                {
+                    "name": "TestThreadPriorityRoundRobin",
+                    "type": "simple",
+                    "condition": "script"
+                },
+                {
+                    "name": "TestThreadPriorityWakeup",
+                    "type": "simple",
+                    "condition": "script"
+                },
+                {
+                    "name": "TestThreadPriorityYield",
+                    "type": "simple",
+                    "condition": "pass"
+                }
+            ],
+            "Timer": [
+                {
+                    "name": "TestThreadTimerAbsolute",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadTimerAbsolutePassed",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadTimerMultipleThreads",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadTimerMultipleTimers",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadTimerPeriodicMultiple",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadTimerPeriodicOnce",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadTimerPeriodicZero",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadTimerRelative",
+                    "type": "simple",
+                    "condition": "pass"
+                },
+                {
+                    "name": "TestThreadTimerRelativeZero",
+                    "type": "simple",
+                    "condition": "pass"
+                }
+            ]
+        },
+        "UserProg": {
+            "Arguments": [
+                {
+                    "name": "TestUserArgsAll",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "TestUserArgsMany",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "TestUserArgsNone",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "TestUserArgsOne",
+                    "type": "process",
+                    "condition": "filecompare"
+                }
+            ],
+            "BadActions": [
+                {
+                    "name": "BadJumpKernel",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadJumpNoncanonical",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadJumpNull",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadReadIoPort",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadReadKernel",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadReadMsr",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadReadNoncanonical",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadReadNull",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadWriteIoPort",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadWriteKernel",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadWriteMsr",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadWriteNoncanonical",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "BadWriteNull",
+                    "type": "process",
+                    "condition": "filecompare"
+                }
+            ],
+            "FileSyscalls": [
+                {
+                    "name": "FileCloseBad",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCloseNormal",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCloseStdout",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCloseTwice",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCreateBadPointer",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCreateEmptyPath",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCreateExistent",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCreateMissing",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCreateNormal",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCreateNull",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileCreateTwice",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileReadBadHandle",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileReadBadPointer",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileReadKernel",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileReadNormal",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileReadStdout",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "FileReadZero",
+                    "type": "process",
+                    "condition": "filecompare"
+                }
+            ],
+            "ProcessSyscalls": [
+                {
+                    "name": "ProcessCloseFile",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessCloseNormal",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessCloseParentHandle",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessCloseTwice",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessCreateBadPointer",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessCreateMissingFile",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessCreateMultiple",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessCreateOnce",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessCreateWithArguments",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessExit",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessGetPid",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessWaitBadHandle",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessWaitClosedHandle",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "ProcessWaitNormal",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessWaitTerminated",
+                    "type": "process",
+                    "condition": "filecompare"
+                }
+            ],
+            "ThreadSyscalls": [
+                {
+                    "name": "ThreadCloseTwice",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadCreateBadPointer",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadCreateMultiple",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadCreateOnce",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadCreateWithArguments",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadExit",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadGetTid",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadWaitBadHandle",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadWaitClosedHandle",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadWaitNormal",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ThreadWaitTerminated",
+                    "type": "process",
+                    "condition": "filecompare"
+                }
+            ]
+        },
+        "VirtualMemory": {
+            "ProcessQuota": [
+                {
+                    "name": "ProcessQuotaGood",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessQuotaJustRight",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "ProcessQuotaMore",
+                    "type": "process",
+                    "condition": "filecompare"
+                }
+            ],
+            "StackGrowth": [
+                {
+                    "name": "StackGrowthRecursiveFunction",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "StackGrowthVariables",
+                    "type": "process",
+                    "condition": "pass"
+                }
+            ],
+            "Swap": [
+                {
+                    "name": "SwapLinear",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "SwapMultiple",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "SwapMultipleShared",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "SwapZeros",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "SwapZerosWritten",
+                    "type": "process",
+                    "condition": "pass"
+                }
+            ],
+            "Syscalls": [
+                {
+                    "name": "VirtualAllocAccessFail",
+                    "type": "process",
+                    "condition": "filecompare"
+                },
+                {
+                    "name": "VirtualAllocHugeEager",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualAllocHugeLazy",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualAllocNormal",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualAllocWriteExec",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualAllocZeros",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualFreeInvalid",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualFreeMore",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualSharedDifferentSize",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualSharedHugeEager",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualSharedHugeLazy",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualSharedLessAccess",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualSharedMoreAccess",
+                    "type": "process",
+                    "condition": "pass"
+                },
+                {
+                    "name": "VirtualSharedNormal",
+                    "type": "process",
+                    "condition": "pass"
+                }
+            ]
+        }
+    }
+}

@@ -4,7 +4,7 @@
     "L": "tools/OVMF",
     "bios": "OVMF.fd",
     "m": "4G",
-    "smp": 4,
+    "smp": 8,
     "chardev": "file,id=char0,path=HAL9000.log",
     "serial": "chardev:char0",
     "device": [
