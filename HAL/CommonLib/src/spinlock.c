@@ -21,13 +21,22 @@ SpinlockInit(
     NotifyDebugger();
 }
 
+// DO NOT CHANGE FUNCTION NAME
 void
 SpinlockAcquire(
     INOUT       PSPINLOCK       Lock,
     OUT         INTR_STATE*     IntrState
     )
 {
+    // Read by the debugger to see if
+    // the core is waiting.
+    // I think this is the simplest way to do it,
+    // without relying on this specific implementation.
+    // Also it makes detection uniform across all lock types.
+    BOOLEAN spinning;
     PVOID pCurrentCpu;
+    
+    spinning = FALSE;
 
     ASSERT(NULL != Lock);
     ASSERT(NULL != IntrState);
@@ -44,8 +53,11 @@ SpinlockAcquire(
 
     while (LOCK_TAKEN == AtomicCompareExchange8(&Lock->State, LOCK_TAKEN, LOCK_FREE))
     {
+        spinning = TRUE;
         AsmPause();
     }
+
+    spinning = FALSE;
 
     ASSERT(NULL == Lock->FunctionWhichTookLock);
     ASSERT(NULL == Lock->Holder);

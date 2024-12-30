@@ -52,7 +52,7 @@ class ListRunningThreadsCommand(ParsedCommand):
             proc = hal_utils.get_process_from_thread(thread)
             proc_addr = hal_utils.get_address_of_value(proc)
             proc_name = hal_utils.get_process_name(proc)
-            print(f'Core {i}: Thread {hex(thread_addr)}: {thread_name}; Process {hex(proc_addr)}: {proc_name}')
+            print(f'Core {i + 1}: Thread {hex(thread_addr)}: {thread_name}; Process {hex(proc_addr)}: {proc_name}')
 
 class DumpThreadCommand(ParsedCommand):
     def setup_command_definition(self):

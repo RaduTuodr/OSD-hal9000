@@ -21,13 +21,18 @@ MonitorLockInit(
     NotifyDebugger();
 }
 
+// DO NOT CHANGE FUNCTION NAME
 void
 MonitorLockAcquire(
     INOUT       PMONITOR_LOCK       Lock,
     OUT         INTR_STATE*         IntrState
     )
 {
+    // See spinlock.c
+    BOOLEAN spinning;
     PVOID pCurrentCpu;
+
+    spinning = FALSE;
 
     ASSERT(NULL != Lock);
     ASSERT(NULL != IntrState);
@@ -46,6 +51,8 @@ MonitorLockAcquire(
 MSVC_WARNING_SUPPRESS(4127)
     while(TRUE)
     {
+        spinning = TRUE;
+
         AsmMonitor(Lock, 0, 0);
 
         if (LOCK_FREE == AtomicCompareExchange8(&Lock->Lock.State, LOCK_TAKEN, LOCK_FREE))
@@ -55,6 +62,8 @@ MSVC_WARNING_SUPPRESS(4127)
 
         AsmMwait(0, 0);
     }
+
+    spinning = FALSE;
 
     ASSERT(NULL == Lock->Lock.FunctionWhichTookLock);
     ASSERT(NULL == Lock->Lock.Holder);

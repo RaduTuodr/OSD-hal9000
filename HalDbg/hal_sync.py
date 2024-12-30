@@ -325,3 +325,75 @@ class ListLocksCommand(ParsedCommand):
                     line = value.frame_location.line_entry.GetLine()
                     col = value.frame_location.line_entry.GetColumn()
                     print(f'  Init location: {function} at {filename}:{line}:{col}')
+
+class DumpLockCommand(ParsedCommand):
+    def setup_command_definition(self):
+        parser = self.get_parser()
+        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+
+    def get_short_help(self):
+        return "Dump lock based on address."
+
+    def get_flags(self):
+        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
+
+    def _in_lock_acquire(self, func_name):
+        if func_name == 'SpinlockAcquire':
+            return 'Lock' 
+
+        if func_name == 'MonitorLockAcquire':
+            return 'Lock'
+        
+        if func_name == 'RwSpinlockAcquire':
+            return 'Spinlock'
+
+        if func_name == 'RecRwSpinlockAcquire':
+            return 'Spinlock'
+
+        return None
+
+    def __call__(self, debugger, args_array, exe_ctx, result):
+        global _locks
+
+        try:
+            addr = int(args_array, base=16)
+        except ValueError:
+            print('Invalid hexadecimal address!')
+            return
+
+        if not addr in _locks:
+            print('Lock not found.')
+            return
+        
+        lock_entry = _locks[addr]
+        if lock_entry.type == LockType.Spinlock:
+            lock_type = hal_utils.SPINLOCK_TYPE
+        elif lock_entry.type == LockType.MonitorLock:
+            lock_type = hal_utils.MONITOR_LOCK_TYPE
+        elif lock_entry.type == LockType.RwSpinlock:
+            lock_type = hal_utils.RW_SPINLOCK_TYPE
+        elif lock_entry.type == LockType.RecRwSpinlock:
+            lock_type = hal_utils.REC_RW_SPINLOCK_TYPE
+        else:
+            print('Unknown lock type.')
+            return
+        
+        lock = hal_utils.get_value_from_address(lock_type, addr)
+        print(f'Lock {hex(addr)}:')
+        print(lock)
+        print('Waiters:')
+        
+        core_count = hal_utils.DEBUGGER_PROCESS.GetNumThreads()
+        for i in range(core_count):
+            core = hal_utils.DEBUGGER_PROCESS.GetThreadAtIndex(i)
+            frame = core.GetSelectedFrame()
+            param_name = self._in_lock_acquire(frame.GetDisplayFunctionName())
+            if param_name:
+                spinning = frame.FindVariable('spinning')
+                if not spinning:
+                    continue
+                lock_addr = frame.FindVariable(param_name).GetValueAsAddress()
+                if lock_addr == addr and spinning.GetValueAsUnsigned() != 0:
+                    cpu = hal_utils.get_current_cpu(frame)
+                    cpu_addr = hal_utils.get_address_of_value(cpu)
+                    print(f'Core {i + 1}: {hex(cpu_addr)}')

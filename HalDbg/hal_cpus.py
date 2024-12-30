@@ -24,7 +24,7 @@ class ListCpusCommand(ParsedCommand):
             cpu_addr = hal_utils.get_address_of_value(cpu)
             apic_id = hal_utils.get_field_as_unsigned(cpu, 'ApicId')
             logical_apic_id = hal_utils.get_field_as_unsigned(cpu, 'LogicalApicId')
-            print(f'Core {i}: PCPU {hex(cpu_addr)}: ApicId: {apic_id}, LogicalApicId: {logical_apic_id}')
+            print(f'Core {i + 1}: PCPU {hex(cpu_addr)}: ApicId: {apic_id}, LogicalApicId: {logical_apic_id}')
 
 class DumpCpuCommand(ParsedCommand): 
     def setup_command_definition(self):

@@ -18,6 +18,7 @@ RwSpinlockInit(
     NotifyDebugger();
 }
 
+// DO NOT CHANGE FUNCTION NAME
 REQUIRES_NOT_HELD_LOCK(*Spinlock)
 _When_(Exclusive, ACQUIRES_EXCL_AND_NON_REENTRANT_LOCK(*Spinlock))
 _When_(!Exclusive, ACQUIRES_SHARED_AND_NON_REENTRANT_LOCK(*Spinlock))
@@ -28,6 +29,11 @@ RwSpinlockAcquire(
     IN      BOOLEAN         Exclusive
     )
 {
+    BOOLEAN spinning;
+
+    // See spinlock.c
+    spinning = FALSE;
+
     ASSERT( NULL != Spinlock );
     ASSERT( NULL != IntrState );
 
@@ -40,8 +46,11 @@ RwSpinlockAcquire(
         // because this is done on DWORD it will affect ActiveWrite and ActiveReaders
         while (0 != AtomicCompareExchange32((volatile DWORD*) &Spinlock->ActiveWriter, 1, 0))
         {
+            spinning = TRUE;
             AsmPause();
         }
+
+        spinning = FALSE;
 
         // we're here => we're the active writer
         // => we're no longer a waiting writer
@@ -59,8 +68,11 @@ RwSpinlockAcquire(
         // check WaitingWriters and ActiveWriter (so writers will have priority)
         while (0 != AtomicCompareExchange32((volatile DWORD*) &Spinlock->WaitingWriters, pseudoActiveWriter, 0))
         {
+            spinning = TRUE;
             AsmPause();
         }
+
+        spinning = FALSE;
 
         // we're here => we're an active reader
         AtomicIncrement16(&Spinlock->ActiveReaders);
