@@ -24,7 +24,7 @@ __main(
         UmThreadCreate((PFUNC_ThreadStart) 0x70003203ULL, NULL, &hThread);
 
         // wait for the process to crash
-        while(&hThread)
+        while(TRUE)
         {
             test += 1;
             AsmPause();

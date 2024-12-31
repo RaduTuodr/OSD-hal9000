@@ -3,6 +3,7 @@
 #include "mmu.h"
 #include "bootinfo.h"
 #include "cal_seh.h"
+#include "cal_warning.h"
 
 #define BOOT_MODULE_MAX_NAME_LEN        33
 
@@ -192,6 +193,9 @@ BootModuleGet(
     return STATUS_ELEMENT_NOT_FOUND;
 }
 
+WARNING_PUSH
+GNU_WARNING_IGNORE("-Wtautological-pointer-compare")
+
 static
 STATUS
 _MapSingleModule(
@@ -289,6 +293,8 @@ _MapSingleModule(
 
     return status;
 }
+
+WARNING_POP
 
 static
 void

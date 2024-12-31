@@ -388,7 +388,7 @@ ThreadCreateEx(
             pThread->UserStack = (PVOID) PtrDiff(pThread->UserStack, SHADOW_STACK_SIZE + sizeof(PVOID));
         }
 
-        pStartFunction = (PVOID) (bProcessIniialThread ? entryAddress : Function);
+        pStartFunction = (PVOID) (bProcessIniialThread ? entryAddress : (PVOID) Function);
         firstArg       = (QWORD) (bProcessIniialThread ? Process->NumberOfArguments : (QWORD) Context);
         secondArg      = (QWORD) (bProcessIniialThread ? PtrOffset(pThread->UserStack, SHADOW_STACK_SIZE + sizeof(PVOID)) : 0);
     }

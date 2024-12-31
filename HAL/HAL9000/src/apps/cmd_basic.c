@@ -7,6 +7,7 @@
 #include "test_common.h"
 #include "strutils.h"
 #include "cal_annotate.h"
+#include "cal_warning.h"
 
 void
 CmdPrintVolumeInformation(
@@ -30,6 +31,8 @@ WARNING_PUSH
 
 // warning C4717: '_CmdInfiniteRecursion': recursive on all control paths, function will cause runtime stack overflow
 MSVC_WARNING_DISABLE(4717)
+GNU_WARNING_IGNORE("-Winfinite-recursion")
+
 void
 CmdInfiniteRecursion(
     IN      QWORD           NumberOfParameters

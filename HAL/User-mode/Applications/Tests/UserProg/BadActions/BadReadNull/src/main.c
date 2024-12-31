@@ -1,6 +1,9 @@
 #include "common_lib.h"
 #include "syscall_if.h"
 #include "um_lib_helper.h"
+#include "cal_optimize.h"
+
+GNU_WARNING_IGNORE("-Wnull-dereference")
 
 STATUS
 __main(

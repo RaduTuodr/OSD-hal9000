@@ -10,7 +10,7 @@ else()
     endif()
 
     set(CMAKE_YASM_COMPILE_OBJECT 
-        "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> ${NASM_BIN_FORMAT} -o <OBJECT> <SOURCE>"
+        "<CMAKE_YASM_COMPILER> <DEFINES> <INCLUDES> ${NASM_BIN_FORMAT} -w-label-orphan -w-number-overflow -o <OBJECT> <SOURCE>"
     )
 endif()
 

@@ -14,17 +14,21 @@ typedef struct _STACK_COMPLETE_FUNCS
 static const STACK_COMPLETE_FUNCS STACK_FUNCS[StackTypeReserved] =
 {
     {// StackTypeDynamic
-        StackDynamicPush,
-        StackDynamicPop,
-        StackDynamicPeek,
-        StackDynamicClear,
-        StackDynamicIsEmpty,
-        StackDynamicSize,
-        StackDynamicGetRequiredSize,
-        StackDynamicInit
+        {
+            StackDynamicPush,
+            StackDynamicPop,
+            StackDynamicPeek,
+            StackDynamicClear,
+            StackDynamicIsEmpty,
+            StackDynamicSize,
+        },
+        {
+            StackDynamicGetRequiredSize,
+            StackDynamicInit
+        }
     },
 
-    { NULL, NULL, NULL, NULL, NULL },       // StackTypeInterlocked
+    { { NULL, NULL, NULL, NULL, NULL } },       // StackTypeInterlocked
 };
 
 DWORD

@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "hash_table.h"
 #include "cal_annotate.h"
+#include "cal_warning.h"
 
 WARNING_PUSH
 
@@ -304,7 +305,7 @@ QWORD
     QWORD keyValue;
 
     ASSERT(Key != NULL);
-    ASSERT(KeyLength <= MAX_QWORD);
+    // ASSERT(KeyLength <= MAX_QWORD);
 
     keyValue = 0;
     cl_memcpy(&keyValue, Key, KeyLength);
@@ -330,7 +331,7 @@ QWORD
     QWORD result;
 
     ASSERT(Key != NULL);
-    ASSERT(KeyLength <= MAX_QWORD);
+    // ASSERT(KeyLength <= MAX_QWORD);
 
     keyValue = 0;
     cl_memcpy(&keyValue, Key, KeyLength);

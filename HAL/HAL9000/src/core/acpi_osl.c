@@ -1,8 +1,10 @@
 // ACPICA OSL implementation
 
 #include "HAL9000.h"
+#include "cal_warning.h"
 
 WARNING_PUSH
+GNU_WARNING_IGNORE("-Wunused-parameter")
 #include "acpi.h"
 WARNING_POP
 #include "mmu.h"
@@ -316,6 +318,7 @@ AcpiOsWaitSemaphore (
         if (MAX_WORD != Timeout)
         {
             LOG_TRACE_ACPI("Will sleep %u ms\n", Timeout);
+GNU_WARNING_IGNORE("-Wtautological-constant-out-of-range-compare")
             ASSERT(Timeout <= MAX_DWORD / MS_IN_US);
 
             // Because we don't have a mechanism to wait for an event

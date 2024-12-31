@@ -1,6 +1,7 @@
 #include "common_lib.h"
 #include "strutils.h"
 #include "cal_annotate.h"
+#include "cal_warning.h"
 
 ALWAYS_INLINE
 void
@@ -118,6 +119,9 @@ itoa(
     }
 }
 
+WARNING_PUSH
+GNU_WARNING_IGNORE("-Wtautological-constant-out-of-range-compare")
+
 void
 atoi(
     _When_(!is64BitValue, OUT_WRITES_BYTES_ALL(sizeof(DWORD)))
@@ -192,3 +196,5 @@ atoi(
         *((PDWORD)valueAddress) = (DWORD) value;
     }
 }
+
+WARNING_POP

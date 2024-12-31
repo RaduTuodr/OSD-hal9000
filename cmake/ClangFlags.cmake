@@ -71,10 +71,20 @@ set(GLOBAL_RELEASE_FLAGS
     -Wall
 )
 
+set(GLOBAL_WARNING_DISABLES
+    -Wno-unused-but-set-variable
+    -Wno-unused-label
+    -Wno-missing-field-initializers
+    -Wno-multichar
+    -Wno-unneeded-internal-declaration
+    -Wno-unused-function
+)
+
 set(GLOBAL_C_FLAGS
     ${GLOBAL_COMMON_FLAGS}
     $<$<CONFIG:Debug>:${GLOBAL_DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${GLOBAL_RELEASE_FLAGS}>
+    ${GLOBAL_WARNING_DISABLES}
 )
 
 set(GLOBAL_FLAGS

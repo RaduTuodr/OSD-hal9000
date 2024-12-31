@@ -154,6 +154,7 @@ MSVC_WARNING_SUPPRESS(4152)
 
         // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'
 MSVC_WARNING_SUPPRESS(4311)
+GNU_WARNING_IGNORE("-Wvoid-pointer-to-int-cast")
         pConfig->SystemConfig.Pml4PhysicalAddress = (DWORD)cr3;
 
         LOGL("CR3: 0x%X\n", cr3);
@@ -183,6 +184,7 @@ MSVC_WARNING_SUPPRESS(4311)
 
                 // warning C4312: 'type cast': conversion from 'DWORD' to 'PHYSICAL_ADDRESS' of greater size
 MSVC_WARNING_SUPPRESS(4312)
+GNU_WARNING_IGNORE("-Wint-to-void-pointer-cast")
                 MmuMapMemoryInternal((PHYSICAL_ADDRESS)(pConfig->ApConfig[apicId].StackPhysicalAddress - LOW_MEMORY_STACK_SIZE),
                                      LOW_MEMORY_STACK_SIZE,
                                      PAGE_RIGHTS_READWRITE,

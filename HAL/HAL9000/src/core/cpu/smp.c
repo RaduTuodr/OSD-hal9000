@@ -13,6 +13,7 @@
 #include "cal_atomic.h"
 #include "cal_assembly.h"
 #include "cal_seh.h"
+#include "cal_warning.h"
 
 extern void ApAsmStub();
 
@@ -21,10 +22,15 @@ extern void ApAsmStub();
 #define INIT_SLEEP                              (10*MS_IN_US)   // 10 ms = 10000us sleep
 #define SIPI_SLEEP                              (200)           // 200 us sleep
 
+WARNING_PUSH
+GNU_WARNING_IGNORE("-Wenum-compare")
+
 STATIC_ASSERT(SmpIpiSendToCpu == ApicDestinationShorthandNone);
 STATIC_ASSERT(SmpIpiSendToSelf == ApicDestinationShorthandSelf);
 STATIC_ASSERT(SmpIpiSendToAllIncludingSelf == ApicDestinationShorthandAll);
 STATIC_ASSERT(SmpIpiSendToAllExcludingSelf == ApicDestinationShorthandAllExcludingSelf);
+
+WARNING_POP
 
 typedef struct _SMP_DATA
 {
@@ -67,6 +73,8 @@ _SmpInstallInterruptRoutine(
     return IoRegisterInterruptEx(&ioInterrupt, NULL, Vector);
 }
 
+WARNING_PUSH
+
 ALWAYS_INLINE
 void
 static
@@ -81,6 +89,7 @@ _SmpSendIpcIpi(
     APIC_DESTINATION_MODE apicDestinationMode;
     APIC_ID apicId;
 
+GNU_WARNING_IGNORE("-Wenum-conversion")
     apicShorthand = SendMode <= SmpIpiSendToAllExcludingSelf ? SendMode : ApicDestinationShorthandNone;
     apicDestinationMode = SendMode != SmpIpiSendToGroup ? ApicDestinationModePhysical : ApicDestinationModeLogical;
 
@@ -96,6 +105,8 @@ _SmpSendIpcIpi(
 
     LapicSystemSendIpi(apicId, ApicDeliveryModeFixed, apicShorthand, apicDestinationMode, &vector);
 }
+
+WARNING_POP
 
 ALWAYS_INLINE
 static

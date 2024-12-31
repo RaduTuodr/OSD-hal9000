@@ -3,6 +3,7 @@
 #include "cal_warning.h"
 
 WARNING_PUSH
+GNU_WARNING_IGNORE("-Wunused-parameter")
 #include "acpi.h"
 WARNING_POP
 

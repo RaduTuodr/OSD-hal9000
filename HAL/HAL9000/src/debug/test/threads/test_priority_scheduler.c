@@ -71,6 +71,7 @@ void
 
     // warning C4305: 'type cast': truncation from 'const PVOID' to 'BOOLEAN'
 MSVC_WARNING_SUPPRESS(4305)
+GNU_WARNING_IGNORE("-Wvoid-pointer-to-int-cast")
     acquireMutex = (BOOLEAN) PrepareContext;
 
     MutexInit(pMutex, FALSE);
@@ -349,6 +350,7 @@ void
 
     // warning C4305: 'type cast': truncation from 'const PVOID' to 'BOOLEAN'
 MSVC_WARNING_SUPPRESS(4305)
+GNU_WARNING_IGNORE("-Wvoid-pointer-to-int-cast")
     bMultipleThreads = (BOOLEAN) PrepareContext;
 
     pNewContext = ExAllocatePoolWithTag(PoolAllocateZeroMemory | PoolAllocatePanicIfFail,

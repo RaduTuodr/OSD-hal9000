@@ -907,7 +907,7 @@ MmuProbeMemory(
         offset = offset + PAGE_SIZE
         )
     {
-        BYTE temp = *(pBuffer + offset);temp;
+        BYTE temp = *(pBuffer + offset);(void)(temp);
     }
 }
 

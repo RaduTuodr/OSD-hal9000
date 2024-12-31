@@ -3,6 +3,7 @@
 #include "cpumu.h"
 #include "list.h"
 #include "cal_seh.h"
+#include "cal_warning.h"
 
 #include "accommon.h"
 #include "io.h"
@@ -609,6 +610,7 @@ _AcpiInterfaceParsePrts(
         return STATUS_UNSUCCESSFUL;
     }
 
+GNU_WARNING_IGNORE("-Wgnu-null-pointer-arithmetic")
     acpiStatus = AcpiWalkNamespace(ACPI_TYPE_DEVICE, ACPI_ROOT_OBJECT, ACPI_UINT32_MAX, _AcpiInterfaceDeviceWalkCallback, NULL, NULL, NULL);
     if (AE_OK != acpiStatus)
     {

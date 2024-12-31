@@ -27,6 +27,9 @@ typedef struct _RTC_framedesc
 } _RTC_framedesc;
 #pragma pack(pop)
 
+WARNING_PUSH
+GNU_WARNING_IGNORE("-Winvalid-noreturn")
+
 // NOT referenced anywhere in code
 NO_RETURN
 void
@@ -48,6 +51,8 @@ _RTC_InitBase(
 {
     NOT_REACHED;
 }
+
+WARNING_POP
 
 // we are the ones responsible for checking if any buffer overflow occurred near
 // the protected variables

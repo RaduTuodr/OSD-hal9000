@@ -231,7 +231,7 @@ _DispPutCharFrameBuffer(
         m_displayData.MappedBufferAddress +
         (Line * GLYPH_HEIGHT * m_displayData.DisplayInformation.FrameBufferPitch) +
         (Column * GLYPH_WIDTH * sizeof(DWORD));
-    BYTE *glyph = GLYPHS[Character];
+    BYTE *glyph = GLYPHS[(WORD)Character];
 
     for (BYTE i = 0; i < GLYPH_HEIGHT; i++)
     {

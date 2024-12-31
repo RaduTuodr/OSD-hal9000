@@ -764,6 +764,7 @@ _IoApicSystemInitEntry(
 
     // warning C4312: 'type cast': conversion from 'const UINT32' to 'PHYSICAL_ADDRESS' of greater size
 MSVC_WARNING_SUPPRESS(4312)
+GNU_WARNING_IGNORE("-Wint-to-void-pointer-cast")
     pIoApic->MappedAddress = IoMapMemory((PHYSICAL_ADDRESS)AcpiEntry->Address,
                                          PAGE_SIZE,
                                          PAGE_RIGHTS_READWRITE

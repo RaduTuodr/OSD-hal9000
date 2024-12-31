@@ -3,11 +3,13 @@
 #include "cpu.h"
 #include "cal_annotate.h"
 #include "cal_assembly.h"
+#include "cal_optimize.h"
 
 // The pragma optimize off is required for all the functions which are called from
 // HalActivateFpu - this is because we don't want the compiler to generate any SSE
 // instructions before we actually enabled the FP unit :)
-#pragma optimize( "", off )
+NO_OPTIMIZE
+
 ALWAYS_INLINE
 static
 BOOLEAN
@@ -66,7 +68,8 @@ HalActivateFpu(
     _HalEnableFpu();
 #endif
 }
-#pragma optimize( "", on )
+
+OPTIMIZE
 
 ALWAYS_INLINE
 static

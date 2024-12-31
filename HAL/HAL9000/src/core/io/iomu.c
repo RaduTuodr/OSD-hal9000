@@ -886,6 +886,7 @@ IomuRegisterInterrupt(
 
         LOG_TRACE_INTERRUPT("Will register vector 0x%02x for IRQL 0x%x\n", interruptVector, Interrupt->Irql);
 
+GNU_WARNING_IGNORE("-Wtautological-constant-out-of-range-compare")
         ASSERT(interruptVector >= NO_OF_RESERVED_EXCEPTIONS && interruptVector < NO_OF_TOTAL_INTERRUPTS);
         interruptIndex = interruptVector - NO_OF_RESERVED_EXCEPTIONS;
 
@@ -901,6 +902,7 @@ IomuRegisterInterrupt(
 
             // warning C4306: 'type cast': conversion from 'const BYTE' to 'PVOID' of greater size
 MSVC_WARNING_SUPPRESS(4306)
+GNU_WARNING_IGNORE("-Wint-to-void-pointer-cast")
             status = IsrInstallEx(interruptVector, _IomuGenericInterrupt, (PVOID)interruptIndex);
             if (!SUCCEEDED(status))
             {
@@ -1101,6 +1103,7 @@ BOOLEAN
 
     // warning C4305: 'type cast': truncation from 'const PVOID' to 'BYTE'
 MSVC_WARNING_SUPPRESS(4305)
+GNU_WARNING_IGNORE("-Wvoid-pointer-to-int-cast")
     interrupt = (BYTE) Context;
 
     bFoundEntry = FALSE;

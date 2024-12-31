@@ -70,7 +70,7 @@ PteLargePageGetPhysicalAddress(
 
     pEntry = (PPD_ENTRY_2MB)PageTable;
 
-    return (PHYSICAL_ADDRESS)(pEntry->PhysicalAddress << SHIFT_FOR_LARGE_PAGE);
+    return (PHYSICAL_ADDRESS)((QWORD) pEntry->PhysicalAddress << SHIFT_FOR_LARGE_PAGE);
 
 }
 

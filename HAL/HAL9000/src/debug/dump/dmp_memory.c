@@ -1,4 +1,5 @@
 #include "HAL9000.h"
+#include "cal_warning.h"
 #include "dmp_memory.h"
 #include "dmp_common.h"
 #include "strutils.h"
@@ -46,6 +47,7 @@ DumpMemory(
         currentLine[3 * charPosition + 2] = ' ';
         
         snprintf(tempStr, 3, "%c", curValue);
+GNU_WARNING_IGNORE("-Wtautological-constant-out-of-range-compare")
         asciiLine[charPosition] = isascii(tempStr[0]) ? tempStr[0] : ' ';
 
         charPosition++;

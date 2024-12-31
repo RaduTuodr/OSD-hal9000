@@ -180,6 +180,7 @@ void
 
     // warning C4305: 'type cast': truncation from 'const PVOID' to 'BOOLEAN'
 MSVC_WARNING_SUPPRESS(4305)
+GNU_WARNING_IGNORE("-Wvoid-pointer-to-int-cast")
     bPrepareArray = (BOOLEAN) PrepareContext;
 
     if (bPrepareArray)

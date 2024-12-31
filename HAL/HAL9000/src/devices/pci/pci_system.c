@@ -119,7 +119,7 @@ PciSystemInit(
 
     status = STATUS_SUCCESS;
     bRestartSearch = TRUE;
-    pEntry = FALSE;
+    pEntry = NULL;
     pMcfg = NULL;
 
 MSVC_WARNING_SUPPRESS(4127)

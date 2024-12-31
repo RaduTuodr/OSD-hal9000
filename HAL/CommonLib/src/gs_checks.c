@@ -8,6 +8,9 @@ MSVC_WARNING_DISABLE(4206)
 #else
 #include "common_lib.h"
 
+WARNING_PUSH
+GNU_WARNING_IGNORE("-Winvalid-noreturn")
+
 #define DEFAULT_SECURITY_COOKIE_VALUE       (QWORD)0xBEEF03012497EC03ULL
 
 /// TODO: should we initialize the cookie at runtime?
@@ -72,5 +75,7 @@ __stack_chk_fail(
     ASSERT_INFO(FALSE, "Security cookie is damaged. RA is 0x%X\n",
                 GET_RETURN_ADDRESS);
 }
+
+WARNING_POP
 
 #endif // CL_NO_RUNTIME_CHECKS

@@ -6,7 +6,7 @@ C_HEADER_START
 #include "data_type.h"
 
 #ifndef UNREFERENCED_PARAMETER
-#define UNREFERENCED_PARAMETER(x)   (x);
+#define UNREFERENCED_PARAMETER(x)   ((void)(x));
 #endif // UNREFERENCED_PARAMETER
 
 #ifndef NOTHING

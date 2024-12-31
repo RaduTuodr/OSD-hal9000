@@ -399,7 +399,7 @@ _AtaPrepareDmaTransfer(
 
                 // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'
 MSVC_WARNING_SUPPRESS(4311)
-                prdTable[indexInPrdEntries].PhysicalAddress = (DWORD)pCurPair->Address;
+                prdTable[indexInPrdEntries].PhysicalAddress = (DWORD)((QWORD)pCurPair->Address);
                 prdTable[indexInPrdEntries].ByteCount = byteCountForAlignment;
                 prdTable[indexInPrdEntries].LastEntry = 0;
 
@@ -408,7 +408,7 @@ MSVC_WARNING_SUPPRESS(4311)
 
             // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'
 MSVC_WARNING_SUPPRESS(4311)
-            prdTable[indexInPrdEntries].PhysicalAddress = (DWORD)pCurPair->Address + byteCountForAlignment;
+            prdTable[indexInPrdEntries].PhysicalAddress = (DWORD)((QWORD)pCurPair->Address) + byteCountForAlignment;
             prdTable[indexInPrdEntries].ByteCount = byteCountForPrd - byteCountForAlignment;
             prdTable[indexInPrdEntries].LastEntry = 0;
 
@@ -446,7 +446,7 @@ MSVC_WARNING_SUPPRESS(4311)
 
     // warning C4311: 'type cast': pointer truncation from 'PHYSICAL_ADDRESS' to 'DWORD'
 MSVC_WARNING_SUPPRESS(4311)
-        _AtaWriteDmaRegisters(AtaDevice, (DWORD)prdtPa, WriteOperation);
+        _AtaWriteDmaRegisters(AtaDevice, (DWORD)((QWORD)prdtPa), WriteOperation);
 
         CurrentTransfer->Prdt = prdTable;
     }

@@ -60,8 +60,10 @@ else()
 
     set(ACPI_FLAGS
         -g 
-        -Wall
-        -Wextra
+        # Not our code
+        # -Wall
+        # -Wextra
+        -w
         -O1
         -MT
         -fstack-protector-all
