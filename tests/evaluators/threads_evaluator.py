@@ -25,6 +25,9 @@ class ThreadNonDecreasingPriorityEvaluator(AbstractEvaluator):
 
 class ThreadRoundRobinEvaluator(AbstractEvaluator):
     def evaluate(self, result, args):
+        if '[ERROR]' in result or '[CRITICAL]' in result:
+            return 0, '[ERROR] or [CRITICAL] found in result!'
+
         prio_pattern = re.compile(r'Thread (0x[0-9a-fA-F]+) with priority (\d+)')
         count_pattern = re.compile(r'Will create (\d+) threads for running test')
 
