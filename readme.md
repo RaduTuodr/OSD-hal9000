@@ -43,6 +43,7 @@ Repository structure:
 - `dump_ex_event`
 - `list_cpus`
 - `dump_cpu`
+- `track`
 
 Run `help <command>` in `lldb` to see description.
 

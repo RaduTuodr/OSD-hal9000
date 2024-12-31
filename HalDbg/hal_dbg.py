@@ -72,7 +72,10 @@ def __lldb_init_module(debugger, internal_dict):
                    'list_cpus'),
         HalCommand('hal_dbg.hal_cpus.DumpCpuCommand',
                    HalCommandType.HalCommandTypeClass,
-                   'dump_cpu')
+                   'dump_cpu'),
+        HalCommand('hal_dbg.hal_notify.TrackCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'track')
     ]
 
     hal_utils.add_commands(debugger, commands)
