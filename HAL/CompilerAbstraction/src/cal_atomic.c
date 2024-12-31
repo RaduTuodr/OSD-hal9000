@@ -104,4 +104,3 @@ void* AtomicCompareExchangePointer(void * volatile * destination, void* exchange
 
     return expected;
 }
-

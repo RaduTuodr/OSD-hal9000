@@ -193,7 +193,6 @@ STATUS
     __finally
     {
         MutexRelease(&synchContext.Mutex);
-        MutexDestroy(&synchContext.Mutex);
 
         ExFreePoolWithTag((PVOID)synchContext.SynchronizationContext.Array, HEAP_TEST_TAG);
 
@@ -207,6 +206,8 @@ STATUS
 
             ThreadCloseHandle(pThread);
             pThread = NULL;
+
+            MutexDestroy(&synchContext.Mutex);
         }
     }
 
@@ -353,7 +354,6 @@ STATUS
             if (!bReleasedMutexes[i])
             {
                 MutexRelease(&contexes[i].Mutex);
-                MutexDestroy(&contexes[i].Mutex);
                 bReleasedMutexes[i] = TRUE;
             }
 
@@ -372,6 +372,8 @@ STATUS
 
                 ThreadCloseHandle(pThreads[i]);
                 pThreads[i] = NULL;
+
+                MutexDestroy(&contexes[i].Mutex);
             }
         }
     }

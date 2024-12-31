@@ -409,6 +409,8 @@ def run_tests(tests, job_count, debug):
 
     if not install_hal():
         return
+    
+    separate_debug_information()
 
     tester = Tester('config/Tests.json', tests, 'tests', 'artifacts/Tests', 'HAL9000.log', 0)
 
