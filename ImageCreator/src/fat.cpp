@@ -10,6 +10,8 @@
 #include <ctime>
 #include <cmath>
 
+#include <utf8.h>
+
 struct DSKSZTOSECPERCLUS
 {
     // In sectors
@@ -142,16 +144,21 @@ void Fat::createRootDirectory()
     DWORD sector = getFirstSectorOfCluster(2);
     DIR_ENTRY volumeLabelEntry;
 
+    std::string volumeName = utf8::utf16to8(partition.PartitionName);
+
     std::memset(&volumeLabelEntry, 0, 1 * sizeof(DIR_ENTRY));
+
     std::memset(&volumeLabelEntry.DIR_Name, ' ', 11 * sizeof(BYTE));
-    volumeLabelEntry.DIR_Name[0] = 'N';
-    volumeLabelEntry.DIR_Name[1] = 'O';
-    volumeLabelEntry.DIR_Name[2] = ' ';
-    volumeLabelEntry.DIR_Name[3] = 'N';
-    volumeLabelEntry.DIR_Name[4] = 'A';
-    volumeLabelEntry.DIR_Name[5] = 'M';
-    volumeLabelEntry.DIR_Name[6] = 'E';
+    std::memcpy(&volumeLabelEntry.DIR_Name,
+                volumeName.c_str(),
+                std::min(static_cast<size_t>(11), volumeName.size()));
     volumeLabelEntry.DIR_Attr |= ATTR_VOLUME_ID;
+    auto [date, time] = getCurrentDateAndTime();
+    volumeLabelEntry.DIR_CrtTime = time;
+    volumeLabelEntry.DIR_CrtDate = date;
+    volumeLabelEntry.DIR_WrtTime = time;
+    volumeLabelEntry.DIR_WrtDate = date;
+    volumeLabelEntry.DIR_LstAccDate = date;
 
     writeToSector(sector, reinterpret_cast<BYTE*>(&volumeLabelEntry), sizeof(DIR_ENTRY));
 }

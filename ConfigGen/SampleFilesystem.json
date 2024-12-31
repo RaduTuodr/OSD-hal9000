@@ -40,12 +40,8 @@
                     "destination": "/EFI/OS/HAL9000.bin"
                 },
                 {
-                    "source": "config/Tests",
+                    "source": "artifacts/Tests",
                     "destination": "/EFI/MODULES/Tests"
-                },
-                {
-                    "source": "config/HAL9000.ini",
-                    "destination": "/HAL9000.ini"
                 }
             ]
         } 

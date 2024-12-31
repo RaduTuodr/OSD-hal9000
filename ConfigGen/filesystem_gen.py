@@ -9,7 +9,12 @@ def main():
     data_filesys = {}
     data_filesys['partition'] = 'DATA'
     data_filesys['directories'] = ['/Applications']
-    data_filesys['files'] = []
+    data_filesys['files'] = [
+        {
+        'source': 'config/HAL9000.ini',
+        'destination': '/HAL9000.ini'
+        }
+    ]
     app_dir = 'artifacts/apps'
     apps = []
     for dirname in os.listdir(app_dir):

@@ -13,3 +13,5 @@ bootdrive/*
 !.vscode/tasks.json
 temp/*
 !tools/OVMF/OVMF.fd
+tests/__pycache__/*
+tests/evaluators/__pycache__/*

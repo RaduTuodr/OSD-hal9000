@@ -46,8 +46,8 @@ Run `help <command>` in `lldb` to see description.
 
 ## Prerequisites
 
-Install `Visual Studio Code` and the `CodeLLDB` extensions.
-Install `python3`.
+Install `Visual Studio Code` with the `Python` and `CodeLLDB` extensions.
+Install `Python` at least 3.10.
 
 Tools used by `HAL`:
 - `qemu` &rarr; the emulator.
@@ -92,8 +92,10 @@ Run using `Run.ps1`. -->
 
 Run with `HAL9000.py --run`, use the `-d` flag if you want to attach the debugger to the virtual machine.
 
-**TODO**:
-`HAL9000.py --run-tests Module`
+## Testing
+
+You can run tests with `HAL9000.py --run-tests`. A list of test patterns can be given and all matching
+tests are run. Pattern syntax: Module:Category:Name.
 
 ## Clean
 

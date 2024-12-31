@@ -6,6 +6,8 @@ import platform
 import subprocess
 import multiprocessing
 import json
+import time
+from tests.testing import Tester
 
 if str(platform.system()).lower() == 'linux':
     import distro
@@ -244,11 +246,18 @@ def build_hal(job_count):
     prGreen('Done.')
     return True
 
+def clear_tests_module():
+    f = open('artifacts/Tests', 'w')
+    f.truncate(0)
+    f.write('/vol\n')
+    f.close()
+
 def install_hal():
     prCyan('Installing HAL9000...')
     p = subprocess.run(f'cmake --install build',
                     cwd='HAL',
                     env=get_build_env(),
+                    stdout=subprocess.DEVNULL,
                     shell=True)
     if p.returncode != 0:
         prRed('Error installing HAL9000!')
@@ -256,7 +265,7 @@ def install_hal():
     prGreen('Done.')
     return True
 
-def generate_qemu_image():
+def separate_debug_information():
     prCyan('Separating debug information...')
     subprocess.run(f'"llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
                     env=get_build_env(),
@@ -271,6 +280,7 @@ def generate_qemu_image():
                     shell=True)
     prGreen('Done.')
 
+def generate_qemu_image():
     prCyan('Generating QEMU image...')
     p = subprocess.run(f'"tools/ImageCreator/bin/ImageCreator{".exe" if str(platform.system()).lower() == "windows" else ""}" "config/HAL9000.json"',
                         env=get_build_env(),
@@ -314,6 +324,7 @@ def build_all(job_count):
     p = subprocess.run(f'cmake --install build {build_type}',
                         cwd='ImageCreator',
                         env=get_build_env(),
+                        stdout=subprocess.DEVNULL,
                         shell=True)
     if p.returncode != 0:
         prRed('Error installing ImageCreator!')
@@ -324,6 +335,7 @@ def build_all(job_count):
     p = subprocess.run(f'cmake --install build',
                         cwd='UefiBootloader',
                         env=get_build_env(),
+                        stdout=subprocess.DEVNULL,
                         shell=True)
     if p.returncode != 0:
         prRed('Error installing UefiBootloader!')
@@ -333,8 +345,9 @@ def build_all(job_count):
     if not install_hal():
         return
 
-    if not generate_qemu_image():
-        return
+    clear_tests_module()
+
+    separate_debug_information()
 
 def build(job_count):
     if not build_hal(job_count):
@@ -343,8 +356,9 @@ def build(job_count):
     if not install_hal():
         return
 
-    if not generate_qemu_image():
-        return
+    clear_tests_module()
+
+    separate_debug_information()
 
 def parse_qemu_options(debug):
     f = open('config/QEMU.json', 'r')
@@ -365,11 +379,70 @@ def parse_qemu_options(debug):
     return qemu_options
 
 def run(debug):
+    if not generate_qemu_image():
+        return 
+
     prCyan('Starting QEMU...')
     qemu_options = parse_qemu_options(debug)
     subprocess.run(f'qemu-system-x86_64{".exe" if str(platform.system()).lower() == "windows" else ""} \
-                    {qemu_options}',
-                    shell=True)
+                   {qemu_options}',
+                   shell=True)
+
+def run_async(debug) -> subprocess.Popen:
+    if not generate_qemu_image():
+        return 
+
+    prCyan('Starting QEMU...')
+    qemu_options = parse_qemu_options(debug)
+    return subprocess.Popen(f'qemu-system-x86_64{".exe" if str(platform.system()).lower() == "windows" else ""} \
+                            {qemu_options}',
+                            shell=True,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                            stdin=subprocess.DEVNULL)
+
+def run_tests(tests, job_count, debug):
+    prCyan(f'Running tests matching: {tests}')
+
+    if not build_hal(job_count):
+        return
+
+    if not install_hal():
+        return
+
+    tester = Tester('config/Tests.json', tests, 'tests', 'artifacts/Tests', 'HAL9000.log', 0)
+
+    prCyan('Generating tests module...')
+    err = tester.generate_tests_module()
+    if err:
+        prRed(f'Error: {err}')
+        return
+    prGreen('Done.')
+
+    timeout = tester.timeout
+
+    p = run_async(debug)
+
+    if timeout == 0:
+        prYellow('There is no timeout. Waiting for QEMU to finish...')
+        p.wait()
+    else:
+        prYellow(f'Timeout is {timeout}s. Sleeping...')
+        time.sleep(timeout)
+
+    if p.poll() == None:
+        prRed('Error: QEMU did not finish in time.')
+        p.terminate()
+        clear_tests_module()
+        return
+    
+    prCyan('Evaluating results...')
+
+    print(tester.evaluate_results())
+    
+    clear_tests_module()
+
+    prGreen('Done.')
 
 def main():
     parser = argparse.ArgumentParser(prog='HAL9000.py',
@@ -412,6 +485,9 @@ def main():
                         help='Run HAL9000',
                         action='store_true',
                         default=False)
+    parser.add_argument('--run_tests',
+                        help='Run the matching tests, regular expressions are also accepted',
+                        nargs='+')
     parser.add_argument('-j',
                         help='Job count, use it for parallel build (default: number of CPUs)',
                         type=int,
@@ -455,6 +531,10 @@ def main():
 
     if args['run']:
         run(args['d'])
+        return
+
+    if 'run_tests' in args:
+        run_tests(args['run_tests'], args['j'], args['d'])
         return
 
 if __name__ == '__main__':
