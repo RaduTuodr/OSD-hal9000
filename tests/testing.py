@@ -250,8 +250,11 @@ class Tester:
     def evaluate_results(self) -> str:
         evals = {}
         for name, clazz in inspect.getmembers(sys.modules[__name__], inspect.isclass):            
-            if 'Evaluator' in name:
+            if 'Evaluator' in name and not 'Abstract' in name:
                 name = name.replace('Evaluator', '')
+                if not issubclass(clazz, AbstractEvaluator):
+                    prYellow(f'Evaluator {name} does not implement required interface. Skipping.')
+                    continue
                 evals[name] = clazz()
 
         test_logs = self.__extract_test_logs()
