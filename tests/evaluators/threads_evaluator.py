@@ -37,7 +37,7 @@ class ThreadRoundRobinEvaluator(AbstractEvaluator):
         for line in result.split('\n'):
             m = prio_pattern.search(line)
             if m:
-                captured_data.append(int(m.group(1), base=16), int(m.group(2)))
+                captured_data.append((int(m.group(1), base=16), int(m.group(2))))
             else:
                 m = count_pattern.search(line)
                 if m:
@@ -56,10 +56,10 @@ class ThreadRoundRobinEvaluator(AbstractEvaluator):
             if th_idx < no_of_threads:
                 sequence.append(tid)
             else:
-               msg += f'          Next thread should have been with TID {hex(sequence[th_idx % no_of_threads])}, instead thread with TID {hex(tid)} executed!\n' 
-               failure = True
-               if sequence[th_idx % no_of_threads] != tid:
-                   break
+                if sequence[th_idx % no_of_threads] != tid:
+                    msg += f'          Next thread should have been with TID {hex(sequence[th_idx % no_of_threads])}, instead thread with TID {hex(tid)} executed!\n' 
+                    failure = True
+                    break
             th_idx = th_idx + 1
 
         if not failure:

@@ -103,6 +103,10 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": []
         },
         {
@@ -132,5 +136,35 @@
             },
             "problemMatcher": []
         },
+        {
+            "label": "Run tests",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "HAL9000.py",
+                "--run_tests",
+                "${input:testModule}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+    ],
+    "inputs": [
+        {
+            "id": "testModule",
+            "description": "Select module",
+            "type": "pickString",
+            "options": [
+                "Threads",
+                "UserProg",
+                "VirtualMemory"
+            ]
+        }
     ]
 }

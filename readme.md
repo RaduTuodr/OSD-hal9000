@@ -1,7 +1,9 @@
 ## Introduction
 
 Repository structure:
-- `.vscode` &rarr; contains `launch.json`.
+- `.vscode`:
+    - `launch.json` &rarr; debug configuration.
+    - `tasks.json` &rarr; tasks for building `HAL` and running test, you can map shortcuts.
 - `artifacts` &rarr; will contain the final build artifacts.
 - `cmake` &rarr; `CMake` toolchain configuration files. 
 - `config`:
