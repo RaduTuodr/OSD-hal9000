@@ -233,6 +233,7 @@ VmReservationSpaceInit(
     LOG_TRACE_VMM("Reserved area size: %U KB\n", ReservationMetadataSize / KB_SIZE );
 
     RwSpinlockInit(&ReservationSpace->ReservationLock);
+    RwSpinlockSetName(&ReservationSpace->ReservationLock, "ReservationLock");
 }
 
 _No_competing_thread_

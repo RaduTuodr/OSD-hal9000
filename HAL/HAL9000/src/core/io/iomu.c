@@ -241,6 +241,7 @@ IomuPreinitSystem(
     {
         InitializeListHead(&m_iomuData.RegisteredInterrupts[i].List);
         RwSpinlockInit(&m_iomuData.RegisteredInterrupts[i].Lock);
+        RwSpinlockSetName(&m_iomuData.RegisteredInterrupts[i].Lock, "InterruptLock");
     }
 
     bitmapSize = BitmapPreinit(&m_iomuData.InterruptBitmap, NO_OF_TOTAL_INTERRUPTS);

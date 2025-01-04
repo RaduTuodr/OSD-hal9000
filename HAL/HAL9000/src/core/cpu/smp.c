@@ -183,6 +183,7 @@ SmpPreinit(
 
     InitializeListHead(&m_smpData.CpuList);
     RwSpinlockInit(&m_smpData.CpuLock);
+    RwSpinlockSetName(&m_smpData.CpuLock, "SmpCpuLock");
 }
 
 STATUS

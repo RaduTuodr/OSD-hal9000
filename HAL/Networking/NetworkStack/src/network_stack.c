@@ -32,6 +32,7 @@ NetworkStackPreinit(
 
     InitializeListHead(&m_netStackData.NetworkDeviceList);
     RwSpinlockInit(&m_netStackData.DeviceLock);
+    RwSpinlockSetName(&m_netStackData.DeviceLock, "NetStackDev");
 
     m_netStackData.NetworkingEnabled = TRUE;
 }
