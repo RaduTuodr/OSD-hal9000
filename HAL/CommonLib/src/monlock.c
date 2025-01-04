@@ -78,6 +78,7 @@ MonitorLockSetName(
     strncpy(Lock->Lock.Name, Name, length);
 }
 
+// DO NOT CHANGE THE NAME OF THIS FUNCTION
 void
 MonitorLockAcquire(
     INOUT       PMONITOR_LOCK       Lock,

@@ -2,52 +2,6 @@ import lldb
 from lldb.plugins.parsed_cmd import ParsedCommand
 
 import hal_utils
-from hal_utils import FrameLocation
-
-_file_objects = {}
-
-# What about record ?
-class FileObject:
-    def __init__(self, process, file_name, frame_location):
-        self.process = hal_utils.get_address_of_value(process)
-        self.process_name = hal_utils.get_process_name(process)
-        self.file_name = file_name
-        self.frame_location = frame_location
-
-def on_file_create(core, frame):
-    global _file_objects
-    handle_param = frame.FindVariable('Handle')
-    file_name_param = frame.FindVariable('FileName')
-
-    pfile_obj_addr = handle_param.GetValueAsAddress()
-    pfile_obj = hal_utils.get_value_from_address(
-        hal_utils.PFILE_OBJECT_TYPE,
-        pfile_obj_addr)
-    file_obj_addr = pfile_obj.GetValueAsAddress()
-    
-    file_name_addr = file_name_param.GetValueAsAddress()
-    file_name = hal_utils.get_c_string(file_name_addr, 256) 
-
-    thread = hal_utils.get_current_thread(core.GetSelectedFrame())
-    process = hal_utils.get_process_from_thread(thread)
-
-    loc = None
-    if core.GetNumFrames() >= 3:
-        creator = core.GetFrameAtIndex(2)
-        loc = FrameLocation(creator.GetDisplayFunctionName(),
-                            creator.GetLineEntry(),
-                            []) # Do not store too much
-                            # creator.arguments) 
-
-    _file_objects[file_obj_addr] = FileObject(process, file_name, loc) 
-
-def on_file_close(core, frame):
-    global _file_objects
-
-    handle_param = frame.FindVariable('FileHandle')
-    file_obj_addr = handle_param.GetValueAsAddress()
-    if file_obj_addr in _file_objects:
-        _file_objects.pop(file_obj_addr)
 
 class ListFileObjectsCommand(ParsedCommand):
     def setup_command_definition(self):
@@ -60,17 +14,24 @@ class ListFileObjectsCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_cxt, result):
-        global _file_objects
+        file_list_ptr = hal_utils.get_debug_data('FileList')
+        print(hex(file_list_ptr))
+        file_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, file_list_ptr)
+        print(file_list)
+
+        def list_callback(list_entry):
+            file = hal_utils.containing_record(list_entry, hal_utils.FILE_OBJECT_TYPE, 'AllList') 
+            file_addr = hal_utils.get_address_of_value(file)
+            try:
+                file_name = hal_utils.get_file_name(file)
+            except:
+                file_name = None
+            if not file_name:
+                file_name = 'NULL'
+            print(f'File object {hex(file_addr)}: {file_name}')
 
         print('File objects:')
-        for key, value in _file_objects.items():
-            print(f'File object {hex(key)}: FileName: {value.file_name}; Process {hex(value.process)}: {value.process_name}')
-            if value.frame_location:
-                function = value.frame_location.function
-                filename = value.frame_location.line_entry.GetFileSpec().basename
-                line = value.frame_location.line_entry.GetLine()
-                col = value.frame_location.line_entry.GetColumn()
-                print(f'  Create location: {function} at {filename}:{line}:{col}')
+        hal_utils.traverse_list(file_list, list_callback)
 
 class DumpFileObjectCommand(ParsedCommand):
     def setup_command_definition(self):

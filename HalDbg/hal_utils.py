@@ -189,7 +189,7 @@ def get_file_name(file_object):
    name_addr = get_field_as_address(file_object, 'FileName')
    return get_c_string(name_addr, 256)
 
-def get_mutex_name(mutex):
+def get_name(mutex):
    name = get_field(mutex, 'Name')
    name_addr = get_address_of_value(name)
    return get_c_string(name_addr, 256)
@@ -203,3 +203,7 @@ def get_enum_member_value_as_unsigned(enum_type, member):
 def get_debug_data(name):
    debug_data = find_global_variable('m_debugSystemData')
    return get_field_as_address(debug_data, name)
+
+def get_debug_value_as_unsigned(name):
+   debug_data = find_global_variable('m_debugSystemData')
+   return get_field_as_unsigned(debug_data, name)

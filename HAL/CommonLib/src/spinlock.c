@@ -78,6 +78,7 @@ SpinlockSetName(
     strncpy(Lock->Name, Name, length);
 }
 
+// DO NOT CHANGE THE NAME OF THIS FUNCTION
 void
 SpinlockAcquire(
     INOUT       PSPINLOCK       Lock,

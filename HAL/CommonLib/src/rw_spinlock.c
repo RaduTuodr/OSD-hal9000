@@ -71,6 +71,7 @@ RwSpinlockSetName(
     strncpy(Spinlock->Name, Name, length);
 }
 
+// DO NOT CHANGE THE NAME OF THIS FUNCTION
 REQUIRES_NOT_HELD_LOCK(*Spinlock)
 _When_(Exclusive, ACQUIRES_EXCL_AND_NON_REENTRANT_LOCK(*Spinlock))
 _When_(!Exclusive, ACQUIRES_SHARED_AND_NON_REENTRANT_LOCK(*Spinlock))

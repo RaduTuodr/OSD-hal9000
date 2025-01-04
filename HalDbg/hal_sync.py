@@ -5,52 +5,9 @@ from enum import Enum
 import hal_utils
 from hal_utils import FrameLocation
 
-_mutexes = {}
-_ex_events = {}
-_locks = {}
-
 class LockType(Enum):
     Spinlock = 1,
-    MonitorLock = 2,
     RwSpinlock = 3,
-    RecRwSpinlock = 4,
-    Any = 5
-
-class Lock:
-    def __init__(self, type, frame_location):
-        self.type = type
-        self.frame_location = frame_location
-
-class Mutex:
-    def __init__(self, frame_location):
-        self.frame_location = frame_location
-
-class ExEvent:
-    def __init__(self, frame_location):
-        self.frame_location = frame_location
-
-def on_mutex_init(core, frame):
-    global _mutexes
-
-    mutex_ptr = frame.FindVariable('Mutex').GetValueAsAddress()
-
-    loc = None
-    if core.GetNumFrames() >= 3:
-        creator = core.GetFrameAtIndex(2)
-        loc = FrameLocation(creator.GetDisplayFunctionName(),
-                            creator.GetLineEntry(),
-                            []) # Do not store too much
-                            # creator.arguments) 
-
-    _mutexes[mutex_ptr] = Mutex(loc)
-
-def on_mutex_destroy(core, frame):
-    global _mutexes
-
-    mutex_ptr = frame.FindVariable('Mutex').GetValueAsAddress()
-
-    if mutex_ptr in _mutexes:
-        _mutexes.pop(mutex_ptr)
 
 class ListMutexesCommand(ParsedCommand):
     def setup_command_definition(self):
@@ -69,7 +26,7 @@ class ListMutexesCommand(ParsedCommand):
         def list_callback(list_entry):
             mutex = hal_utils.containing_record(list_entry, hal_utils.MUTEX_TYPE, 'AllList') 
             mutex_addr = hal_utils.get_address_of_value(mutex)
-            mutex_name = hal_utils.get_mutex_name(mutex)
+            mutex_name = hal_utils.get_name(mutex)
             if not mutex_name:
                 mutex_name = 'NULL'
             print(f'Mutex {hex(mutex_addr)}: {mutex_name}')
@@ -113,29 +70,6 @@ class DumpMutexCommand(ParsedCommand):
         print(f'Waiting list: ')
         hal_utils.traverse_list(waiting_list, list_callback)
 
-def on_ex_event_init(core, frame):
-    global _ex_events
-
-    event_ptr = frame.FindVariable('Event').GetValueAsAddress()
-
-    loc = None
-    if core.GetNumFrames() >= 3:
-        creator = core.GetFrameAtIndex(2)
-        loc = FrameLocation(creator.GetDisplayFunctionName(),
-                            creator.GetLineEntry(),
-                            []) # Do not store too much
-                            # creator.arguments) 
-
-    _ex_events[event_ptr] = ExEvent(loc)
-
-def on_ex_event_destroy(core, frame):
-    global _ex_events
-
-    event_ptr = frame.FindVariable('Event').GetValueAsAddress()
-
-    if event_ptr in _ex_events:
-        _ex_events.pop(event_ptr)
-
 class ListExEventsCommand(ParsedCommand):
     def setup_command_definition(self):
         None
@@ -147,17 +81,19 @@ class ListExEventsCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_cxt, result):
-        global _ex_events
+        ex_event_list_ptr = hal_utils.get_debug_data('ExEventList')
+        ex_event_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, ex_event_list_ptr)
+
+        def list_callback(list_entry):
+            event = hal_utils.containing_record(list_entry, hal_utils.EX_EVENT_TYPE, 'AllList')
+            event_addr = hal_utils.get_address_of_value(event)
+            event_name = hal_utils.get_name(event)
+            if not event_name:
+                event_name = 'NULL'
+            print(f'EX Event {hex(event_addr)}: {event_name}')
 
         print('EX Events:')
-        for key, value in _ex_events.items():
-            print(f'EX Event {hex(key)}')
-            if value.frame_location:
-                function = value.frame_location.function
-                filename = value.frame_location.line_entry.GetFileSpec().basename
-                line = value.frame_location.line_entry.GetLine()
-                col = value.frame_location.line_entry.GetColumn()
-                print(f'  Init location: {function} at {filename}:{line}:{col}')
+        hal_utils.traverse_list(ex_event_list, list_callback) 
 
 class DumpExEventCommand(ParsedCommand):
     def setup_command_definition(self):
@@ -195,114 +131,19 @@ class DumpExEventCommand(ParsedCommand):
         print(f'Waiting list: ')
         hal_utils.traverse_list(waiting_list, list_callback)
 
-def add_lock(type, lock_ptr, core):
-    global _locks
-
-    loc = None
-    if core.GetNumFrames() >= 3:
-        creator = core.GetFrameAtIndex(2)
-        loc = FrameLocation(creator.GetDisplayFunctionName(),
-                            creator.GetLineEntry(),
-                            []) # Do not store too much
-                            # creator.arguments) 
-
-    _locks[lock_ptr] = Lock(type, loc)
-
-def on_spinlock_init(core, frame):
-    lock_ptr = frame.FindVariable('Lock').GetValueAsAddress()
-
-    add_lock(LockType.Spinlock, lock_ptr, core)
-
-def on_monlock_init(core, frame):
-    lock_ptr = frame.FindVariable('Lock').GetValueAsAddress()
-
-    add_lock(LockType.MonitorLock, lock_ptr, core)
-
-def on_lock_destroy(core, frame):
-    global _locks
-
-    lock_ptr = frame.FindVariable('Lock').GetValueAsAddress()
-
-    if lock_ptr in _locks:
-        _locks.pop(lock_ptr)
-
-def on_rw_spinlock_init(core, frame):
-    lock_ptr = frame.FindVariable('Spinlock').GetValueAsAddress()
-
-    add_lock(LockType.RwSpinlock, lock_ptr, core)
-
-def on_rec_rw_spinlock_init(core, frame):
-    global _locks
-
-    lock_ptr = frame.FindVariable('Spinlock').GetValueAsAddress()
-    rec_rw_lock = hal_utils.get_value_from_address(hal_utils.REC_RW_SPINLOCK_TYPE,
-                                                   lock_ptr)
-    rw_lock = hal_utils.get_field(rec_rw_lock, 'RwSpinlock')
-    rw_lock_ptr = hal_utils.get_address_of_value(rw_lock)
-
-    # See rec rw lock init function
-    if rw_lock_ptr in _locks:
-        _locks.pop(rw_lock_ptr)
-    else:
-        print('We should have had a rw lock saved')
-
-    add_lock(LockType.RecRwSpinlock, lock_ptr, core) 
-
-def on_rw_spinlock_destroy(core, frame):
-    global _locks
-
-    lock_ptr = frame.FindVariable('Spinlock').GetValueAsAddress()
-
-    if lock_ptr in _locks:
-        _locks.pop(lock_ptr)
-
-def on_rec_rw_spinlock_destroy(core, frame):
-    global _locks
-
-    lock_ptr = frame.FindVariable('Spinlock').GetValueAsAddress()
-
-    if lock_ptr in _locks:
-        _locks.pop(lock_ptr)
-
-class ListAllLocksCommand(ParsedCommand):
-    def setup_command_definition(self):
-        None
-
-    def get_short_help(self):
-        return 'List all locks.'        
-
-    def get_flags(self):
-        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
-    
-    def __call__(self, debugger, args_array, exe_cxt, result):
-        global _locks
-
-        print('Locks:')
-        for key, value in _locks.items():
-            print(f'Lock {hex(key)}, Type: {value.type.name}')
-            if value.frame_location:
-                function = value.frame_location.function
-                filename = value.frame_location.line_entry.GetFileSpec().basename
-                line = value.frame_location.line_entry.GetLine()
-                col = value.frame_location.line_entry.GetColumn()
-                print(f'  Init location: {function} at {filename}:{line}:{col}')
-
 class ListLocksCommand(ParsedCommand):
 
     def setup_command_definition(self):
         enum_values = [
-            ['Any', 'Select all lock types'],
             ['Spinlock', 'Select all spinlocks'],
-            ['MonitorLock', 'Select all monitorlocks'],
             ['RwSpinlock', 'Select all rw spinlocks'],
-            ['RecRwSpinlock', 'Select all rec rw spinlocks']
         ]
 
         parser = self.get_parser()
         parser.add_option(short_option='t',
                         long_option='type',
                         help='Filters displayed spinlocks based on type',
-                        default='Any',
+                        default='Spinlock',
                         value_type=lldb.eArgTypeTypeName,
                         enum_values=enum_values)
 
@@ -315,72 +156,57 @@ class ListLocksCommand(ParsedCommand):
     def __call__(self, debugger, args_array, exe_cxt, result):
         global _locks
 
-        filt = LockType[self.get_parser().type]
+        requested_type = LockType[self.get_parser().type]
+
+        if requested_type == LockType.RwSpinlock:
+            lock_list_ptr = hal_utils.get_debug_data('RwSpinlockList')
+        else:
+            lock_list_ptr = hal_utils.get_debug_data('LockList')
+        
+        lock_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, lock_list_ptr)
+
+        def list_callback(list_entry):
+            if requested_type == LockType.RwSpinlock:
+                lock = hal_utils.containing_record(list_entry, hal_utils.RW_SPINLOCK_TYPE, 'AllList')
+            elif requested_type == LockType.Spinlock:
+                lock = hal_utils.containing_record(list_entry, hal_utils.SPINLOCK_TYPE, 'AllList')
+            lock_name = hal_utils.get_name(lock)
+            lock_addr = hal_utils.get_address_of_value(lock)
+            if not lock_name:
+                lock_name = 'NULL'
+            print(f'Lock {hex(lock_addr)}: {lock_name}')
 
         print('Locks:')
-        for key, value in _locks.items():
-            if filt == LockType.Any or filt == value.type:
-                print(f'Lock {hex(key)}, Type: {value.type.name}')
-                if value.frame_location:
-                    function = value.frame_location.function
-                    filename = value.frame_location.line_entry.GetFileSpec().basename
-                    line = value.frame_location.line_entry.GetLine()
-                    col = value.frame_location.line_entry.GetColumn()
-                    print(f'  Init location: {function} at {filename}:{line}:{col}')
+        hal_utils.traverse_list(lock_list, list_callback)
 
-class DumpLockCommand(ParsedCommand):
+class DumpSpinlockCommand(ParsedCommand):
     def setup_command_definition(self):
         parser = self.get_parser()
         parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
 
     def get_short_help(self):
-        return "Dump lock based on address."
+        return "Dump spinlock based on address."
 
     def get_flags(self):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
 
     def _in_lock_acquire(self, func_name):
         if func_name == 'SpinlockAcquire':
-            return 'Lock' 
+            return True
 
         if func_name == 'MonitorLockAcquire':
-            return 'Lock'
+            return True
         
-        if func_name == 'RwSpinlockAcquire':
-            return 'Spinlock'
-
-        if func_name == 'RecRwSpinlockAcquire':
-            return 'Spinlock'
-
-        return None
+        return False
 
     def __call__(self, debugger, args_array, exe_ctx, result):
-        global _locks
-
         try:
             addr = int(args_array, base=16)
         except ValueError:
             print('Invalid hexadecimal address!')
             return
 
-        if not addr in _locks:
-            print('Lock not found.')
-            return
-        
-        lock_entry = _locks[addr]
-        if lock_entry.type == LockType.Spinlock:
-            lock_type = hal_utils.SPINLOCK_TYPE
-        elif lock_entry.type == LockType.MonitorLock:
-            lock_type = hal_utils.MONITOR_LOCK_TYPE
-        elif lock_entry.type == LockType.RwSpinlock:
-            lock_type = hal_utils.RW_SPINLOCK_TYPE
-        elif lock_entry.type == LockType.RecRwSpinlock:
-            lock_type = hal_utils.REC_RW_SPINLOCK_TYPE
-        else:
-            print('Unknown lock type.')
-            return
-        
-        lock = hal_utils.get_value_from_address(lock_type, addr)
+        lock = hal_utils.get_value_from_address(hal_utils.SPINLOCK_TYPE, addr)
         print(f'Lock {hex(addr)}:')
         print(lock)
         print('Waiters:')
@@ -389,12 +215,61 @@ class DumpLockCommand(ParsedCommand):
         for i in range(core_count):
             core = hal_utils.DEBUGGER_PROCESS.GetThreadAtIndex(i)
             frame = core.GetSelectedFrame()
-            param_name = self._in_lock_acquire(frame.GetDisplayFunctionName())
-            if param_name:
+            if self._in_lock_acquire(frame.GetDisplayFunctionName()):
                 spinning = frame.FindVariable('spinning')
                 if not spinning:
                     continue
-                lock_addr = frame.FindVariable(param_name).GetValueAsAddress()
+                lock_addr = frame.FindVariable('Lock').GetValueAsAddress()
+                if not lock_addr:
+                    continue
+                if lock_addr == addr and spinning.GetValueAsUnsigned() != 0:
+                    cpu = hal_utils.get_current_cpu(frame)
+                    cpu_addr = hal_utils.get_address_of_value(cpu)
+                    print(f'Core {i + 1}: {hex(cpu_addr)}')
+
+class DumpRwSpinlockCommand(ParsedCommand):
+    def setup_command_definition(self):
+        parser = self.get_parser()
+        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+
+    def get_short_help(self):
+        return "Dump rwspinlock based on address."
+
+    def get_flags(self):
+        return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
+
+    def _in_lock_acquire(self, func_name):
+        if func_name == 'RwSpinlockAcquire':
+            return True
+
+        if func_name == 'RecRwSpinlockAcquire':
+            return True
+        
+        return False
+
+    def __call__(self, debugger, args_array, exe_ctx, result):
+        try:
+            addr = int(args_array, base=16)
+        except ValueError:
+            print('Invalid hexadecimal address!')
+            return
+        
+        lock = hal_utils.get_value_from_address(hal_utils.RW_SPINLOCK_TYPE, addr)
+        print(f'Lock {hex(addr)}:')
+        print(lock)
+        print('Waiters:')
+        
+        core_count = hal_utils.DEBUGGER_PROCESS.GetNumThreads()
+        for i in range(core_count):
+            core = hal_utils.DEBUGGER_PROCESS.GetThreadAtIndex(i)
+            frame = core.GetSelectedFrame()
+            if self._in_lock_acquire(frame.GetDisplayFunctionName()):
+                spinning = frame.FindVariable('spinning')
+                if not spinning:
+                    continue
+                lock_addr = frame.FindVariable('Spinlock').GetValueAsAddress()
+                if not lock_addr:
+                    continue
                 if lock_addr == addr and spinning.GetValueAsUnsigned() != 0:
                     cpu = hal_utils.get_current_cpu(frame)
                     cpu_addr = hal_utils.get_address_of_value(cpu)

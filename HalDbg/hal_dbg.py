@@ -52,9 +52,12 @@ def __lldb_init_module(debugger, internal_dict):
         HalCommand('hal_dbg.hal_sync.ListLocksCommand',
                    HalCommandType.HalCommandTypeParsed,
                    'list_locks'),
-        HalCommand('hal_dbg.hal_sync.DumpLockCommand',
+        HalCommand('hal_dbg.hal_sync.DumpSpinlockCommand',
                    HalCommandType.HalCommandTypeClass,
-                   'dump_lock'),
+                   'dump_spinlock'),
+        HalCommand('hal_dbg.hal_sync.DumpRwSpinlockCommand',
+                   HalCommandType.HalCommandTypeClass,
+                   'dump_rwspinlock'),
         HalCommand('hal_dbg.hal_sync.ListMutexesCommand',
                    HalCommandType.HalCommandTypeClass,
                    'list_mutexes'),
@@ -72,30 +75,9 @@ def __lldb_init_module(debugger, internal_dict):
                    'list_cpus'),
         HalCommand('hal_dbg.hal_cpus.DumpCpuCommand',
                    HalCommandType.HalCommandTypeClass,
-                   'dump_cpu'),
-        HalCommand('hal_dbg.hal_notify.TrackCommand',
-                   HalCommandType.HalCommandTypeClass,
-                   'track')
+                   'dump_cpu')
     ]
 
     hal_utils.add_commands(debugger, commands)
-
-    print('Setting notification breakpoint')
-    debugger.HandleCommand('breakpoint set -n NotifyDebugger')
-    debugger.HandleCommand('breakpoint command add -F hal_dbg.hal_notify.receive_notification')
-
-    hal_notify.register_notification('IoCreateFile', hal_files.on_file_create)
-    hal_notify.register_notification('IoCloseFile', hal_files.on_file_close)
-    hal_notify.register_notification('MutexInit', hal_sync.on_mutex_init)
-    hal_notify.register_notification('MutexDestroy', hal_sync.on_mutex_destroy)
-    hal_notify.register_notification('ExEventInit', hal_sync.on_ex_event_init)
-    hal_notify.register_notification('ExEventDestroy', hal_sync.on_ex_event_destroy)
-    hal_notify.register_notification('SpinlockInit', hal_sync.on_spinlock_init)
-    hal_notify.register_notification('MonitorLockInit', hal_sync.on_monlock_init)
-    hal_notify.register_notification('_LockDestroy', hal_sync.on_lock_destroy)
-    hal_notify.register_notification('RwSpinlockInit', hal_sync.on_rw_spinlock_init)
-    hal_notify.register_notification('RwSpinlockDestroy', hal_sync.on_rw_spinlock_destroy)
-    hal_notify.register_notification('RecRwSpinlockInit', hal_sync.on_rec_rw_spinlock_init)
-    hal_notify.register_notification('RecRwSpinlockDestroy', hal_sync.on_rec_rw_spinlock_destroy)
 
     print('Loaded HAL9000 module.')
