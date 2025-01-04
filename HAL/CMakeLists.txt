@@ -17,6 +17,7 @@ set(HAL9000_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/HAL9000/headers/core/io
     ${CMAKE_CURRENT_LIST_DIR}/HAL9000/headers/core/memory
     ${CMAKE_CURRENT_LIST_DIR}/HAL9000/headers/crt
+    ${CMAKE_CURRENT_LIST_DIR}/HAL9000/headers/debug
     ${CMAKE_CURRENT_LIST_DIR}/HAL9000/headers/debug/dump
     ${CMAKE_CURRENT_LIST_DIR}/HAL9000/headers/debug/test
     ${CMAKE_CURRENT_LIST_DIR}/HAL9000/headers/debug/test/threads

@@ -91,6 +91,7 @@ IoCreateDevice(
         pDevice->StackSize = 1;
 
         MutexInit(&pDevice->DeviceLock, FALSE);
+        MutexSetName(&pDevice->DeviceLock, "DeviceLock");
 
         // insert device into list
         /// TODO: need to lock

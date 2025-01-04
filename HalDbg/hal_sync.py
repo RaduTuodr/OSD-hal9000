@@ -63,17 +63,19 @@ class ListMutexesCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_cxt, result):
-        global _mutexes
+        mutex_list_ptr = hal_utils.get_debug_data('MutexList')
+        mutex_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY, mutex_list_ptr)
+        
+        def list_callback(list_entry):
+            mutex = hal_utils.containing_record(list_entry, hal_utils.MUTEX_TYPE, 'AllList') 
+            mutex_addr = hal_utils.get_address_of_value(mutex)
+            mutex_name = hal_utils.get_mutex_name(mutex)
+            if not mutex_name:
+                mutex_name = 'NULL'
+            print(f'Mutex {hex(mutex_addr)}: {mutex_name}')
 
         print('Mutexes:')
-        for key, value in _mutexes.items():
-            print(f'Mutex {hex(key)}')
-            if value.frame_location:
-                function = value.frame_location.function
-                filename = value.frame_location.line_entry.GetFileSpec().basename
-                line = value.frame_location.line_entry.GetLine()
-                col = value.frame_location.line_entry.GetColumn()
-                print(f'  Init location: {function} at {filename}:{line}:{col}')
+        hal_utils.traverse_list(mutex_list, list_callback)
 
 class DumpMutexCommand(ParsedCommand):
     def setup_command_definition(self):

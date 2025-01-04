@@ -55,7 +55,7 @@ set(GLOBAL_DEBUG_FLAGS
     -O0
     -fstack-protector-all
     # -fstack-clash-protection
-    # -Werror
+    -Werror
     -Wall
     -Wextra
 )
@@ -67,7 +67,7 @@ set(GLOBAL_RELEASE_FLAGS
     -O2
     -fstack-protector-all
     # -fstack-clash-protection
-    # -Werror
+    -Werror
     -Wall
 )
 
@@ -92,7 +92,7 @@ set(GLOBAL_FLAGS
 )
 
 set(UEFI_APP_C_COMPILE_FLAGS
-    # -Werror
+    -Werror
     -nostdinc
     -ffreestanding
     -nostdlib

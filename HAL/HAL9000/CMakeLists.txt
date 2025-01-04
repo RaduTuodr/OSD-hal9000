@@ -10,6 +10,7 @@ set(HAL9000_C_INCLUDES
     ${CMAKE_CURRENT_LIST_DIR}/headers/core/io
     ${CMAKE_CURRENT_LIST_DIR}/headers/core/memory
     ${CMAKE_CURRENT_LIST_DIR}/headers/crt
+    ${CMAKE_CURRENT_LIST_DIR}/headers/debug
     ${CMAKE_CURRENT_LIST_DIR}/headers/debug/dump
     ${CMAKE_CURRENT_LIST_DIR}/headers/debug/test
     ${CMAKE_CURRENT_LIST_DIR}/headers/debug/test/threads

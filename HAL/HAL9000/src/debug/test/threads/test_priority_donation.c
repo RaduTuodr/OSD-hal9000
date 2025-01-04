@@ -153,6 +153,7 @@ STATUS
     CheckinQueueInit(&synchContext.SynchronizationContext, buffer);
 
     MutexInit(&synchContext.Mutex, FALSE);
+    MutexSetName(&synchContext.Mutex, "PrioDonBasic");
     MutexAcquire(&synchContext.Mutex);
 
     status = STATUS_SUCCESS;
@@ -255,6 +256,7 @@ STATUS
         CheckinQueueInit(&contexes[i].SynchronizationContext, buffer);
 
         MutexInit(&contexes[i].Mutex, FALSE);
+        MutexSetName(&contexes[i].Mutex, "PrioDonMulti");
         MutexAcquire(&contexes[i].Mutex);
     }
 
@@ -435,6 +437,7 @@ STATUS
             DWORD nxtThIdx = (i-1) % noOfThreads;
 
             MutexInit(&pDonationChainData[i].ThreadMutex, FALSE);
+            MutexSetName(&pDonationChainData[i].ThreadMutex, "PrioDonChain");
 
             LOGL("Thread 0x%x will acquire mutex 0x%x and 0x%x\n", i, i, nxtThIdx);
 

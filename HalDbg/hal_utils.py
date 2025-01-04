@@ -20,6 +20,7 @@ SPINLOCK_TYPE = None
 MONITOR_LOCK_TYPE = None
 RW_SPINLOCK_TYPE = None
 REC_RW_SPINLOCK_TYPE = None
+DEBUG_SYSTEM_DATA = None
 
 _hal_commands = None
 
@@ -62,6 +63,7 @@ def init(debugger):
    global MONITOR_LOCK_TYPE
    global RW_SPINLOCK_TYPE
    global REC_RW_SPINLOCK_TYPE
+   global DEBUG_SYSTEM_DATA
    global _hal_commands
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
@@ -83,6 +85,7 @@ def init(debugger):
    MONITOR_LOCK_TYPE = DEBUGGER_TARGET.FindFirstType('struct _MONITOR_LOCK')
    RW_SPINLOCK_TYPE = DEBUGGER_TARGET.FindFirstType('struct _RW_SPINLOCK')
    REC_RW_SPINLOCK_TYPE = DEBUGGER_TARGET.FindFirstType('struct _REC_RW_SPINLOCK')
+   DEBUG_SYSTEM_DATA = DEBUGGER_TARGET.FindFirstType('struct _DEBUG_SYSTEM_DATA')
 
    _hal_commands = []
 
@@ -186,8 +189,17 @@ def get_file_name(file_object):
    name_addr = get_field_as_address(file_object, 'FileName')
    return get_c_string(name_addr, 256)
 
+def get_mutex_name(mutex):
+   name = get_field(mutex, 'Name')
+   name_addr = get_address_of_value(name)
+   return get_c_string(name_addr, 256)
+
 def get_enum_member_value_as_unsigned(enum_type, member):
    for enum_member in enum_type.GetEnumMembers():
       if member == enum_member.GetName():
          return enum_member.GetValueAsUnsigned()
    return None
+
+def get_debug_data(name):
+   debug_data = find_global_variable('m_debugSystemData')
+   return get_field_as_address(debug_data, name)

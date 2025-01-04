@@ -156,6 +156,19 @@ ThreadSystemPreinit(
     LockInit(&m_threadSystemData.ReadyThreadsLock);
 }
 
+void
+ThreadSystemGetThreadList(
+    OUT PLOCK*              ListLock,
+    OUT PLIST_ENTRY*        ListHead
+    )
+{
+    ASSERT(ListLock != NULL);
+    ASSERT(ListHead != NULL);
+
+    *ListLock = &m_threadSystemData.AllThreadsLock;
+    *ListHead = &m_threadSystemData.AllThreadsList; 
+}
+
 STATUS
 ThreadSystemInitMainForCurrentCPU(
     void

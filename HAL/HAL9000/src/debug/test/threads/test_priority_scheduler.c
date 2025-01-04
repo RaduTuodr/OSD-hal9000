@@ -75,6 +75,7 @@ GNU_WARNING_IGNORE("-Wvoid-pointer-to-int-cast")
     acquireMutex = (BOOLEAN) PrepareContext;
 
     MutexInit(pMutex, FALSE);
+    MutexSetName(pMutex, "TestMutex");
 
     if (acquireMutex)
     {

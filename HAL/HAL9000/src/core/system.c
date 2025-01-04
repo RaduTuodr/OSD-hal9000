@@ -23,6 +23,7 @@
 #include "process_internal.h"
 #include "boot_module.h"
 #include "display.h"
+#include "debug_database.h"
 
 #define NO_OF_TSS_STACKS             7
 STATIC_ASSERT(NO_OF_TSS_STACKS <= NO_OF_IST);
@@ -42,9 +43,13 @@ SystemPreinit(
     IN  HAL_BOOT_INFORMATION*     BootInformation
     )
 {
+    DISPLAY_INFORMATION displayInformation;
+    PLOCK pLock;
+    PMUTEX pMutex;
+    PLIST_ENTRY pList;
+
     memzero(&m_systemData, sizeof(SYSTEM_DATA));
 
-    DISPLAY_INFORMATION displayInformation;
     displayInformation.FrameBufferAddress = BootInformation->VirtualDisplayAddress;
     memcpy(&(displayInformation.FrameBufferPitch), 
            &(BootInformation->Framebuffer.Pitch),
@@ -56,6 +61,7 @@ SystemPreinit(
 
     BootModulesPreinit();
     DumpPreinit();
+    MutexSystemPreinit();
     ThreadSystemPreinit();
     printSystemPreinit(&displayInformation);
     LogSystemPreinit();
@@ -69,6 +75,13 @@ SystemPreinit(
     CorePreinit();
     NetworkStackPreinit();
     ProcessSystemPreinit();
+    DebugDatabasePreinit();
+    MutexSystemGetMutexList(&pLock, &pList);
+    DebugDatabaseSetMutexList(pLock, pList);
+    ThreadSystemGetThreadList(&pLock, &pList);
+    DebugDatabaseSetThreadList(pLock, pList);
+    ProcessSystemGetProcessList(&pMutex, &pList);
+    DebugDatabaseSetProcessList(pMutex, pList);
 }
 
 STATUS

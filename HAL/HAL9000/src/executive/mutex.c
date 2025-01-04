@@ -1,9 +1,43 @@
 #include "HAL9000.h"
 #include "thread_internal.h"
 #include "mutex.h"
-#include "debug.h"
 
 #define MUTEX_MAX_RECURSIVITY_DEPTH         MAX_BYTE
+
+typedef struct _MUTEX_SYSTEM_DATA
+{
+    LOCK                  Lock;
+
+    _Guarded_by_(Lock)
+    LIST_ENTRY            MutexList;
+} MUTEX_SYSTEM_DATA, *PMUTEX_SYSTEM_DATA;
+
+static MUTEX_SYSTEM_DATA m_mutexData;
+
+STATUS
+MutexSystemPreinit(
+    void
+    )
+{
+    memzero(&m_mutexData, sizeof(MUTEX_SYSTEM_DATA));
+    LockInit(&m_mutexData.Lock);
+    InitializeListHead(&m_mutexData.MutexList);
+
+    return STATUS_SUCCESS;
+}
+
+void
+MutexSystemGetMutexList(
+    OUT PLOCK*             ListLock,
+    OUT PLIST_ENTRY*       ListHead
+    )
+{
+    ASSERT(ListLock != NULL);
+    ASSERT(ListHead != NULL);
+
+    *ListLock = &m_mutexData.Lock;
+    *ListHead = &m_mutexData.MutexList;
+}
 
 _No_competing_thread_
 void
@@ -12,6 +46,8 @@ MutexInit(
     IN          BOOLEAN     Recursive
     )
 {
+    INTR_STATE oldState;
+
     ASSERT( NULL != Mutex );
 
     memzero(Mutex, sizeof(MUTEX));
@@ -22,7 +58,33 @@ MutexInit(
 
     Mutex->MaxRecursivityDepth = Recursive ? MUTEX_MAX_RECURSIVITY_DEPTH : 1;
 
-    NotifyDebugger();
+    LockAcquire(&m_mutexData.Lock, &oldState);
+    InsertTailList(&m_mutexData.MutexList, &Mutex->AllList);
+    LockRelease(&m_mutexData.Lock, oldState);
+}
+
+_No_competing_thread_
+void
+MutexSetName(
+    OUT         PMUTEX      Mutex,
+    IN          char*       Name
+    )
+{
+    INTR_STATE oldState;
+    DWORD length;
+
+    ASSERT(Mutex != NULL);
+    ASSERT(Name != NULL);
+
+    length = strlen_s(Name, 16);
+    LockAcquire(&Mutex->MutexLock, &oldState);
+    if (length > 15)
+    {
+        length = 15;
+        Mutex->Name[15] = 0;
+    }
+    strncpy(Mutex->Name, Name, length);
+    LockRelease(&Mutex->MutexLock, oldState);
 }
 
 ACQUIRES_EXCL_AND_REENTRANT_LOCK(*Mutex)
@@ -121,10 +183,15 @@ MutexDestroy(
     INOUT       PMUTEX      Mutex
     )
 {
+    INTR_STATE oldState;
+
     ASSERT(Mutex != NULL);
 
     LockDestroy(&Mutex->MutexLock);
-    memzero(Mutex, sizeof(MUTEX));
 
-    NotifyDebugger();
+    LockAcquire(&m_mutexData.Lock, &oldState);
+    RemoveEntryList(&Mutex->AllList);
+    LockRelease(&m_mutexData.Lock, oldState);
+
+    memzero(Mutex, sizeof(MUTEX));
 }

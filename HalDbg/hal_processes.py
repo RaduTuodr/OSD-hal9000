@@ -14,8 +14,8 @@ class ListProcessesCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_cxt, result):
-        proc_data = hal_utils.find_global_variable('m_processData')
-        all_proc_list = hal_utils.get_field(proc_data, 'ProcessList')
+        proc_list_ptr = hal_utils.get_debug_data('ProcessList')
+        proc_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY, proc_list_ptr)
 
         def list_callback(list_entry):
             proc = hal_utils.containing_record(list_entry, hal_utils.PROCESS_TYPE, 'NextProcess') 
@@ -24,7 +24,7 @@ class ListProcessesCommand(ParsedCommand):
             print(f'Process {hex(proc_addr)}: {proc_name}')
 
         print('Processes:')
-        hal_utils.traverse_list(all_proc_list, list_callback)
+        hal_utils.traverse_list(proc_list, list_callback)
 
 class DumpProcessCommand(ParsedCommand):
     def setup_command_definition(self):

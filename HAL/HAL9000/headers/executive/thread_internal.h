@@ -137,6 +137,19 @@ ThreadSystemInitIdleForCurrentCPU(
     );
 
 //******************************************************************************
+// Function:     ThreadSystemGetThreadList
+// Description:  Retrieves the list of all threads and its lock.
+// Returns:      void
+// Parameter:    OUT PLOCK* ListLock
+// Parameter:    OUT PLIST_ENTRY* ListHead
+//******************************************************************************
+void
+ThreadSystemGetThreadList(
+    OUT PLOCK*              ListLock,
+    OUT PLIST_ENTRY*        ListHead
+    );
+
+//******************************************************************************
 // Function:     ThreadCreateEx
 // Description:  Same as ThreadCreate except it also takes an additional
 //               parameter, the process to which the thread should belong. This

@@ -5,6 +5,7 @@
 #include "process.h"
 #include "synch.h"
 #include "ex_event.h"
+#include "mutex.h"
 
 #define PROCESS_MAX_PHYSICAL_FRAMES     16
 #define PROCESS_MAX_OPEN_FILES          16
@@ -73,6 +74,19 @@ _No_competing_thread_
 void
 ProcessSystemPreinit(
     void
+    );
+
+//******************************************************************************
+// Function:     ProcessSystemGetThreadList
+// Description:  Retrieves the list of all processes and its lock.
+// Returns:      void
+// Parameter:    OUT PLOCK* ListLock
+// Parameter:    OUT PLIST_ENTRY* ListHead
+//******************************************************************************
+void
+ProcessSystemGetProcessList(
+    OUT PMUTEX*              ListMutex,
+    OUT PLIST_ENTRY*         ListHead
     );
 
 //******************************************************************************

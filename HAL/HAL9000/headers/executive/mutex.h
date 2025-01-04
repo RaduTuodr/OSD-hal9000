@@ -8,13 +8,42 @@ typedef struct _MUTEX
     // DO NOT CHANGE THE NAMES OF THESE FIELDS
     LOCK                MutexLock;
 
+    _Guarded_by_(MutexLock)
+    char                Name[16];
+
     BYTE                CurrentRecursivityDepth;
     BYTE                MaxRecursivityDepth;
 
     _Guarded_by_(MutexLock)
     LIST_ENTRY          WaitingList;
     struct _THREAD*     Holder;
+    
+    LIST_ENTRY          AllList;
 } MUTEX, *PMUTEX;
+
+//******************************************************************************
+// Function:     MutexSystemInit
+// Description:  Initializes the mutex system.
+// Returns:      STATUS
+// Parameter:    void
+//******************************************************************************
+STATUS
+MutexSystemPreinit(
+    void
+    );
+
+//******************************************************************************
+// Function:     MutexSystemGetMutexList
+// Description:  Retrieves the global mutex list and its lock.
+// Returns:      void
+// Parameter:    OUT PLOCK* ListLock
+// Parameter:    OUT PLIST_ENTRY* ListHead
+//******************************************************************************
+void
+MutexSystemGetMutexList(
+    OUT PLOCK*             ListLock,
+    OUT PLIST_ENTRY*       ListHead
+    );
 
 //******************************************************************************
 // Function:     MutexInit
@@ -31,6 +60,23 @@ void
 MutexInit(
     OUT         PMUTEX      Mutex,
     IN          BOOLEAN     Recursive
+    );
+
+//******************************************************************************
+// Function:     MutexSetName
+// Description:  Sets the name of a mutex.
+// Returns:      void
+// Parameter:    OUT PMUTEX Mutex
+// Parameter:    IN char* Name - name of the mutex, maximum length 15 chars,
+//               excluding the null terminator 
+// NOTE:         It is not mandatory to call this function. The name helps
+//               helps to identify it in the debugger.
+//******************************************************************************
+_No_competing_thread_
+void
+MutexSetName(
+    OUT         PMUTEX      Mutex,
+    IN          char*       Name
     );
 
 //******************************************************************************

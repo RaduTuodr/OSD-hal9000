@@ -123,9 +123,24 @@ ProcessSystemPreinit(
     BitmapSetBit(&m_processData.PidBitmap, 0);
 
     MutexInit(&m_processData.PidBitmapLock, FALSE);
+    MutexSetName(&m_processData.PidBitmapLock, "PidBitmap");
 
     MutexInit(&m_processData.ProcessListLock, FALSE);
+    MutexSetName(&m_processData.ProcessListLock, "ProcessList");
     InitializeListHead(&m_processData.ProcessList);
+}
+
+void
+ProcessSystemGetProcessList(
+    OUT PMUTEX*              ListMutex,
+    OUT PLIST_ENTRY*         ListHead
+    )
+{
+    ASSERT(ListMutex != NULL);
+    ASSERT(ListHead != NULL);
+
+    *ListMutex = &m_processData.ProcessListLock;
+    *ListHead = &m_processData.ProcessList;
 }
 
 _No_competing_thread_
