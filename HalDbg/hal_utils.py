@@ -5,6 +5,7 @@ DEBUGGER_TARGET = None
 DEBUGGER_PROCESS = None
 LIST_ENTRY_TYPE = None
 THREAD_TYPE = None
+THREAD_STATE_TYPE = None
 PROCESS_TYPE = None
 PFILE_OBJECT_TYPE = None
 FILE_OBJECT_TYPE = None
@@ -48,6 +49,7 @@ def init(debugger):
    global DEBUGGER_PROCESS
    global LIST_ENTRY_TYPE
    global THREAD_TYPE
+   global THREAD_STATE_TYPE
    global PROCESS_TYPE
    global PFILE_OBJECT_TYPE
    global FILE_OBJECT_TYPE
@@ -70,6 +72,7 @@ def init(debugger):
    DEBUGGER_PROCESS = DEBUGGER_TARGET.GetProcess()
    LIST_ENTRY_TYPE = DEBUGGER_TARGET.FindFirstType('struct _LIST_ENTRY')
    THREAD_TYPE = DEBUGGER_TARGET.FindFirstType('struct _THREAD')
+   THREAD_STATE_TYPE = DEBUGGER_TARGET.FindFirstType('enum _THREAD_STATE')
    PROCESS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _PROCESS')
    PFILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('PFILE_OBJECT')
    FILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('struct _FILE_OBJECT')
@@ -207,3 +210,11 @@ def get_debug_data(name):
 def get_debug_value_as_unsigned(name):
    debug_data = find_global_variable('m_debugSystemData')
    return get_field_as_unsigned(debug_data, name)
+
+def enum_field_to_string(enum_type, field):
+   field_val = field.GetValueAsUnsigned()
+   for member in enum_type.GetEnumMembers():
+      val = member.GetValueAsUnsigned()
+      if val == field_val:
+         return member.GetName()
+   return ''

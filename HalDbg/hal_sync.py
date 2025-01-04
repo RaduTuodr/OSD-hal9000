@@ -55,7 +55,8 @@ class DumpMutexCommand(ParsedCommand):
         mutex = hal_utils.get_value_from_address(hal_utils.MUTEX_TYPE,
                                                     addr)
         waiting_list = hal_utils.get_field(mutex, 'WaitingList')
-
+        holder = hal_utils.get_field_as_address(mutex, 'Holder')
+      
         def list_callback(list_entry):
             thread = hal_utils.containing_record(list_entry, hal_utils.THREAD_TYPE, 'ReadyList') 
             thread_addr = hal_utils.get_address_of_value(thread)
@@ -67,6 +68,16 @@ class DumpMutexCommand(ParsedCommand):
 
         print(f'Mutex: {hex(addr)}')
         print(mutex)
+        if holder != 0:
+            holder_addr = holder
+            holder = hal_utils.get_value_from_address(hal_utils.THREAD_TYPE, holder)
+            holder_name = hal_utils.get_thread_name(holder)
+            holder_proc = hal_utils.get_process_from_thread(holder)
+            holder_proc_addr = hal_utils.get_address_of_value(holder_proc)
+            holder_proc_name = hal_utils.get_process_name(holder_proc)
+            print(f'Holder: Thread {hex(holder_addr)}: {holder_name}; Process {hex(holder_proc_addr)}: {holder_proc_name}')
+        else:
+            print('Holder: NULL')
         print(f'Waiting list: ')
         hal_utils.traverse_list(waiting_list, list_callback)
 

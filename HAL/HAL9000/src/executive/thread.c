@@ -1027,6 +1027,7 @@ _ThreadSchedule(
         // appearing to cause inconsistencies
         pCurrentThread->UninterruptedTicks = 0;
 
+        pNextThread->State = ThreadStateRunning;
         SetCurrentThread(pNextThread);
         ThreadSwitch( &pCurrentThread->Stack, pNextThread->Stack);
 

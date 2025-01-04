@@ -21,10 +21,14 @@ class ListThreadsCommand(ParsedCommand):
             thread = hal_utils.containing_record(list_entry, hal_utils.THREAD_TYPE, 'AllList') 
             thread_addr = hal_utils.get_address_of_value(thread)
             thread_name = hal_utils.get_thread_name(thread)
+            thread_state = hal_utils.get_field(thread, 'State')
+            state = hal_utils.enum_field_to_string(hal_utils.THREAD_STATE_TYPE, thread_state)
+            if state:
+                state = state.replace('ThreadState', '')
             proc = hal_utils.get_process_from_thread(thread)
             proc_addr = hal_utils.get_address_of_value(proc)
             proc_name = hal_utils.get_process_name(proc)
-            print(f'Thread {hex(thread_addr)}: {thread_name}; Process {hex(proc_addr)}: {proc_name}')
+            print(f'Thread {hex(thread_addr)}: {thread_name}; Process {hex(proc_addr)}: {proc_name}; State: {state}')
 
         print('Threads:')
         hal_utils.traverse_list(thread_list, list_callback)

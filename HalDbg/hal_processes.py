@@ -21,7 +21,16 @@ class ListProcessesCommand(ParsedCommand):
             proc = hal_utils.containing_record(list_entry, hal_utils.PROCESS_TYPE, 'NextProcess') 
             proc_addr = hal_utils.get_address_of_value(proc)
             proc_name = hal_utils.get_process_name(proc)
-            print(f'Process {hex(proc_addr)}: {proc_name}')
+            thread_count = 0
+            
+            def count_callback(list_entry):
+                nonlocal thread_count
+                thread_count = thread_count + 1
+
+            thread_list = hal_utils.get_field(proc, 'ThreadList')
+            hal_utils.traverse_list(thread_list, count_callback)
+
+            print(f'Process {hex(proc_addr)}: {proc_name}; Thread count: {thread_count}')
 
         print('Processes:')
         hal_utils.traverse_list(proc_list, list_callback)
