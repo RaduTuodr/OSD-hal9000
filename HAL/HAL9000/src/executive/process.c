@@ -496,6 +496,7 @@ _ProcessInit(
             LOG_FUNC_ERROR("ExEventInit", status);
             __leave;
         }
+        ExEventSetName(&pProcess->TerminationEvt, "ProcTerminate");
 
         InitializeListHead(&pProcess->NextProcess);
 

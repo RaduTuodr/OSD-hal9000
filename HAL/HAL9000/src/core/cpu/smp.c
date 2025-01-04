@@ -206,6 +206,7 @@ SmpInit(
         LOG_FUNC_ERROR("EvtInitialize", status);
         return status;
     }
+    ExEventSetName(&m_smpData.ApStartupEvent, "ApStartup");
 
     // install ISRs
     status = _SmpInstallInterruptRoutines();

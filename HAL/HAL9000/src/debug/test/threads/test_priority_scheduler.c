@@ -194,6 +194,7 @@ void
                          ExEventTypeSynchronization,
                          FALSE);
     ASSERT(SUCCEEDED(status));
+    ExEventSetName(&pWakeupCtx->WakeupEvent, "TestWakeup");
 
     *Context = pWakeupCtx;
 }

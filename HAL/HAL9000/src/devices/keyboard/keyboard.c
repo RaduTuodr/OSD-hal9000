@@ -345,6 +345,7 @@ KeyboardInitialize(
         LOG_FUNC_ERROR("ExEventInit", status);
         return status;
     }
+    ExEventSetName(&m_keyboardData.KeyPressedEvt, "KeyPressed");
 
     // install ISR
     ioInterrupt.Type = IoInterruptTypeLegacy;

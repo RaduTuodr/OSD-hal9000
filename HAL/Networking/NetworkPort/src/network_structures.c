@@ -254,6 +254,7 @@ _NetworkPortDeviceInitRx(
         LOG_FUNC_ERROR("ExEventInit", status);
         return status;
     }
+    ExEventSetName(&RxData->Buffers.FramesListNotEmptyEvent, "NetRx");
 
     return status;
 }
@@ -286,6 +287,7 @@ _NetworkPortDeviceInitTx(
         LOG_FUNC_ERROR("ExEventInit", status);
         return status;
     }
+    ExEventSetName(&TxData->Buffers.FramesListNotEmptyEvent, "NetTx");
 
     status = ExEventInit(&TxData->DescriptorsAvailable, ExEventTypeNotification, TRUE);
     if (!SUCCEEDED(status))
@@ -293,6 +295,7 @@ _NetworkPortDeviceInitTx(
         LOG_FUNC_ERROR("ExEventInit", status);
         return status;
     }
+    ExEventSetName(&TxData->DescriptorsAvailable, "NetTx");
 
     status = ThreadCreate("TX worker thread",
                           ThreadPriorityDefault,

@@ -602,6 +602,7 @@ void
             pCtx[i+cpuBound].EventWaitTimes = IO_BOUND_EVENT_TIMES;
             pCtx[i+cpuBound].CpuUsage = IO_BOUND_CPU_USAGE;
             ExEventInit(&pCtx[i+cpuBound].Event, ExEventTypeSynchronization, FALSE);
+            ExEventSetName(&pCtx[i+cpuBound].Event, "CmdSpawnThread");
 
             status = ThreadCreate(thName,
                                   ThreadPriorityDefault,

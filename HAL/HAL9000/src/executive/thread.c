@@ -245,6 +245,7 @@ ThreadSystemInitIdleForCurrentCPU(
         return status;
     }
     LOGPL("EvtInitialize succeeded\n");
+    ExEventSetName(&idleStarted, "IdleStarted");
 
     snprintf(idleThreadName, MAX_PATH, "%s-%02x", "idle", pCpu->ApicId);
 
@@ -792,6 +793,7 @@ _ThreadInit(
             LOG_FUNC_ERROR("ExEventInit", status);
             __leave;
         }
+        ExEventSetName(&pThread->TerminationEvt, "ThrTermination");
 
         if (AllocateKernelStack)
         {

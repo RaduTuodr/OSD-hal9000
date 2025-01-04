@@ -371,6 +371,7 @@ MmuInitSystem(
         LOG_FUNC_ERROR("ExEventInit", status );
         return status;
     }
+    ExEventSetName(&m_mmuData.ZeroThreadData.NewPagesEvent, "ZeroerNewPages");
     LOGL("ExEventInit succeeded\n");
 
     status = _MmuRetrieveKernelInfoAndValidate((PVOID) KernelBaseAddress,

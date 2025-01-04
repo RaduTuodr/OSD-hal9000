@@ -675,6 +675,7 @@ MSVC_WARNING_SUPPRESS(4127)
         LOG_FUNC_ERROR("ExEventInit", status );
         return status;
     }
+    ExEventSetName(&pDeviceExtension->CurrentTransfer.TransferReady, "AtaTransferRdy");
 
     ioInterrupt.Type = bLegacyDevice ? IoInterruptTypeLegacy : IoInterruptTypePci;
     ioInterrupt.Irql = IrqlStorageLevel;
