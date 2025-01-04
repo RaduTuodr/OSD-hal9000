@@ -375,7 +375,7 @@ def parse_qemu_options(debug):
 
     qemu_options += '-s'
     if debug:
-        qemu_options += '-S'
+        qemu_options += ' -S '
 
     return qemu_options
 

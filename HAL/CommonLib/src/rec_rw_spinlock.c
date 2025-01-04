@@ -1,7 +1,6 @@
 #include "common_lib.h"
 #include "rec_rw_spinlock.h"
 #include "lock_common.h"
-#include "debug.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
 
@@ -24,8 +23,17 @@ RecRwSpinlockInit(
     RwSpinlockInit(&Spinlock->RwSpinlock);
 
     Spinlock->MaxRecursivityDepth = recursivityDepth;
+}
 
-    NotifyDebugger();
+void
+RecRwSpinlockSetName(
+    INOUT   PREC_RW_SPINLOCK    Spinlock,
+    IN      char*               Name
+    )
+{
+    ASSERT(Spinlock != NULL);
+
+    RwSpinlockSetName(&Spinlock->RwSpinlock, Name);
 }
 
 // warning C26165 : Possibly failing to release lock '* Spinlock' in function 'RecRwSpinlockAcquire'.
@@ -137,8 +145,6 @@ RecRwSpinlockDestroy(
     RwSpinlockDestroy(&Spinlock->RwSpinlock);
 
     memzero(Spinlock, sizeof(REC_RW_SPINLOCK));
-
-    NotifyDebugger();
 }
 
 WARNING_POP

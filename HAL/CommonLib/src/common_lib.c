@@ -1,5 +1,6 @@
 #include "common_lib.h"
 #include "lock_common.h"
+#include "rw_spinlock.h"
 
 STATUS
 CommonLibInit(
@@ -22,6 +23,7 @@ CommonLibInit(
 
 #ifndef _COMMONLIB_NO_LOCKS_
     LockSystemInit(InitSettings->MonitorSupport);
+    RwSpinlockSystemInit();
 #endif // _COMMONLIB_NO_LOCKS_
 
     AssertSetFunction(InitSettings->AssertFunction);

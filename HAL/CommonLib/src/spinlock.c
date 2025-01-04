@@ -3,25 +3,81 @@
 #include "cal_atomic.h"
 #include "cal_assembly.h"
 #include "cal_intrin.h"
-#include "debug.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
+
+typedef struct _SPINLOCK_SYSTEM_DATA
+{
+    SPINLOCK           Lock;
+    LIST_ENTRY         SpinlockList; 
+} SPINLOCK_SYSTEM_DATA, *PSPINLOCK_SYSTEM_DATA;
+
+static SPINLOCK_SYSTEM_DATA m_spinlockData;
+
+void
+SpinlockSystemInit(
+    void
+    )
+{
+    memzero(&m_spinlockData, sizeof(SPINLOCK_SYSTEM_DATA));
+    InitializeListHead(&m_spinlockData.SpinlockList);
+    AtomicExchange8(&m_spinlockData.Lock.State, LOCK_FREE);
+}
+
+void
+SpinlockSystemGetSpinlockList(
+    OUT BOOLEAN*           IsSpinlock,
+    OUT PSPINLOCK*         ListLock,
+    OUT PLIST_ENTRY*       ListHead   
+    )
+{
+    ASSERT(IsSpinlock != NULL);
+    ASSERT(ListLock != NULL);
+    ASSERT(ListHead != NULL);
+
+    *IsSpinlock = TRUE;
+    *ListLock = &m_spinlockData.Lock;
+    *ListHead = &m_spinlockData.SpinlockList;
+}
 
 void
 SpinlockInit(
     OUT         PSPINLOCK       Lock
     )
 {
+    INTR_STATE oldState;
+
     ASSERT(NULL != Lock);
 
     memzero(Lock, sizeof(SPINLOCK));
 
     AtomicExchange8(&Lock->State, LOCK_FREE);
 
-    NotifyDebugger();
+    SpinlockAcquire(&m_spinlockData.Lock, &oldState);
+    InsertTailList(&m_spinlockData.SpinlockList, &Lock->AllList);
+    SpinlockRelease(&m_spinlockData.Lock, oldState);
 }
 
-// DO NOT CHANGE FUNCTION NAME
+void
+SpinlockSetName(
+    INOUT       PSPINLOCK       Lock,
+    IN          char*           Name
+    )
+{
+    DWORD length;
+
+    ASSERT(Lock != NULL);
+    ASSERT(Name != NULL);
+
+    length = strlen_s(Name, 16);
+    if (length > 15)
+    {
+        length = 15;
+        Lock->Name[15] = 0;
+    }
+    strncpy(Lock->Name, Name, length);
+}
+
 void
 SpinlockAcquire(
     INOUT       PSPINLOCK       Lock,
@@ -134,6 +190,22 @@ SpinlockRelease(
     AtomicExchange8(&Lock->State, LOCK_FREE);
 
     CpuIntrSetState(OldIntrState);
+}
+
+void
+SpinlockDestroy(
+    INOUT       PSPINLOCK       Lock
+    )
+{
+    INTR_STATE oldState;
+
+    ASSERT(Lock != NULL);
+
+    SpinlockAcquire(&m_spinlockData.Lock, &oldState);
+    RemoveEntryList(&Lock->AllList);
+    SpinlockRelease(&m_spinlockData.Lock, oldState);
+
+    memzero(Lock, sizeof(SPINLOCK));
 }
 
 #endif // _COMMONLIB_NO_LOCKS_

@@ -22,7 +22,7 @@ typedef struct _MUTEX
 } MUTEX, *PMUTEX;
 
 //******************************************************************************
-// Function:     MutexSystemInit
+// Function:     MutexSystemPreinit
 // Description:  Initializes the mutex system.
 // Returns:      STATUS
 // Parameter:    void
@@ -68,14 +68,14 @@ MutexInit(
 // Returns:      void
 // Parameter:    OUT PMUTEX Mutex
 // Parameter:    IN char* Name - name of the mutex, maximum length 15 chars,
-//               excluding the null terminator 
+//               excluding the null terminator.
 // NOTE:         It is not mandatory to call this function. The name helps
 //               helps to identify it in the debugger.
 //******************************************************************************
 _No_competing_thread_
 void
 MutexSetName(
-    OUT         PMUTEX      Mutex,
+    INOUT       PMUTEX      Mutex,
     IN          char*       Name
     );
 

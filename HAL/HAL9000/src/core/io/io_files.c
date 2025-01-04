@@ -4,12 +4,43 @@
 #include "iomu.h"
 #include "cal_annotate.h"
 #include "cal_seh.h"
-#include "debug.h"
+#include "lock_common.h"
 
 #include "strutils.h"
 
 // X:\\ => minimum 3 letters to open root
 #define FILE_NAME_MIN_LEN               3
+
+typedef struct _IO_FILES_SYSTEM_DATA
+{
+    LOCK            Lock;
+    LIST_ENTRY      FileList; 
+} IO_FILES_SYSTEM_DATA, *PIO_FILES_SYSTEM_DATA;
+
+static IO_FILES_SYSTEM_DATA m_ioFilesData;
+
+void
+IoFilesSystemPreinit(
+    void
+    )
+{
+    memzero(&m_ioFilesData, sizeof(IO_FILES_SYSTEM_DATA));
+    LockInit(&m_ioFilesData.Lock);
+    InitializeListHead(&m_ioFilesData.FileList);
+}
+
+void
+IoFilesSystemGetFileList(
+    OUT PLOCK*             ListLock,
+    OUT PLIST_ENTRY*       ListHead
+    )
+{
+    ASSERT(ListLock != NULL);
+    ASSERT(ListHead != NULL);
+
+    *ListLock = &m_ioFilesData.Lock;
+    *ListHead = &m_ioFilesData.FileList;
+}
 
 ALWAYS_INLINE
 static
@@ -102,6 +133,7 @@ IoCreateFile(
     )
 {
     STATUS status;
+    INTR_STATE oldState;
     PIRP pIrp;
     PVPB pVpb;
     char driveLetter;
@@ -189,7 +221,9 @@ IoCreateFile(
 
             // complete file handle
             *Handle = pStackLocation->FileObject;
-            NotifyDebugger();
+            LockAcquire(&m_ioFilesData.Lock, &oldState);
+            InsertTailList(&m_ioFilesData.FileList, &(pStackLocation->FileObject->AllList));
+            LockRelease(&m_ioFilesData.Lock, oldState);
         }
 
         if (NULL != pIrp)
@@ -208,6 +242,7 @@ IoCloseFile(
     )
 {
     STATUS status;
+    INTR_STATE oldState;
     PIRP pIrp;
     PDEVICE_OBJECT pFileSystemDevice;
     PIO_STACK_LOCATION pStackLocation;
@@ -220,6 +255,10 @@ IoCloseFile(
     pStackLocation = NULL;
 
     ASSERT(NULL != pFileSystemDevice);
+
+    LockAcquire(&m_ioFilesData.Lock, &oldState);
+    RemoveEntryList(&FileHandle->AllList);
+    LockRelease(&m_ioFilesData.Lock, oldState);
 
     pIrp = IoAllocateIrp(pFileSystemDevice->StackSize);
     if (NULL == pIrp)
@@ -249,10 +288,6 @@ IoCloseFile(
         {
             IoFreeIrp(pIrp);
             pIrp = NULL;
-        }
-        if (SUCCEEDED(status))
-        {
-            NotifyDebugger();
         }
     }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "list.h"
+
 C_HEADER_START
 #pragma pack(push,16)
 typedef struct _RW_SPINLOCK
@@ -8,14 +10,33 @@ typedef struct _RW_SPINLOCK
     volatile WORD   WaitingWriters;
     volatile WORD   ActiveWriter;
     volatile WORD   ActiveReaders;
+    char            Name[16];
+    LIST_ENTRY      AllList;
 } RW_SPINLOCK, *PRW_SPINLOCK;
 STATIC_ASSERT(FIELD_OFFSET(RW_SPINLOCK,WaitingWriters) + sizeof(WORD) == FIELD_OFFSET(RW_SPINLOCK, ActiveWriter));
 STATIC_ASSERT(FIELD_OFFSET(RW_SPINLOCK,ActiveWriter) + sizeof(WORD) == FIELD_OFFSET(RW_SPINLOCK, ActiveReaders));
 #pragma pack(pop)
 
 void
+RwSpinlockSystemInit(
+    void
+    );
+
+void
+RwSpinlockSystemGetLockList(
+    OUT PRW_SPINLOCK*      ListLock,
+    OUT PLIST_ENTRY*       ListHead
+    );
+
+void
 RwSpinlockInit(
     OUT     PRW_SPINLOCK    Spinlock
+    );
+
+void
+RwSpinlockSetName(
+    INOUT   PRW_SPINLOCK    Spinlock,
+    IN      char*           Name
     );
 
 REQUIRES_NOT_HELD_LOCK(*Spinlock)

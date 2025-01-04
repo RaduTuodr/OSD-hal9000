@@ -3,6 +3,7 @@
 C_HEADER_START
 
 #ifndef _COMMONLIB_NO_LOCKS_
+#include "list.h"
 #include "spinlock.h"
 #include "monlock.h"
 #include "rw_spinlock.h"
@@ -56,11 +57,30 @@ typedef union _LOCK
 
 typedef
 void
+(CDECL FUNC_LockSystemGetLockList)(
+    OUT BOOLEAN*           IsSpinlock,
+    OUT PLOCK*             ListLock,
+    OUT PLIST_ENTRY*       ListHead
+    );
+
+typedef FUNC_LockSystemGetLockList* PFUNC_LockSystemGetLockList;
+
+typedef
+void
 (CDECL FUNC_LockInit)(
     OUT         PLOCK           Lock
     );
 
 typedef FUNC_LockInit*          PFUNC_LockInit;
+
+typedef
+void
+(CDECL FUNC_LockSetName)(
+    INOUT PLOCK            Lock,
+    IN    char*            Name
+    );
+
+typedef FUNC_LockSetName*       PFUNC_LockSetName;
 
 typedef
 void
@@ -109,7 +129,11 @@ void
 
 typedef FUNC_LockDestroy*       PFUNC_LockDestroy;
 
+extern PFUNC_LockSystemGetLockList LockSystemGetLockList;
+
 extern PFUNC_LockInit           LockInit;
+
+extern PFUNC_LockSetName        LockSetName;
 
 extern PFUNC_LockAcquire        LockAcquire;
 

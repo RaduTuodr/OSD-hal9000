@@ -234,6 +234,12 @@ IoGetCurrentDateTime(
 /////////                        FILE OPERATIONS                                        /////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
+void
+IoFilesSystemGetFileList(
+    OUT PLOCK*             ListLock,
+    OUT PLIST_ENTRY*       ListHead
+    );
+
 STATUS
 IoCreateFile(
     OUT_PTR     PFILE_OBJECT*           Handle,

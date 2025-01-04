@@ -4,11 +4,40 @@ C_HEADER_START
 #pragma pack(push,16)
 typedef struct _SPINLOCK
 {
+    // DO NOT CHANGE THE NAMES OF THESE FIELDS
     volatile BYTE       State;
     PVOID               Holder;
     PVOID               FunctionWhichTookLock;
+    char                Name[16];
+    LIST_ENTRY          AllList;
 } SPINLOCK, *PSPINLOCK;
 #pragma pack(pop)
+
+//******************************************************************************
+// Function:     SpinlockSystemInit
+// Description:  Initializes the spinlock system.
+// Returns:      void
+// Parameter:    void
+//******************************************************************************
+void
+SpinlockSystemInit(
+    void
+    );
+
+//******************************************************************************
+// Function:     SpinlockSystemGetSpinlockList
+// Description:  Retrieves the global spinlock list.
+// Returns:      void
+// Parameter:    OUT BOOLEAN* IsSpinlock
+// Parameter:    OUT PLOCK*   ListLock
+// Parameter:    OUT PLIST_ENTRY* ListHead
+//******************************************************************************
+void
+SpinlockSystemGetSpinlockList(
+    OUT BOOLEAN*           IsSpinlock,
+    OUT PSPINLOCK*         ListLock,
+    OUT PLIST_ENTRY*       ListHead   
+    );
 
 //******************************************************************************
 // Function:     SpinlockInit
@@ -20,6 +49,24 @@ typedef struct _SPINLOCK
 void
 SpinlockInit(
     OUT         PSPINLOCK       Lock
+    );
+
+//******************************************************************************
+// Function:     SpinlockSetName
+// Description:  Sets the name of a spinlock.
+// Returns:      void
+// Parameter:    INOUT PSPINLOCK Lock
+// Parameter:    IN char* Name - name of the spinlock, maximum length 15 chars,
+//               excluding the null terminator.
+// NOTE:         It is not mandatory to call this function. The name helps
+//               helps to identify it in the debugger.
+//               This function is not synchronized, you are responsible
+//               to make sure it is called correctly.
+//******************************************************************************
+void
+SpinlockSetName(
+    INOUT       PSPINLOCK       Lock,
+    IN          char*           Name
     );
 
 //******************************************************************************
@@ -78,4 +125,16 @@ SpinlockRelease(
     INOUT       PSPINLOCK       Lock,
     IN          INTR_STATE      OldIntrState
     );
+
+//******************************************************************************
+// Function:     SpinlockDestroy
+// Description:  Destroys a spinlock.
+// Returns:      void
+// Parameter:    INOUT PSPINLOCK Lock
+//******************************************************************************
+void
+SpinlockDestroy(
+    INOUT       PSPINLOCK       Lock
+    );
+
 C_HEADER_END

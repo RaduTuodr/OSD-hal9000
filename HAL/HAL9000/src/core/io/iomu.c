@@ -212,6 +212,12 @@ _IomuProgramPciInterrupt(
                 APIC_DELIVERY_MODE          DeliveryMode
     );
 
+extern
+void
+IoFilesSystemPreinit(
+    void
+    );
+
 void
 _No_competing_thread_
 IomuPreinitSystem(
@@ -248,6 +254,7 @@ IomuPreinitSystem(
     LockInit(&m_iomuData.GlobalInterruptLock);
 
     IoApicSystemPreinit();
+    IoFilesSystemPreinit();
 }
 
 _No_competing_thread_

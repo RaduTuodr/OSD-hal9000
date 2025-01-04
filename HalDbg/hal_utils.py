@@ -3,7 +3,7 @@ from enum import Enum
 
 DEBUGGER_TARGET = None
 DEBUGGER_PROCESS = None
-LIST_ENTRY = None
+LIST_ENTRY_TYPE = None
 THREAD_TYPE = None
 PROCESS_TYPE = None
 PFILE_OBJECT_TYPE = None
@@ -46,7 +46,7 @@ class HalCommand:
 def init(debugger):
    global DEBUGGER_TARGET
    global DEBUGGER_PROCESS
-   global LIST_ENTRY
+   global LIST_ENTRY_TYPE
    global THREAD_TYPE
    global PROCESS_TYPE
    global PFILE_OBJECT_TYPE
@@ -68,7 +68,7 @@ def init(debugger):
 
    DEBUGGER_TARGET = debugger.GetSelectedTarget()
    DEBUGGER_PROCESS = DEBUGGER_TARGET.GetProcess()
-   LIST_ENTRY = DEBUGGER_TARGET.FindFirstType('struct _LIST_ENTRY')
+   LIST_ENTRY_TYPE = DEBUGGER_TARGET.FindFirstType('struct _LIST_ENTRY')
    THREAD_TYPE = DEBUGGER_TARGET.FindFirstType('struct _THREAD')
    PROCESS_TYPE = DEBUGGER_TARGET.FindFirstType('struct _PROCESS')
    PFILE_OBJECT_TYPE = DEBUGGER_TARGET.FindFirstType('PFILE_OBJECT')
@@ -121,7 +121,7 @@ def traverse_list(list_head_value, callback):
    curr_entry = list_head_value.GetChildMemberWithName('Flink').GetValueAsAddress()
 
    while curr_entry != list_head:
-      list_entry = get_value_from_address(LIST_ENTRY, curr_entry)
+      list_entry = get_value_from_address(LIST_ENTRY_TYPE, curr_entry)
       callback(list_entry)
       curr_entry = list_entry.GetChildMemberWithName('Flink').GetValueAsAddress()
 

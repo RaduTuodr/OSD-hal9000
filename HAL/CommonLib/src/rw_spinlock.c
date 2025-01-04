@@ -2,23 +2,75 @@
 #include "lock_common.h"
 #include "cal_atomic.h"
 #include "cal_assembly.h"
-#include "debug.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
+
+typedef struct _RW_SPINLOCK_SYSTEM_DATA
+{
+    RW_SPINLOCK     Lock;
+    LIST_ENTRY      RwSpinlockList;
+} RW_SPINLOCK_SYSTEM_DATA, *PRW_SPINLOCK_SYSTEM_DATA;
+
+static RW_SPINLOCK_SYSTEM_DATA m_rwSpinlockData;
+
+void
+RwSpinlockSystemInit(
+    void
+    )
+{
+    memzero(&m_rwSpinlockData, sizeof(RW_SPINLOCK_SYSTEM_DATA));
+    InitializeListHead(&m_rwSpinlockData.RwSpinlockList);
+}
+
+void
+RwSpinlockSystemGetLockList(
+    OUT PRW_SPINLOCK*      ListLock,
+    OUT PLIST_ENTRY*       ListHead
+    )
+{
+    ASSERT(ListLock != NULL);
+    ASSERT(ListHead != NULL);
+
+    *ListLock = &m_rwSpinlockData.Lock;
+    *ListHead = &m_rwSpinlockData.RwSpinlockList;
+}
 
 void
 RwSpinlockInit(
     OUT     PRW_SPINLOCK    Spinlock
     )
 {
+    INTR_STATE oldState;
+
     ASSERT( NULL != Spinlock );
 
     memzero( Spinlock, sizeof(RW_SPINLOCK));
 
-    NotifyDebugger();
+    RwSpinlockAcquireExclusive(&m_rwSpinlockData.Lock, &oldState);
+    InsertTailList(&m_rwSpinlockData.RwSpinlockList, &Spinlock->AllList);
+    RwSpinlockReleaseExclusive(&m_rwSpinlockData.Lock, oldState);
 }
 
-// DO NOT CHANGE FUNCTION NAME
+void
+RwSpinlockSetName(
+    INOUT   PRW_SPINLOCK    Spinlock,
+    IN      char*           Name
+    )
+{
+    DWORD length;
+
+    ASSERT(Spinlock != NULL);
+    ASSERT(Name != NULL);
+
+    length = strlen_s(Name, 16);
+    if (length > 15)
+    {
+        length = 15;
+        Spinlock->Name[15] = 0;
+    }
+    strncpy(Spinlock->Name, Name, length);
+}
+
 REQUIRES_NOT_HELD_LOCK(*Spinlock)
 _When_(Exclusive, ACQUIRES_EXCL_AND_NON_REENTRANT_LOCK(*Spinlock))
 _When_(!Exclusive, ACQUIRES_SHARED_AND_NON_REENTRANT_LOCK(*Spinlock))
@@ -122,11 +174,15 @@ RwSpinlockDestroy(
     INOUT   RW_SPINLOCK     *Spinlock
     )
 {
+    INTR_STATE oldState;
+
     ASSERT(Spinlock != NULL);
 
+    RwSpinlockAcquireExclusive(&m_rwSpinlockData.Lock, &oldState);
+    RemoveEntryList(&Spinlock->AllList);
+    RwSpinlockReleaseExclusive(&m_rwSpinlockData.Lock, oldState);
+    
     memzero(Spinlock, sizeof(RW_SPINLOCK));
-
-    NotifyDebugger();
 }
 
 #endif // _COMMONLIB_NO_LOCKS_

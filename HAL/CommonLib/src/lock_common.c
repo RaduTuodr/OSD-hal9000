@@ -1,10 +1,13 @@
 #include "common_lib.h"
 #include "lock_common.h"
-#include "debug.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
 
+PFUNC_LockSystemGetLockList LockSystemGetLockList = NULL;
+
 PFUNC_LockInit           LockInit = NULL;
+
+PFUNC_LockSetName        LockSetName = NULL;
 
 PFUNC_LockAcquire        LockAcquire = NULL;
 
@@ -23,19 +26,6 @@ MSVC_WARNING_DISABLE(4113) // Error for VS2022
 MSVC_WARNING_DISABLE(4028) // Error for VS2019
 GNU_WARNING_IGNORE("-Wincompatible-pointer-types")
 
-static
-void
-(CDECL _LockDestroy)(
-    INOUT       PLOCK           Lock
-    )
-{
-    ASSERT(Lock != NULL);
-
-    memzero(Lock, sizeof(LOCK));
-
-    NotifyDebugger();
-}
-
 void
 LockSystemInit(
     IN      BOOLEAN             MonitorSupport
@@ -45,23 +35,29 @@ LockSystemInit(
     if (MonitorSupport)
     {
         // we have monitor support
+        LockSystemGetLockList = MonitorLockSystemGetMonitorLockList;
         LockInit = MonitorLockInit;
+        LockSetName = MonitorLockSetName;
         LockAcquire = MonitorLockAcquire;
         LockTryAcquire = MonitorLockTryAcquire;
         LockIsOwner = MonitorLockIsOwner;
         LockRelease = MonitorLockRelease;
+        LockDestroy = MonitorLockDestroy;
+        MonitorLockSystemInit();
     }
     else
     {
         // use classic spinlock
+        LockSystemGetLockList = SpinlockSystemGetSpinlockList;
         LockInit = SpinlockInit;
+        LockSetName = SpinlockSetName;
         LockAcquire = SpinlockAcquire;
         LockTryAcquire = SpinlockTryAcquire;
         LockIsOwner = SpinlockIsOwner;
         LockRelease = SpinlockRelease;
+        LockDestroy = SpinlockDestroy;
+        SpinlockSystemInit();
     }
-
-    LockDestroy = _LockDestroy;
 }
 
 WARNING_POP

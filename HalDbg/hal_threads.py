@@ -15,7 +15,7 @@ class ListThreadsCommand(ParsedCommand):
     
     def __call__(self, debugger, args_array, exe_cxt, result):
         thread_list_ptr = hal_utils.get_debug_data('ThreadList')
-        thread_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY, thread_list_ptr)
+        thread_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, thread_list_ptr)
 
         def list_callback(list_entry):
             thread = hal_utils.containing_record(list_entry, hal_utils.THREAD_TYPE, 'AllList') 

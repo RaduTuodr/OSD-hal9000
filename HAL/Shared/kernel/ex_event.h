@@ -18,7 +18,33 @@ typedef struct _EX_EVENT
     LIST_ENTRY          WaitingList;
     EX_EVT_TYPE         EventType;
     volatile BYTE       Signaled;
+    LIST_ENTRY          AllList;
+    char                Name[16];
 } EX_EVENT, *PEX_EVENT;
+
+//******************************************************************************
+// Function:     ExEventSystemPreinit
+// Description:  Initializes the executive event system.
+// Returns:      STATUS
+// Parameter:    void
+//******************************************************************************
+STATUS
+ExEventSystemPreinit(
+    void
+    );
+
+//******************************************************************************
+// Function:     ExEventSystemGetEventList
+// Description:  Retrieves the global executive event list and its lock.
+// Returns:      void
+// Parameter:    OUT PLOCK* ListLock
+// Parameter:    OUT PLIST_ENTRY* ListHead
+//******************************************************************************
+void
+ExEventSystemGetEventList(
+    OUT PLOCK*             ListLock,
+    OUT PLIST_ENTRY*       ListHead
+    );
 
 //******************************************************************************
 // Function:     ExEventInit
@@ -35,6 +61,23 @@ ExEventInit(
     OUT     EX_EVENT*     Event,
     IN      EX_EVT_TYPE   EventType,
     IN      BOOLEAN       Signaled
+    );
+
+//******************************************************************************
+// Function:     ExEventSetName
+// Description:  Sets the name of an executive event.
+// Returns:      void
+// Parameter:    OUT PMUTEX Mutex
+// Parameter:    IN char* Name - name of the mutex, maximum length 15 chars,
+//               excluding the null terminator.
+// NOTE:         It is not mandatory to call this function. The name helps
+//               helps to identify it in the debugger.
+//******************************************************************************
+_No_competing_thread_
+void
+ExEventSetName(
+    INOUT       PEX_EVENT   Event,
+    IN          char*       Name
     );
 
 //******************************************************************************

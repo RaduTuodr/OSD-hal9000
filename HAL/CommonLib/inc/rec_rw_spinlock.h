@@ -19,7 +19,6 @@ typedef struct _REC_RW_SPINLOCK
 } REC_RW_SPINLOCK, *PREC_RW_SPINLOCK;
 #pragma pack(pop)
 
-
 //******************************************************************************
 // Function:     RecRwSpinlockInit
 // Description:  
@@ -32,6 +31,12 @@ void
 RecRwSpinlockInit(
     IN      BYTE                    RecursivityDepth,
     OUT     PREC_RW_SPINLOCK        Spinlock
+    );
+
+void
+RecRwSpinlockSetName(
+    INOUT   PREC_RW_SPINLOCK    Spinlock,
+    IN      char*               Name
     );
 
 REQUIRES_NOT_HELD_LOCK(*Spinlock)

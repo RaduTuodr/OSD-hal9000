@@ -3,25 +3,81 @@
 #include "cal_atomic.h"
 #include "cal_assembly.h"
 #include "cal_intrin.h"
-#include "debug.h"
 
 #ifndef _COMMONLIB_NO_LOCKS_
+
+typedef struct _MONITOR_LOCK_SYSTEM_DATA
+{
+    MONITOR_LOCK      Lock;
+    LIST_ENTRY        MonitorLockList;
+} MONITOR_LOCK_SYSTEM_DATA, *PMONITOR_LOCK_SYSTEM_DATA;
+
+static MONITOR_LOCK_SYSTEM_DATA m_monitorLockData;
+
+void
+MonitorLockSystemInit(
+    void
+    )
+{
+    memzero(&m_monitorLockData, sizeof(MONITOR_LOCK_SYSTEM_DATA));
+    InitializeListHead(&m_monitorLockData.MonitorLockList);
+    AtomicExchange8(&m_monitorLockData.Lock.Lock.State, LOCK_FREE);
+}
+
+void
+MonitorLockSystemGetMonitorLockList(
+    OUT BOOLEAN*           IsSpinlock,
+    OUT PMONITOR_LOCK*     ListLock,
+    OUT PLIST_ENTRY*       ListHead   
+    )
+{
+    ASSERT(IsSpinlock != NULL);
+    ASSERT(ListLock != NULL);
+    ASSERT(ListHead != NULL);
+
+    *IsSpinlock = FALSE;
+    *ListLock = &m_monitorLockData.Lock;
+    *ListHead = &m_monitorLockData.MonitorLockList;
+}
 
 void
 MonitorLockInit(
     OUT         PMONITOR_LOCK       Lock
     )
 {
+    INTR_STATE oldState;
+
     ASSERT(NULL != Lock);
 
     memzero(Lock, sizeof(MONITOR_LOCK));
 
     AtomicExchange8(&Lock->Lock.State, LOCK_FREE);
-
-    NotifyDebugger();
+    
+    MonitorLockAcquire(&m_monitorLockData.Lock, &oldState);
+    InsertTailList(&m_monitorLockData.MonitorLockList, &Lock->Lock.AllList);
+    MonitorLockRelease(&m_monitorLockData.Lock, oldState);
 }
 
-// DO NOT CHANGE FUNCTION NAME
+void
+MonitorLockSetName(
+    INOUT       PMONITOR_LOCK       Lock,
+    IN          char*               Name
+    )
+{
+    DWORD length;
+
+    ASSERT(Lock != NULL);
+    ASSERT(Name != NULL);
+
+    length = strlen_s(Name, 16);
+    if (length > 15)
+    {
+        length = 15;
+        Lock->Lock.Name[15] = 0;
+    }
+    strncpy(Lock->Lock.Name, Name, length);
+}
+
 void
 MonitorLockAcquire(
     INOUT       PMONITOR_LOCK       Lock,
@@ -137,6 +193,22 @@ MonitorLockRelease(
     AtomicExchange8(&Lock->Lock.State, LOCK_FREE);
 
     CpuIntrSetState(OldIntrState);
+}
+
+void
+MonitorLockDestroy(
+    INOUT       PMONITOR_LOCK       Lock
+    )
+{
+    INTR_STATE oldState;
+
+    ASSERT(Lock != NULL);
+
+    MonitorLockAcquire(&m_monitorLockData.Lock, &oldState);
+    RemoveEntryList(&Lock->Lock.AllList);
+    MonitorLockRelease(&m_monitorLockData.Lock, oldState);
+
+    memzero(Lock, sizeof(MONITOR_LOCK));
 }
 
 #endif // _COMMONLIB_NO_LOCKS_

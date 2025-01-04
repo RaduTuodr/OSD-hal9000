@@ -66,7 +66,7 @@ MutexInit(
 _No_competing_thread_
 void
 MutexSetName(
-    OUT         PMUTEX      Mutex,
+    INOUT       PMUTEX      Mutex,
     IN          char*       Name
     )
 {

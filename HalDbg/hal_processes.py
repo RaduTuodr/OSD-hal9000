@@ -15,7 +15,7 @@ class ListProcessesCommand(ParsedCommand):
     
     def __call__(self, debugger, args_array, exe_cxt, result):
         proc_list_ptr = hal_utils.get_debug_data('ProcessList')
-        proc_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY, proc_list_ptr)
+        proc_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, proc_list_ptr)
 
         def list_callback(list_entry):
             proc = hal_utils.containing_record(list_entry, hal_utils.PROCESS_TYPE, 'NextProcess') 

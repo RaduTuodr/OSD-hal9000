@@ -64,7 +64,7 @@ class ListMutexesCommand(ParsedCommand):
     
     def __call__(self, debugger, args_array, exe_cxt, result):
         mutex_list_ptr = hal_utils.get_debug_data('MutexList')
-        mutex_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY, mutex_list_ptr)
+        mutex_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, mutex_list_ptr)
         
         def list_callback(list_entry):
             mutex = hal_utils.containing_record(list_entry, hal_utils.MUTEX_TYPE, 'AllList') 

@@ -44,9 +44,12 @@ SystemPreinit(
     )
 {
     DISPLAY_INFORMATION displayInformation;
+    BOOLEAN isSpinlock;
     PLOCK pLock;
+    PRW_SPINLOCK pRwSpinlock;
     PMUTEX pMutex;
     PLIST_ENTRY pList;
+    PLIST_ENTRY pAnotherList;
 
     memzero(&m_systemData, sizeof(SYSTEM_DATA));
 
@@ -61,6 +64,7 @@ SystemPreinit(
 
     BootModulesPreinit();
     DumpPreinit();
+    ExEventSystemPreinit();
     MutexSystemPreinit();
     ThreadSystemPreinit();
     printSystemPreinit(&displayInformation);
@@ -75,6 +79,7 @@ SystemPreinit(
     CorePreinit();
     NetworkStackPreinit();
     ProcessSystemPreinit();
+    
     DebugDatabasePreinit();
     MutexSystemGetMutexList(&pLock, &pList);
     DebugDatabaseSetMutexList(pLock, pList);
@@ -82,6 +87,13 @@ SystemPreinit(
     DebugDatabaseSetThreadList(pLock, pList);
     ProcessSystemGetProcessList(&pMutex, &pList);
     DebugDatabaseSetProcessList(pMutex, pList);
+    LockSystemGetLockList(&isSpinlock, &pLock, &pList);
+    RwSpinlockSystemGetLockList(&pRwSpinlock, &pAnotherList);
+    DebugDatabaseSetLockLists(isSpinlock, pLock, pList, pRwSpinlock, pAnotherList);
+    IoFilesSystemGetFileList(&pLock, &pList);
+    DebugSystemSetFilesList(pLock, pList);
+    ExEventSystemGetEventList(&pLock, &pList);
+    DebugSystemSetEventList(pLock, pList);
 }
 
 STATUS
