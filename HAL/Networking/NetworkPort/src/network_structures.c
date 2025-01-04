@@ -12,6 +12,7 @@ _NetworkPortPreinitBuffers(
     memzero(Buffers, sizeof(PORT_BUFFERS));
 
     LockInit(&Buffers->FramesLock);
+    LockSetName(&Buffers->FramesLock, "NetFrames");
     InitializeListHead(&Buffers->FramesList);
 }
 

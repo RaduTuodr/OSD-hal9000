@@ -26,6 +26,7 @@ IoFilesSystemPreinit(
 {
     memzero(&m_ioFilesData, sizeof(IO_FILES_SYSTEM_DATA));
     LockInit(&m_ioFilesData.Lock);
+    LockSetName(&m_ioFilesData.Lock, "FileList");
     InitializeListHead(&m_ioFilesData.FileList);
 }
 

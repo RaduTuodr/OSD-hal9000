@@ -15,6 +15,7 @@ printSystemPreinit(
 {
     DispPreinitScreen( DisplayInformation, 1, LINES_PER_SCREEN - 1);
     LockInit(&m_printLock);
+    LockSetName(&m_printLock, "Print");
 }
 
 static

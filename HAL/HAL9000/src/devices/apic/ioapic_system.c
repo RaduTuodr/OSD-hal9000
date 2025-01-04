@@ -791,6 +791,7 @@ GNU_WARNING_IGNORE("-Wint-to-void-pointer-cast")
     }
 
     LockInit(&pIoApic->IoApicLock);
+    LockSetName(&pIoApic->IoApicLock, "IoApic");
 
     *IoApicEntry = pIoApic;
 

@@ -82,6 +82,7 @@ PmmPreinitSystem(
     }
 
     LockInit(&m_pmmData.AllocationLock);
+    LockSetName(&m_pmmData.AllocationLock, "PmmAlloc");
 }
 
 _No_competing_thread_

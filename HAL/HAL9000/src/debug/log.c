@@ -43,6 +43,7 @@ LogSystemPreinit(
     memzero(&m_logData, sizeof(LOG_DATA));
 
     LockInit(&m_logData.Lock);
+    LockSetName(&m_logData.Lock, "Log");
 }
 
 _No_competing_thread_

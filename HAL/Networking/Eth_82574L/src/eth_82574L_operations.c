@@ -586,6 +586,7 @@ _EthTxInit(
          EthGetTxInterruptAbsoluteDelay(Device));
 
     LockInit(&Device->TxData.TxInterruptLock);
+    LockSetName(&Device->TxData.TxInterruptLock, "TxIntr");
 
     LOG_FUNC_END;
 

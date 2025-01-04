@@ -160,6 +160,7 @@ AcpiOsCreateLock (
     }
 
     LockInit(lock);
+    LockSetName(lock, "ACPI");
 
     LOG_TRACE_ACPI("Lock at: 0x%X\n", lock );
 

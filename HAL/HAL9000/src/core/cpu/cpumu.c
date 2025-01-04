@@ -318,6 +318,7 @@ CpuMuAllocCpu(
 
     InitializeListHead(&pPcpu->EventList);
     LockInit(&pPcpu->EventListLock);
+    LockSetName(&pPcpu->EventListLock, "EventList");
     pPcpu->NoOfEventsInList = 0;
 
     *PhysicalCpu = pPcpu;

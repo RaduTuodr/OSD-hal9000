@@ -69,6 +69,7 @@ AssertSetFunction(
 
 #ifndef _COMMONLIB_NO_LOCKS_
     LockInit(&m_assertLock);
+    LockSetName(&m_assertLock, "AssertLock");
 #endif // _COMMONLIB_NO_LOCKS_
 }
 

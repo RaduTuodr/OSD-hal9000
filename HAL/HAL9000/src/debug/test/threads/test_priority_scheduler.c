@@ -364,6 +364,7 @@ GNU_WARNING_IGNORE("-Wvoid-pointer-to-int-cast")
     pNewContext->MaxIndex = NumberOfThreads * PRIORITY_SCHEDULER_NO_OF_ITERATIONS;
     pNewContext->MultipleThreads = bMultipleThreads;
     LockInit(&pNewContext->Lock);
+    LockSetName(&pNewContext->Lock, "TestPrioExecCtx");
 
     *Context = pNewContext;
 }

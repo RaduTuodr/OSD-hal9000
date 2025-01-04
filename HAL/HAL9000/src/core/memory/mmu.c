@@ -303,6 +303,7 @@ MmuPreinitSystem(
 
     InitializeListHead(&m_mmuData.ZeroThreadData.PagesToZeroList);
     LockInit(&m_mmuData.ZeroThreadData.PagesLock);
+    LockSetName(&m_mmuData.ZeroThreadData.PagesLock, "ZeroPages");
 
     m_mmuData.PcidSupportAvailable = CpuMuIsPcidFeaturePresent();
 
@@ -2212,6 +2213,7 @@ _MmuInitializeHeap(
     LOG("ClHeapInit suceeded\n");
 
     LockInit(&Heap->HeapLock);
+    LockSetName(&Heap->HeapLock, "Heap");
 
     return status;
 }

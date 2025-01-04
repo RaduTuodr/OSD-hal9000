@@ -151,9 +151,11 @@ ThreadSystemPreinit(
 
     InitializeListHead(&m_threadSystemData.AllThreadsList);
     LockInit(&m_threadSystemData.AllThreadsLock);
+    LockSetName(&m_threadSystemData.AllThreadsLock, "AllThreads");
 
     InitializeListHead(&m_threadSystemData.ReadyThreadsList);
     LockInit(&m_threadSystemData.ReadyThreadsLock);
+    LockSetName(&m_threadSystemData.ReadyThreadsLock, "RdyThreads");
 }
 
 void
@@ -824,6 +826,7 @@ _ThreadInit(
         pThread->Priority = Priority;
 
         LockInit(&pThread->BlockLock);
+        LockSetName(&pThread->BlockLock, "ThrBlock");
 
         LockAcquire(&m_threadSystemData.AllThreadsLock, &oldIntrState);
         InsertTailList(&m_threadSystemData.AllThreadsList, &pThread->AllList);

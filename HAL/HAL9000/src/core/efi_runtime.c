@@ -42,6 +42,7 @@ EfiRuntimeInit(
     }
 
     LockInit(&(m_efiRuntimeData.EfiRuntimeLock));
+    LockSetName(&(m_efiRuntimeData.EfiRuntimeLock), "EfiRuntime");
     m_efiRuntimeData.EfiRuntimeServices->Hdr.CRC32 = Crc32;
 
     return STATUS_SUCCESS;

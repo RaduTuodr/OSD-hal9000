@@ -253,6 +253,7 @@ IomuPreinitSystem(
     BitmapSetBits(&m_iomuData.InterruptBitmap, 0, NO_OF_RESERVED_EXCEPTIONS );
 
     LockInit(&m_iomuData.GlobalInterruptLock);
+    LockSetName(&m_iomuData.GlobalInterruptLock, "GlobalIntr");
 
     IoApicSystemPreinit();
     IoFilesSystemPreinit();
