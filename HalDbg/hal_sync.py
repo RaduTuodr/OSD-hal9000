@@ -1,4 +1,6 @@
 import re
+import inspect
+import ctypes
 
 import lldb
 from lldb.plugins.parsed_cmd import ParsedCommand
@@ -57,7 +59,13 @@ class ListMutexesCommand(ParsedCommand):
 class DumpMutexCommand(ParsedCommand):
     def setup_command_definition(self):
         parser = self.get_parser()
-        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+        args = [parser.make_argument_element(lldb.eArgTypeAddress, repeat='plain')]
+        parser.add_argument_set(args)
+        parser.add_option(short_option='v',
+                          long_option='verbose',
+                          help='Verbose output',
+                          default=False,
+                          value_type=lldb.eArgTypeBoolean)
 
     def get_short_help(self):
         return "Dump mutex based on address."
@@ -66,8 +74,11 @@ class DumpMutexCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_ctx, result):
+        buff = ctypes.create_string_buffer(b'\0' * 256)
+        addr = args_array.GetItemAtIndex(0).GetStringValue(ctypes.addressof(buff))
+
         try:
-            addr = int(args_array, base=16)
+            addr = int(addr, base=16)
         except ValueError:
             print('Invalid hexadecimal address!')
             return
@@ -87,7 +98,8 @@ class DumpMutexCommand(ParsedCommand):
             print(f'Thread {hex(thread_addr)}: {thread_name}; Process {hex(proc_addr)}: {proc_name}')
 
         print(f'Mutex: {hex(addr)}')
-        print(mutex)
+        if self.get_parser().verbose:
+            print(mutex)
         if holder != 0:
             holder_addr = holder
             holder = hal_utils.get_value_from_address(hal_utils.THREAD_TYPE, holder)
@@ -138,7 +150,13 @@ class ListExEventsCommand(ParsedCommand):
 class DumpExEventCommand(ParsedCommand):
     def setup_command_definition(self):
         parser = self.get_parser()
-        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+        args = [parser.make_argument_element(lldb.eArgTypeAddress, repeat='plain')]
+        parser.add_argument_set(args)
+        parser.add_option(short_option='v',
+                          long_option='verbose',
+                          help='Verbose output',
+                          default=False,
+                          value_type=lldb.eArgTypeBoolean)
 
     def get_short_help(self):
         return "Dump ex event based on address."
@@ -147,8 +165,11 @@ class DumpExEventCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_ctx, result):
+        buff = ctypes.create_string_buffer(b'\0' * 256)
+        addr = args_array.GetItemAtIndex(0).GetStringValue(ctypes.addressof(buff))
+
         try:
-            addr = int(args_array, base=16)
+            addr = int(addr, base=16)
         except ValueError:
             print('Invalid hexadecimal address!')
             return
@@ -167,7 +188,8 @@ class DumpExEventCommand(ParsedCommand):
             print(f'Thread {hex(thread_addr)}: {thread_name}; Process {hex(proc_addr)}: {proc_name}')
 
         print(f'EX Event: {hex(addr)}')
-        print(ex_event)
+        if self.get_parser().verbose:
+            print(ex_event)
         print(f'Waiting list: ')
         hal_utils.traverse_list(waiting_list, list_callback)
 
@@ -229,7 +251,13 @@ class ListLocksCommand(ParsedCommand):
 class DumpSpinlockCommand(ParsedCommand):
     def setup_command_definition(self):
         parser = self.get_parser()
-        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+        args = [parser.make_argument_element(lldb.eArgTypeAddress, repeat='plain')]
+        parser.add_argument_set(args)
+        parser.add_option(short_option='v',
+                          long_option='verbose',
+                          help='Verbose output',
+                          default=False,
+                          value_type=lldb.eArgTypeBoolean)
 
     def get_short_help(self):
         return "Dump spinlock based on address."
@@ -247,15 +275,21 @@ class DumpSpinlockCommand(ParsedCommand):
         return False
 
     def __call__(self, debugger, args_array, exe_ctx, result):
+        buff = ctypes.create_string_buffer(b'\0' * 256)
+        addr = args_array.GetItemAtIndex(0).GetStringValue(ctypes.addressof(buff))
+
         try:
-            addr = int(args_array, base=16)
+            addr = int(addr, base=16)
         except ValueError:
             print('Invalid hexadecimal address!')
             return
 
         lock = hal_utils.get_value_from_address(hal_utils.SPINLOCK_TYPE, addr)
+        lock_holder = hal_utils.get_field_as_unsigned(lock, 'Holder')
         print(f'Lock {hex(addr)}:')
-        print(lock)
+        print(f'Holder: {hex(lock_holder)}')
+        if self.get_parser().verbose:
+            print(lock)
         print('Waiters:')
         
         core_count = hal_utils.DEBUGGER_PROCESS.GetNumThreads()
@@ -277,7 +311,13 @@ class DumpSpinlockCommand(ParsedCommand):
 class DumpRwSpinlockCommand(ParsedCommand):
     def setup_command_definition(self):
         parser = self.get_parser()
-        parser.make_argument_element(lldb.eArgTypeAddress, 'plain')
+        args = [parser.make_argument_element(lldb.eArgTypeAddress, repeat='plain')]
+        parser.add_argument_set(args)
+        parser.add_option(short_option='v',
+                          long_option='verbose',
+                          help='Verbose output',
+                          default=False,
+                          value_type=lldb.eArgTypeBoolean)
 
     def get_short_help(self):
         return "Dump rwspinlock based on address."
@@ -295,15 +335,19 @@ class DumpRwSpinlockCommand(ParsedCommand):
         return False
 
     def __call__(self, debugger, args_array, exe_ctx, result):
+        buff = ctypes.create_string_buffer(b'\0' * 256)
+        addr = args_array.GetItemAtIndex(0).GetStringValue(ctypes.addressof(buff))
+
         try:
-            addr = int(args_array, base=16)
+            addr = int(addr, base=16)
         except ValueError:
             print('Invalid hexadecimal address!')
             return
         
         lock = hal_utils.get_value_from_address(hal_utils.RW_SPINLOCK_TYPE, addr)
         print(f'Lock {hex(addr)}:')
-        print(lock)
+        if self.get_parser().verbose:
+            print(lock)
         print('Waiters:')
         
         core_count = hal_utils.DEBUGGER_PROCESS.GetNumThreads()
