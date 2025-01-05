@@ -1,3 +1,5 @@
+import re
+
 import lldb
 from lldb.plugins.parsed_cmd import ParsedCommand
 
@@ -5,7 +7,12 @@ import hal_utils
 
 class ListProcessesCommand(ParsedCommand):
     def setup_command_definition(self):
-        None
+        parser = self.get_parser()
+        parser.add_option(short_option='f',
+                        long_option='filter',
+                        help='Filter regex for name',
+                        default='.*',
+                        value_type=lldb.eArgTypeName)
 
     def get_short_help(self):
         return 'List processes.'        
@@ -16,11 +23,14 @@ class ListProcessesCommand(ParsedCommand):
     def __call__(self, debugger, args_array, exe_cxt, result):
         proc_list_ptr = hal_utils.get_debug_data('ProcessList')
         proc_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, proc_list_ptr)
+        name_pattern = re.compile(self.get_parser().filter)
 
         def list_callback(list_entry):
             proc = hal_utils.containing_record(list_entry, hal_utils.PROCESS_TYPE, 'NextProcess') 
             proc_addr = hal_utils.get_address_of_value(proc)
             proc_name = hal_utils.get_process_name(proc)
+            if not name_pattern.search(proc_name):
+                return
             thread_count = 0
             
             def count_callback(list_entry):

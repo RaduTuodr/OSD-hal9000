@@ -1,3 +1,5 @@
+import re
+
 import lldb
 from lldb.plugins.parsed_cmd import ParsedCommand
 from enum import Enum
@@ -11,7 +13,13 @@ class LockType(Enum):
 
 class ListMutexesCommand(ParsedCommand):
     def setup_command_definition(self):
-        None
+        parser = self.get_parser()
+
+        parser.add_option(short_option='f',
+                        long_option='filter',
+                        help='Filter regex for name',
+                        default='.*',
+                        value_type=lldb.eArgTypeName)
 
     def get_short_help(self):
         return 'List all mutexes.'        
@@ -22,6 +30,7 @@ class ListMutexesCommand(ParsedCommand):
     def __call__(self, debugger, args_array, exe_cxt, result):
         mutex_list_ptr = hal_utils.get_debug_data('MutexList')
         mutex_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, mutex_list_ptr)
+        name_pattern = re.compile(self.get_parser().filter)
         
         def list_callback(list_entry):
             mutex = hal_utils.containing_record(list_entry, hal_utils.MUTEX_TYPE, 'AllList') 
@@ -29,7 +38,18 @@ class ListMutexesCommand(ParsedCommand):
             mutex_name = hal_utils.get_name(mutex)
             if not mutex_name:
                 mutex_name = 'NULL'
+            if not name_pattern.search(mutex_name):
+                return
+            holder = hal_utils.get_field_as_address(mutex, 'Holder')
             print(f'Mutex {hex(mutex_addr)}: {mutex_name}')
+            if holder != 0:
+                holder_addr = holder
+                holder = hal_utils.get_value_from_address(hal_utils.THREAD_TYPE, holder)
+                holder_name = hal_utils.get_thread_name(holder)
+                holder_proc = hal_utils.get_process_from_thread(holder)
+                holder_proc_addr = hal_utils.get_address_of_value(holder_proc)
+                holder_proc_name = hal_utils.get_process_name(holder_proc)
+                print(f'  Holder: Thread {hex(holder_addr)}: {holder_name}; Process {hex(holder_proc_addr)}: {holder_proc_name}')
 
         print('Mutexes:')
         hal_utils.traverse_list(mutex_list, list_callback)
@@ -83,7 +103,13 @@ class DumpMutexCommand(ParsedCommand):
 
 class ListExEventsCommand(ParsedCommand):
     def setup_command_definition(self):
-        None
+        parser = self.get_parser()
+
+        parser.add_option(short_option='f',
+                        long_option='filter',
+                        help='Filter regex for name',
+                        default='.*',
+                        value_type=lldb.eArgTypeName)
 
     def get_short_help(self):
         return 'List all executive events.'        
@@ -94,6 +120,7 @@ class ListExEventsCommand(ParsedCommand):
     def __call__(self, debugger, args_array, exe_cxt, result):
         ex_event_list_ptr = hal_utils.get_debug_data('ExEventList')
         ex_event_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, ex_event_list_ptr)
+        name_pattern = re.compile(self.get_parser().filter)
 
         def list_callback(list_entry):
             event = hal_utils.containing_record(list_entry, hal_utils.EX_EVENT_TYPE, 'AllList')
@@ -101,6 +128,8 @@ class ListExEventsCommand(ParsedCommand):
             event_name = hal_utils.get_name(event)
             if not event_name:
                 event_name = 'NULL'
+            if not name_pattern.search(event_name):
+                return
             print(f'EX Event {hex(event_addr)}: {event_name}')
 
         print('EX Events:')
@@ -153,10 +182,15 @@ class ListLocksCommand(ParsedCommand):
         parser = self.get_parser()
         parser.add_option(short_option='t',
                         long_option='type',
-                        help='Filters displayed spinlocks based on type',
+                        help='Filters displayed locks based on type',
                         default='Spinlock',
                         value_type=lldb.eArgTypeTypeName,
                         enum_values=enum_values)
+        parser.add_option(short_option='f',
+                        long_option='filter',
+                        help='Filter regex for name',
+                        default='.*',
+                        value_type=lldb.eArgTypeName)
 
     def get_short_help(self):
         return 'List all locks of a given type.'        
@@ -165,7 +199,7 @@ class ListLocksCommand(ParsedCommand):
         return lldb.eCommandRequiresFrame | lldb.eCommandProcessMustBePaused
     
     def __call__(self, debugger, args_array, exe_cxt, result):
-        global _locks
+        name_pattern = re.compile(self.get_parser().filter) 
 
         requested_type = LockType[self.get_parser().type]
 
@@ -185,6 +219,8 @@ class ListLocksCommand(ParsedCommand):
             lock_addr = hal_utils.get_address_of_value(lock)
             if not lock_name:
                 lock_name = 'NULL'
+            if not name_pattern.search(lock_name):
+                return
             print(f'Lock {hex(lock_addr)}: {lock_name}')
 
         print('Locks:')

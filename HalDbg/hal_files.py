@@ -1,3 +1,5 @@
+import re
+
 import lldb
 from lldb.plugins.parsed_cmd import ParsedCommand
 
@@ -5,7 +7,12 @@ import hal_utils
 
 class ListFileObjectsCommand(ParsedCommand):
     def setup_command_definition(self):
-        None
+        parser = self.get_parser()
+        parser.add_option(short_option='f',
+                        long_option='filter',
+                        help='Filter regex for name',
+                        default='.*',
+                        value_type=lldb.eArgTypeName)
 
     def get_short_help(self):
         return 'List all file objects.'        
@@ -15,9 +22,8 @@ class ListFileObjectsCommand(ParsedCommand):
     
     def __call__(self, debugger, args_array, exe_cxt, result):
         file_list_ptr = hal_utils.get_debug_data('FileList')
-        print(hex(file_list_ptr))
         file_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, file_list_ptr)
-        print(file_list)
+        name_pattern = re.compile(self.get_parser().filter)
 
         def list_callback(list_entry):
             file = hal_utils.containing_record(list_entry, hal_utils.FILE_OBJECT_TYPE, 'AllList') 
@@ -28,6 +34,8 @@ class ListFileObjectsCommand(ParsedCommand):
                 file_name = None
             if not file_name:
                 file_name = 'NULL'
+            if not name_pattern.search(file_name):
+                return
             print(f'File object {hex(file_addr)}: {file_name}')
 
         print('File objects:')

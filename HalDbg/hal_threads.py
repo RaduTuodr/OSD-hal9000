@@ -1,3 +1,5 @@
+import re
+
 import lldb
 from lldb.plugins.parsed_cmd import ParsedCommand
 
@@ -5,7 +7,12 @@ import hal_utils
 
 class ListThreadsCommand(ParsedCommand):
     def setup_command_definition(self):
-        None
+        parser = self.get_parser()
+        parser.add_option(short_option='f',
+                        long_option='filter',
+                        help='Filter regex for name',
+                        default='.*',
+                        value_type=lldb.eArgTypeName)
 
     def get_short_help(self):
         return 'List all threads.'        
@@ -16,11 +23,14 @@ class ListThreadsCommand(ParsedCommand):
     def __call__(self, debugger, args_array, exe_cxt, result):
         thread_list_ptr = hal_utils.get_debug_data('ThreadList')
         thread_list = hal_utils.get_value_from_address(hal_utils.LIST_ENTRY_TYPE, thread_list_ptr)
+        name_pattern = re.compile(self.get_parser().filter) 
 
         def list_callback(list_entry):
             thread = hal_utils.containing_record(list_entry, hal_utils.THREAD_TYPE, 'AllList') 
             thread_addr = hal_utils.get_address_of_value(thread)
             thread_name = hal_utils.get_thread_name(thread)
+            if not name_pattern.search(thread_name):
+                return 
             thread_state = hal_utils.get_field(thread, 'State')
             state = hal_utils.enum_field_to_string(hal_utils.THREAD_STATE_TYPE, thread_state)
             if state:
