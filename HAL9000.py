@@ -77,7 +77,7 @@ def get_build_env():
         env['PATH'] = f'{os.path.join(os.getenv("LOCALAPPDATA"), "bin", "NASM")}{os.pathsep}{env["PATH"]}'
     return env
 
-def deep_clean():
+def deep_clean(**kwargs):
     prCyan('Deep cleaning ImageCreator...')
     shutil.rmtree('ImageCreator/build', ignore_errors=True)
     prGreen('Done.')
@@ -146,7 +146,7 @@ def bootstrap_linux():
 
     return bootstrap_generic(pkg_manager_cmd, packages)
 
-def bootstrap():
+def bootstrap(**kwargs):
     plat_system = str(platform.system()).lower()
     if plat_system == 'darwin':
         result = bootstrap_darwin()
@@ -160,7 +160,7 @@ def bootstrap():
     else:
        prRed('Failed bootstrap!')
 
-def configure():
+def configure(**kwargs):
     generator = '\"Ninja\"'
     
     prCyan('Configuring ImageCreator...')
@@ -211,9 +211,9 @@ def clean_hal(job_count):
     prGreen('Done.')
     return True
 
-def clean_all(job_count):
+def clean_all(j, **kwargs):
     prCyan('Cleaning ImageCreator...')
-    p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
+    p = subprocess.run(f'cmake --build build -j{j} --target clean',
                         cwd='ImageCreator',
                         env=get_build_env(),
                         shell=True)
@@ -223,7 +223,7 @@ def clean_all(job_count):
     prGreen('Done.')
 
     prCyan('Cleaning UefiBootloader...')
-    p = subprocess.run(f'cmake --build build -j{job_count} --target clean',
+    p = subprocess.run(f'cmake --build build -j{j} --target clean',
                         cwd='UefiBootloader',
                         env=get_build_env(),
                         shell=True)
@@ -232,7 +232,10 @@ def clean_all(job_count):
         return
     prGreen('Done.')
 
-    clean_hal(job_count)
+    clean_hal(j)
+
+def clean(j, **kwargs):
+    clean_hal(j)
 
 def build_hal(job_count):
     prCyan('Building HAL9000...')
@@ -291,14 +294,14 @@ def generate_qemu_image():
     prGreen('Done.')
     return True
 
-def build_all(job_count):
+def build_all(j, **kwargs):
     if str(platform.system()).lower() == 'windows':
         build_type = '--config Release'
     else:
         build_type = ''
 
     prCyan('Building ImageCreator...')
-    p = subprocess.run(f'cmake --build build -j{job_count} {build_type}',
+    p = subprocess.run(f'cmake --build build -j{j} {build_type}',
                         cwd='ImageCreator',
                         env=get_build_env(),
                         shell=True)
@@ -308,7 +311,7 @@ def build_all(job_count):
     prGreen('Done.')
 
     prCyan('Building UefiBootloader...')
-    p = subprocess.run(f'cmake --build build -j{job_count}',
+    p = subprocess.run(f'cmake --build build -j{j}',
                         cwd='UefiBootloader',
                         env=get_build_env(),
                         shell=True)
@@ -317,7 +320,7 @@ def build_all(job_count):
         return
     prGreen('Done.')
 
-    if not build_hal(job_count):
+    if not build_hal(j):
         return
     
     prCyan('Installing ImageCreator...')
@@ -349,8 +352,8 @@ def build_all(job_count):
 
     separate_debug_information()
 
-def build(job_count):
-    if not build_hal(job_count):
+def build(j, **kwargs):
+    if not build_hal(j):
         return
 
     if not install_hal():
@@ -379,22 +382,22 @@ def parse_qemu_options(debug):
 
     return qemu_options
 
-def run(debug):
+def run(d, **kwargs):
     if not generate_qemu_image():
         return 
 
     prCyan('Starting QEMU...')
-    qemu_options = parse_qemu_options(debug)
+    qemu_options = parse_qemu_options(d)
     subprocess.run(f'qemu-system-x86_64{".exe" if str(platform.system()).lower() == "windows" else ""} \
                    {qemu_options}',
                    shell=True)
 
-def run_async(debug) -> subprocess.Popen:
+def run_async(d, **kwargs) -> subprocess.Popen:
     if not generate_qemu_image():
         return 
 
     prCyan('Starting QEMU...')
-    qemu_options = parse_qemu_options(debug)
+    qemu_options = parse_qemu_options(d)
     return subprocess.Popen(f'qemu-system-x86_64{".exe" if str(platform.system()).lower() == "windows" else ""} \
                             {qemu_options}',
                             shell=True,
@@ -402,10 +405,10 @@ def run_async(debug) -> subprocess.Popen:
                             stderr=subprocess.DEVNULL,
                             stdin=subprocess.DEVNULL)
 
-def run_tests(tests, job_count, debug):
-    prCyan(f'Running tests matching: {tests}')
+def run_tests(t, timeout, j, d, **kwargs):
+    prCyan(f'Running tests matching: {t}')
 
-    if not build_hal(job_count):
+    if not build_hal(j):
         return
 
     if not install_hal():
@@ -413,7 +416,7 @@ def run_tests(tests, job_count, debug):
     
     separate_debug_information()
 
-    tester = Tester('config/Tests.json', tests, 'tests', 'artifacts/Tests', 'HAL9000.log', 0)
+    tester = Tester('config/Tests.json', t, 'tests', 'artifacts/Tests', 'HAL9000.log', timeout)
 
     prCyan('Generating tests module...')
     err = tester.generate_tests_module()
@@ -424,7 +427,7 @@ def run_tests(tests, job_count, debug):
 
     timeout = tester.timeout
 
-    p = run_async(debug)
+    p = run_async(d)
 
     if timeout == 0:
         prYellow('There is no timeout. Waiting for QEMU to finish...')
@@ -456,89 +459,89 @@ def main():
                                              foolproof and incapable of error.\' - 2001: A Space Odyssey',
                                      add_help=True)
 
-    parser.add_argument('--deep_clean',
-                        help='Remove all build directories and start with a clean slate',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--bootstrap',
-                        help='Bootstrap HAL9000, it will install the required packages',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--configure',
-                        help='Configure the projects',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--clean_all',
-                        help='Run the clean target for all projects',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--clean',
-                        help='Run the clean target for HAL9000',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--build_all',
-                        help='Build all projects',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--build',
-                        help='Build HAL9000',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--run',
-                        help='Run HAL9000',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--run_tests',
-                        help='Run the matching tests, regular expressions are also accepted',
-                        nargs='+')
-    parser.add_argument('-j',
-                        help='Job count, use it for parallel build (default: number of CPUs)',
-                        type=int,
-                        required=False,
-                        default=multiprocessing.cpu_count())
-    parser.add_argument('-d',
-                        help='Make QEMU wait for the debugger',
-                        action='store_true',
-                        required=False,
-                        default=False)
+    subparsers = parser.add_subparsers(required=True)
+
+    deep_clean_parser = subparsers.add_parser('deep_clean',
+                                              help='Remove all build directories and start with a clean slate')
+    deep_clean_parser.set_defaults(dispatch=deep_clean)
+
+
+    bootstrap_parser = subparsers.add_parser('bootstrap',
+                                            help='Bootstrap HAL9000, it will install the required packages')
+    bootstrap_parser.set_defaults(dispatch=bootstrap)
+
+    configure_parser = subparsers.add_parser('configure',
+                                            help='Configure the projects')
+    configure_parser.set_defaults(dispatch=configure)
+
+    clean_all_parser = subparsers.add_parser('clean_all',
+                                            help='Run the clean target for all projects')
+    clean_all_parser.set_defaults(dispatch=clean_all)
+    clean_all_parser.add_argument('-j',
+                                 help='Job count, use it for parallel build (default: number of CPUs)',
+                                 type=int,
+                                 required=False,
+                                 default=multiprocessing.cpu_count())
+    
+    clean_parser = subparsers.add_parser('clean',
+                                        help='Run the clean target for HAL9000')
+    clean_parser.set_defaults(dispatch=clean)
+    clean_parser.add_argument('-j',
+                             help='Job count, use it for parallel build (default: number of CPUs)',
+                             type=int,
+                             required=False,
+                             default=multiprocessing.cpu_count())
+
+    build_all_parser = subparsers.add_parser('build_all',
+                                            help='Build all projects')
+    build_all_parser.set_defaults(dispatch=build_all)
+    build_all_parser.add_argument('-j',
+                                 help='Job count, use it for parallel build (default: number of CPUs)',
+                                 type=int,
+                                 required=False,
+                                 default=multiprocessing.cpu_count())
+
+    build_parser = subparsers.add_parser('build',
+                                        help='Build HAL9000')
+    build_parser.set_defaults(dispatch=build)
+    build_parser.add_argument('-j',
+                             help='Job count, use it for parallel build (default: number of CPUs)',
+                             type=int,
+                             required=False,
+                             default=multiprocessing.cpu_count())
+
+    run_parser = subparsers.add_parser('run',
+                                      help='Run HAL9000')
+    run_parser.set_defaults(dispatch=run)
+    run_parser.add_argument('-d',
+                            help='Make QEMU wait for the debugger',
+                            action='store_true',
+                            required=False)
+    
+    run_tests_parser = subparsers.add_parser('run_tests',
+                                            help='Run the matching tests, regular expressions are also accepted')
+    run_tests_parser.set_defaults(dispatch=run_tests)
+    run_tests_parser.add_argument('-t',
+                                  help='Tests to run',
+                                  nargs='+')
+    run_tests_parser.add_argument('--timeout',
+                                 help='Timeout in seconds',
+                                 type=int,
+                                 required=False,
+                                 default=0)
+    run_tests_parser.add_argument('-j',
+                                 help='Job count, use it for parallel build (default: number of CPUs)',
+                                 type=int,
+                                 required=False,
+                                 default=multiprocessing.cpu_count())
+    run_tests_parser.add_argument('-d',
+                                 help='Make QEMU wait for the debugger',
+                                 action='store_true',
+                                 required=False)
 
     args = vars(parser.parse_args())
-
-    if args['deep_clean']:
-        deep_clean()
-        return
-
-    if args['bootstrap']:
-        bootstrap()
-        return
-
-    if args['configure']:
-        configure()
-        return
-
-    if args['clean_all']:
-        clean_all(args['j'])
-        return
-
-    if args['clean']:
-        clean_hal(args['j'])
-        return
-    
-    if args['build_all']:
-        build_all(args['j'])
-        return
-
-    if args['build']:
-        build(args['j'])
-        return
-
-    if args['run']:
-        run(args['d'])
-        return
-
-    if 'run_tests' in args:
-        run_tests(args['run_tests'], args['j'], args['d'])
-        return
+    dispatch = args.pop('dispatch')
+    dispatch(**args)
 
 if __name__ == '__main__':
     main()
