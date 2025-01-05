@@ -71,8 +71,8 @@ Useful tools for development:
 
 The `HAL9000.py` installs for you the required packages, provided you have `python3`.
 
-1. Run `HAL9000.py --bootstrap`, downloads the necessary software.
-2. If it succeeds run `HAL9000.py --configure`, this will configure `CMake`.
+1. Run `HAL9000.py bootstrap`, downloads the necessary software.
+2. If it succeeds run `HAL9000.py configure`, this will configure `CMake`.
 
 **NOTE**:
 - If you have problems installing `LLVM` on `Windows` using the script, download and run the installer 
@@ -84,29 +84,29 @@ The `HAL9000.py` installs for you the required packages, provided you have `pyth
 <!-- Visual Studio: 
 To build the project, open **"Developer Powershell for Visual Studio 2022"** (can be found in the start menu, under the "Visual Studio 2022" folder) and run `Build.ps1`. -->
 
-Run `HAL9000.py --build_all` to compile everything, prepare the debug information and generate the `QEMU` image.
+Run `HAL9000.py build_all` to compile everything, prepare the debug information and generate the `QEMU` image.
 
-Run `HAL9000.py --build` to build just HAL, prepare the debug information and generate the `QEMU` image.
+Run `HAL9000.py build` to build just HAL, prepare the debug information and generate the `QEMU` image.
 
 ## Run
 
 <!-- Visual Studio:
 Run using `Run.ps1`. -->
 
-Run with `HAL9000.py --run`, use the `-d` flag if you want to attach the debugger to the virtual machine.
+Run with `HAL9000.py run`, use the `-d` flag if you want to attach the debugger to the virtual machine.
 
 ## Testing
 
-You can run tests with `HAL9000.py --run-tests`. A list of test patterns can be given and all matching
+You can run tests with `HAL9000.py run-tests`. A list of test patterns can be given and all matching
 tests are run. Pattern syntax: Module:Category:Name.
 
 ## Clean
 
-To clean the build directory of all projects run `HAL9000.py --clean_all`, runs every `clean` target.
+To clean the build directory of all projects run `HAL9000.py clean_all`, runs every `clean` target.
 
-To clean the build directory of HAL run `HAL9000.py --clean`, runs HAL's `clean` target.
+To clean the build directory of HAL run `HAL9000.py clean`, runs HAL's `clean` target.
 
-To start with a clean slate run `HAL9000.py --deep_clean` (this will delete the build directories), then you need to configure again.
+To start with a clean slate run `HAL9000.py deep_clean` (this will delete the build directories), then you need to configure again.
 
 ## Help
 
