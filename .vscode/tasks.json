@@ -20,7 +20,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--deep_clean"
+                "deep_clean"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -33,7 +33,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--bootstrap"
+                "bootstrap"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -46,7 +46,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--configure"
+                "configure"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -59,7 +59,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--clean_all"
+                "clean_all"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -72,7 +72,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--clean"
+                "clean"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -85,7 +85,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--build_all"
+                "build_all"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -98,7 +98,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--build"
+                "build"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -115,7 +115,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--run"
+                "run"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -128,7 +128,7 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--run",
+                "run",
                 "-d"
             ],
             "options": {
@@ -142,7 +142,8 @@
             "command": "${command:python.interpreterPath}",
             "args": [
                 "HAL9000.py",
-                "--run_tests",
+                "run_tests",
+                "-t",
                 "${input:testModule}"
             ],
             "options": {
