@@ -52,9 +52,11 @@ typedef struct _ACPI_PRT_ENTRY
 
 typedef struct _ACPI_RESOURCE_WALK_CONTEXT
 {
-    ACPI_HANDLE *pciHandle;
-    ACPI_HANDLE *pilHandle;
-    ACPI_PCI_ROUTING_TABLE *prtEntry;
+    ACPI_HANDLE *PciHandle;
+    ACPI_HANDLE *PilHandle;
+    ACPI_PCI_ROUTING_TABLE *PrtEntry;
+    DWORD Index;
+    BOOLEAN ResourceFound;
 } ACPI_RESOURCE_WALK_CONTEXT, *PACPI_RESOURCE_WALK_CONTEXT;
 
 typedef struct _ACPI_INTERFACE_DATA
@@ -903,15 +905,18 @@ _AcpiParsePrtEntry(
             LOG_TRACE_ACPI("Successfully obtained Current PIL Interrupt resources\n");
 
             ACPI_RESOURCE_WALK_CONTEXT walkContext;
-            walkContext.pciHandle = &Object;
-            walkContext.pilHandle = &pciIntLink;
-            walkContext.prtEntry = PrtEntry;
+            walkContext.PciHandle = &Object;
+            walkContext.PilHandle = &pciIntLink;
+            walkContext.PrtEntry = PrtEntry;
+            walkContext.Index = 0;
+            walkContext.ResourceFound = FALSE;
 
             acpiStatus = AcpiWalkResourceBuffer(&resourceBuffer, 
                                                _AcpiWalkCurrentInterruptResourcesCallback,
                                                &walkContext);
-            if (AE_OK != acpiStatus)
+            if (AE_OK != acpiStatus || !walkContext.ResourceFound)
             {
+                acpiStatus = AE_ERROR;
                 __leave;
             }
             LOG_TRACE_ACPI("Successfully walked Current PIL Interrupt resources\n");
@@ -952,7 +957,13 @@ _AcpiWalkCurrentInterruptResourcesCallback(
     irqNumber = MAX_DWORD;
     irq = NULL;
     extendedIrq = NULL;
-    prtEntry = walkContext->prtEntry;
+    prtEntry = walkContext->PrtEntry;
+
+    if (walkContext->Index != prtEntry->SourceIndex)
+    {
+        ++walkContext->Index;
+        return AE_OK;
+    }
 
     switch (Resource->Type)
     {
@@ -971,7 +982,8 @@ _AcpiWalkCurrentInterruptResourcesCallback(
     default:
         break;
     }
-    
+
+    ++walkContext->Index;
     if (isInterrupt)
     {
         LOG_TRACE_ACPI("Found IRQ Resource with type %d containing %d interrupt(s), first interrupt is 0x%02x\n", 
@@ -979,6 +991,7 @@ _AcpiWalkCurrentInterruptResourcesCallback(
         ASSERT(interruptCount == 1);
         *((DWORD*) prtEntry->Source) = 0;
         prtEntry->SourceIndex = irqNumber;
+        walkContext->ResourceFound = TRUE;
     }
     else
     {
