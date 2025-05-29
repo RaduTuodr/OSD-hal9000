@@ -1816,7 +1816,7 @@ _MmuMapElfInMemory(
         
         if (!AddressToMap)
         {
-            virtualAddress = (PVOID) currentSegment.p_paddr;
+            virtualAddress = (PVOID) currentSegment.p_vaddr;
         }
         else
         {

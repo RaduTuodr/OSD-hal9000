@@ -6,7 +6,7 @@ ENTRY(__HalEntry)
 
 PHDRS
 {
-    headers PT_LOAD FILEHDR PHDRS AT(0xFFFF800001000000) ;
+    headers PT_LOAD FILEHDR PHDRS ;
     text PT_LOAD ;
     data PT_LOAD ;
     rodata PT_LOAD ;
