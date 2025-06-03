@@ -4,6 +4,10 @@ build/*
 HAL/build/*
 UefiBootloader/build/*
 ImageCreator/build/*
+.cache/*
+HAL/.cache/*
+UefiBootloader/.cache/*
+ImageCreator/.cache/*
 tools/*
 yasm/build/*
 yasm/yasm_repo/*
