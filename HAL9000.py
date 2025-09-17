@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import sys
 import os
 import argparse
@@ -10,44 +11,51 @@ import time
 from tests.testing import Tester
 
 
-HOMEBREW_PACKAGES = [
-    "qemu",
-    "cmake",
-    "ninja",
-    "nasm",
-    "llvm",
+@dataclass
+class Package:
+    name: str
+    version: str | None = None
+
+
+HOMEBREW_PACKAGES: list[Package] = [
+    Package("qemu"),
+    Package("cmake"),
+    Package("ninja"),
+    Package("nasm"),
+    Package("llvm"),
 ]
 
-APT_PACKAGES = [
-    "qemu-system",
-    "cmake",
-    "ninja-build",
-    "nasm",
-    "llvm",
-    "clang",
-    "clang-tools",
-    "lld",
-    "lldb",
+APT_PACKAGES: list[Package] = [
+    Package("qemu-system"),
+    Package("cmake"),
+    Package("ninja-build"),
+    Package("nasm"),
+    Package("llvm"),
+    Package("clang"),
+    Package("clang-tools"),
+    Package("lld"),
+    Package("lldb"),
 ]
 
-DNF_PACKAGES = [
-    "qemu",
-    "cmake",
-    "ninja-build",
-    "nasm",
-    "llvm",
-    "clang",
-    "clang-tools-extra",
-    "lld",
-    "lldb",
+DNF_PACKAGES: list[Package] = [
+    Package("qemu"),
+    Package("cmake"),
+    Package("ninja-build"),
+    Package("nasm"),
+    Package("llvm"),
+    Package("clang"),
+    Package("clang-tools-extra"),
+    Package("lld"),
+    Package("lldb"),
 ]
 
-WINGET_PACKAGES = [
-    "SoftwareFreedomConservancy.QEMU",
-    "Kitware.CMake",
-    "Ninja-build.Ninja",
-    "NASM.NASM",
-    "LLVM.LLVM",
+WINGET_PACKAGES: list[Package] = [
+    Package("SoftwareFreedomConservancy.QEMU", version="10.1.0"),
+    Package("Kitware.CMake"),
+    Package("Ninja-build.Ninja"),
+    Package("NASM.NASM"),
+    Package("LLVM.LLVM", version="19.1.7"),
+    Package("Microsoft.WindowsSDK.10.0.22621"),
 ]
 
 
@@ -81,6 +89,13 @@ def prLightGray(str):
 
 def prBlack(str):
     print("\033[98m {}\033[00m".format(str))
+
+
+def get_exe_name(path: str, quote: bool = False):
+    if str(platform.system()).lower() == "windows":
+        path = path.replace("/", "\\")
+        path = path + ".exe"
+    return f'"{path}"' if quote else path
 
 
 def get_build_env():
@@ -131,18 +146,18 @@ def run_cmd_with_echo_and_wait(cmd):
     return p.returncode == 0
 
 
-def bootstrap_generic(pkg_manager_cmd, packages, ignore=False):
+def bootstrap_generic(pkg_manager_cmd, packages: list[Package], ignore=False):
     prYellow("The following packages will be installed:")
     for package in packages:
-        prLightGray(package)
+        prLightGray(package.name)
 
     for package in packages:
-        prCyan(f"Installing {package}...")
+        prCyan(f"Installing {package.name}...")
         if (
-            not run_cmd_with_echo_and_wait(f"{pkg_manager_cmd} {package}")
+            not run_cmd_with_echo_and_wait(f"{pkg_manager_cmd} {package.name}")
             and not ignore
         ):
-            prRed(f"Error installing {package}!")
+            prRed(f"Error installing {package.name}!")
             return False
         prGreen("Done.")
 
@@ -335,19 +350,19 @@ def install_hal():
 def separate_debug_information():
     prCyan("Separating debug information...")
     subprocess.run(
-        f'"llvm-objcopy" --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg',
+        f"{get_exe_name('llvm-objcopy')} --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg",
         env=get_build_env(),
         shell=True,
     )
 
     subprocess.run(
-        f'"llvm-strip" --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin',
+        f"{get_exe_name('llvm-strip')} --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin",
         env=get_build_env(),
         shell=True,
     )
 
     subprocess.run(
-        f'"llvm-objcopy" --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+        f'{get_exe_name("llvm-objcopy")} --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
         env=get_build_env(),
         shell=True,
     )
@@ -357,7 +372,10 @@ def separate_debug_information():
 def generate_qemu_image():
     prCyan("Generating QEMU image...")
     p = subprocess.run(
-        f'"tools/ImageCreator/bin/ImageCreator{".exe" if str(platform.system()).lower() == "windows" else ""}" "config/HAL9000.json"',
+        [
+            get_exe_name("tools/ImageCreator/bin/ImageCreator"),
+            "config/HAL9000.json",
+        ],
         env=get_build_env(),
         shell=True,
     )
