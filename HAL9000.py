@@ -17,6 +17,13 @@ class Package:
     version: str | None = None
 
 
+VSCODE_EXTENSIONS: list[str] = [
+    "ms-python.python",
+    "ms-vscode.cpptools",
+    "ms-vscode.cmake-tools",
+    "vadimcn.vscode-lldb",
+]
+
 HOMEBREW_PACKAGES: list[Package] = [
     Package("qemu"),
     Package("cmake"),
@@ -167,13 +174,11 @@ def bootstrap_generic(
 
 
 def bootstrap_darwin():
-    prCyan("Bootrapping for macOS")
+    prCyan("Bootstrapping for macOS")
 
-    prCyan("Checking for Homebrew...")
-    p = subprocess.run(
-        ["which", "brew"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
-    )
-    if p.returncode != 0:
+    prCyan("Checking for Homebrew")
+    p = shutil.which("brew")
+    if p is None:
         prRed("Homebrew not found. Install Homebrew to continue.")
         return False
     prGreen("Done.")
@@ -184,6 +189,8 @@ def bootstrap_darwin():
 def bootstrap_linux():
     assert str(platform.system()).lower() == "linux"
     import distro
+
+    prCyan("Bootstrapping for linux")
 
     distro_id = distro.id().lower()
     if distro_id == "ubuntu":
@@ -206,6 +213,19 @@ def bootstrap_linux():
     return bootstrap_generic(pkg_manager_cmd, packages)
 
 
+def bootstrap_windows():
+    prCyan("Bootstrapping for Windows")
+
+    prCyan("Checking for winget")
+    p = shutil.which("winget")
+    if p is None:
+        prRed("winget is required to install dependencies on Windows.")
+        return False
+    prGreen("Done.")
+
+    return bootstrap_generic(["winget", "install"], WINGET_PACKAGES, True)
+
+
 def bootstrap():
     plat_system = str(platform.system()).lower()
     if plat_system == "darwin":
@@ -213,12 +233,17 @@ def bootstrap():
     elif plat_system == "linux":
         result = bootstrap_linux()
     elif plat_system == "windows":
-        result = bootstrap_generic(["winget", "install"], WINGET_PACKAGES, True)
+        result = bootstrap_windows()
     else:
         raise Exception(f"Unknown platform {plat_system}")
 
     if result:
         prGreen("Successful bootstrap!")
+        print("Hint: You might need to manually add some tools to PATH.")
+        print(
+            "Hint: After adding the tools to PATH, you need to close the current terminal and open a new one for the tools to be usable."
+        )
+
     else:
         prRed("Failed bootstrap!")
 
@@ -360,7 +385,7 @@ def clean(job_count: int):
     clean_hal(job_count)
 
 
-def build_hal(job_count):
+def build_hal(job_count: int):
     prCyan("Building HAL9000...")
     p = subprocess.run(
         ["cmake", "--build", "build", f"-j{job_count}"],
@@ -509,8 +534,8 @@ def build_all(job_count: int):
     separate_debug_information()
 
 
-def build(j, **kwargs):
-    if not build_hal(j):
+def build(job_count: int):
+    if not build_hal(job_count):
         return
 
     if not install_hal():
@@ -564,7 +589,7 @@ def run_async(wait_debugger: bool) -> subprocess.Popen:
 
 
 def run_tests(
-    tests: list[str], timeout: int, job_count: int, wait_debugger: bool, **kwargs
+    tests: list[str], job_count: int, wait_debugger: bool, timeout: int | None = None
 ):
     prCyan(f"Running tests matching: {tests}")
 
@@ -575,9 +600,6 @@ def run_tests(
         return
 
     separate_debug_information()
-
-    if not generate_qemu_image():
-        return
 
     tester = Tester(
         "config/Tests.json", tests, "tests", "artifacts/Tests", "HAL9000.log", timeout
@@ -590,19 +612,33 @@ def run_tests(
         return
     prGreen("Done.")
 
-    timeout = tester.timeout
+    if not generate_qemu_image():
+        return
 
     p = run_async(wait_debugger)
 
+    timeout = tester.timeout
+    time_limit_exceeded = False
     if timeout == 0:
-        prYellow("There is no timeout. Waiting for QEMU to finish...")
+        prYellow("Timeout set to 0. Waiting for QEMU to finish...")
+        p.wait()
+    elif wait_debugger:
+        prYellow(
+            "Debugger attached, won't enforce timeout. Waiting for QEMU to finish..."
+        )
         p.wait()
     else:
-        prYellow(f"Timeout is {timeout}s. Sleeping...")
-        time.sleep(timeout)
+        prYellow(f"Timeout is {timeout}s.")
+        try:
+            p.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            time_limit_exceeded = True
 
-    if p.poll() is None:
+    if time_limit_exceeded:
         prRed("Error: QEMU did not finish in time.")
+        print(
+            "Note: Attach debugger on start with --wait-debugger or use --timeout 0 to wait indefinitely."
+        )
         p.terminate()
         clear_tests_module()
         return
@@ -614,6 +650,55 @@ def run_tests(
     clear_tests_module()
 
     prGreen("Done.")
+
+
+REQUIRED_EXECUTABLES = [
+    "git",
+    "cmake",
+    "ninja",
+    "qemu-system-x86_64",
+    "clang",
+    "clang++",
+    "llvm-strip",
+    "llvm-objcopy",
+    "nasm",
+]
+
+
+def check_env_cmd():
+    build_env = get_build_env()
+    missing = False
+    for exe_name in REQUIRED_EXECUTABLES:
+        exe_path = get_exe_name(exe_name)
+        print(f"{exe_path}:", end="")
+        if path := shutil.which(exe_path, path=build_env["PATH"]):
+            prGreen(f"OK, found at: {path}")
+        else:
+            missing = True
+            prRed("Missing!")
+
+    sys.exit(-1 if missing else 0)
+
+
+def check_env():
+    build_env = get_build_env()
+    missing = []
+    for exe_name in REQUIRED_EXECUTABLES:
+        exe_path = get_exe_name(exe_name)
+        if not shutil.which(exe_path, path=build_env["PATH"]):
+            missing.append(exe_path)
+
+    if not missing:
+        return True
+
+    prRed("The following required executables are missing from the system:")
+    for exe_name in missing:
+        print("  ", exe_name)
+    print("Note: Run the bootstrap command to install required dependencies.")
+    print(
+        "Note: If you already ran the bootstrap command, make sure the installed dependencies are in PATH."
+    )
+    return False
 
 
 def main():
@@ -639,6 +724,11 @@ def main():
 
     subparsers = parser.add_subparsers(required=True)
 
+    check_parser = subparsers.add_parser(
+        "check", help="Check if required dependencies (tools) are installed properly."
+    )
+    check_parser.set_defaults(dispatch=check_env_cmd)
+
     deep_clean_parser = subparsers.add_parser(
         "deep_clean", help="Remove all build directories and start with a clean slate"
     )
@@ -650,30 +740,30 @@ def main():
     bootstrap_parser.set_defaults(dispatch=bootstrap)
 
     configure_parser = subparsers.add_parser("configure", help="Configure the projects")
-    configure_parser.set_defaults(dispatch=configure)
+    configure_parser.set_defaults(dispatch=configure, pre_check=check_env)
 
     clean_all_parser = subparsers.add_parser(
         "clean_all", help="Run the clean target for all projects"
     )
-    clean_all_parser.set_defaults(dispatch=clean_all)
+    clean_all_parser.set_defaults(dispatch=clean_all, pre_check=check_env)
     job_count_arg(clean_all_parser)
 
     clean_parser = subparsers.add_parser(
         "clean", help="Run the clean target for HAL9000"
     )
-    clean_parser.set_defaults(dispatch=clean)
+    clean_parser.set_defaults(dispatch=clean, pre_check=check_env)
     job_count_arg(clean_parser)
 
     build_all_parser = subparsers.add_parser("build_all", help="Build all projects")
-    build_all_parser.set_defaults(dispatch=build_all)
+    build_all_parser.set_defaults(dispatch=build_all, pre_check=check_env)
     job_count_arg(build_all_parser)
 
     build_parser = subparsers.add_parser("build", help="Build HAL9000")
-    build_parser.set_defaults(dispatch=build)
+    build_parser.set_defaults(dispatch=build, pre_check=check_env)
     job_count_arg(build_parser)
 
     run_parser = subparsers.add_parser("run", help="Run HAL9000")
-    run_parser.set_defaults(dispatch=run)
+    run_parser.set_defaults(dispatch=run, pre_check=check_env)
     run_parser.add_argument(
         "-d",
         "--wait-debugger",
@@ -686,21 +776,34 @@ def main():
         "run_tests",
         help="Run the matching tests, regular expressions are also accepted",
     )
-    run_tests_parser.set_defaults(dispatch=run_tests)
-    run_tests_parser.add_argument("-t", "--tests", help="Tests to run", nargs="+")
+    run_tests_parser.set_defaults(dispatch=run_tests, pre_check=check_env)
     run_tests_parser.add_argument(
-        "--timeout", help="Timeout in seconds", type=int, required=False, default=0
+        "-t",
+        "--tests",
+        help="Tests to run. Tests are given in the format Project[:Component[:TestName]]. For example: "
+        "'Threads' - run all tests for the Threads project; "
+        "'UserProg:Arguments' - run all argument passing tests from the UserProg project; "
+        "'VirtualMemory:Swap:SwapZeros' - run the SwapZeroes test from the VirtualMemory project; ",
+        nargs="+",
+    )
+    run_tests_parser.add_argument(
+        "--timeout", help="Timeout in seconds", type=int, required=False
     )
     job_count_arg(run_tests_parser)
     run_tests_parser.add_argument(
         "-d",
         "--wait-debugger",
-        help="Make QEMU wait for the debugger",
+        help="Make QEMU wait for the debugger. Prevents timeout to allow debugging.",
         action="store_true",
         required=False,
     )
 
     args = vars(parser.parse_args())
+
+    if pre_check := args.pop("pre_check", None):
+        if not pre_check():
+            return
+
     dispatch = args.pop("dispatch")
     dispatch(**args)
 

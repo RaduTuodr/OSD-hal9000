@@ -99,14 +99,15 @@ class Tester:
         resources: str,
         module_path: str,
         log_file: str,
-        timeout: int,
+        timeout: int | None,
     ):
         self.__targets = []
         self.__resources = resources
         self.__module_path = module_path
         self.__log_file = log_file
         self.__max_score_per_test = 10.0
-        self.timeout = timeout
+        self.__timeout = timeout
+        self.timeout = 0
         self.__init_targets(targets)
         self.__parse_config(json_config)
 
@@ -169,10 +170,10 @@ class Tester:
         self.__module_trailer = config["config"]["module_trailer"]
 
         if "timeout" in config["config"]:
-            if self.timeout == 0:
+            if self.__timeout is None:
                 self.timeout = int(config["config"]["timeout"])
             else:
-                self.timeout = min(self.timeout, int(config["config"]["timeout"]))
+                self.timeout = min(self.__timeout, int(config["config"]["timeout"]))
 
     def __generate_test_module(self):
         f = open(self.__module_path, "w")

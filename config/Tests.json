@@ -20,7 +20,8 @@
         ],
         "module_trailer": [
             "/shutdown"
-        ]
+        ],
+        "timeout": 180
     },
     "modules": {
         "Threads": {
