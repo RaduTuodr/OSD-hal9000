@@ -139,14 +139,16 @@ def deep_clean(**kwargs):
     prYellow("Configure must be run now!")
 
 
-def run_cmd_with_echo_and_wait(cmd):
+def run_cmd_with_echo_and_wait(cmd: list[str]):
     prYellow(f"Will run: {cmd}. Press any key to continue.")
     input()
-    p = subprocess.run(cmd, shell=True)
+    p = subprocess.run(cmd)
     return p.returncode == 0
 
 
-def bootstrap_generic(pkg_manager_cmd, packages: list[Package], ignore=False):
+def bootstrap_generic(
+    pkg_manager_cmd: list[str], packages: list[Package], ignore=False
+):
     prYellow("The following packages will be installed:")
     for package in packages:
         prLightGray(package.name)
@@ -154,7 +156,7 @@ def bootstrap_generic(pkg_manager_cmd, packages: list[Package], ignore=False):
     for package in packages:
         prCyan(f"Installing {package.name}...")
         if (
-            not run_cmd_with_echo_and_wait(f"{pkg_manager_cmd} {package.name}")
+            not run_cmd_with_echo_and_wait(pkg_manager_cmd + [package.name])
             and not ignore
         ):
             prRed(f"Error installing {package.name}!")
@@ -169,14 +171,14 @@ def bootstrap_darwin():
 
     prCyan("Checking for Homebrew...")
     p = subprocess.run(
-        "which brew", shell=True, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
+        ["which", "brew"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
     )
     if p.returncode != 0:
         prRed("Homebrew not found. Install Homebrew to continue.")
         return False
     prGreen("Done.")
 
-    return bootstrap_generic("brew install", HOMEBREW_PACKAGES)
+    return bootstrap_generic(["brew", "install"], HOMEBREW_PACKAGES)
 
 
 def bootstrap_linux():
@@ -185,10 +187,10 @@ def bootstrap_linux():
 
     distro_id = distro.id().lower()
     if distro_id == "ubuntu":
-        pkg_manager_cmd = "sudo apt-get install -y"
+        pkg_manager_cmd = ["sudo", "apt-get", "install", "-y"]
         packages = APT_PACKAGES
     elif distro_id == "fedora":
-        pkg_manager_cmd = "sudo dnf install -y"
+        pkg_manager_cmd = ["sudo", "dnf", "install", "-y"]
         packages = DNF_PACKAGES
     elif distro_id == "debian":
         prRed(
@@ -204,14 +206,16 @@ def bootstrap_linux():
     return bootstrap_generic(pkg_manager_cmd, packages)
 
 
-def bootstrap(**kwargs):
+def bootstrap():
     plat_system = str(platform.system()).lower()
     if plat_system == "darwin":
         result = bootstrap_darwin()
     elif plat_system == "linux":
         result = bootstrap_linux()
     elif plat_system == "windows":
-        result = bootstrap_generic("winget install", WINGET_PACKAGES, True)
+        result = bootstrap_generic(["winget", "install"], WINGET_PACKAGES, True)
+    else:
+        raise Exception(f"Unknown platform {plat_system}")
 
     if result:
         prGreen("Successful bootstrap!")
@@ -219,17 +223,24 @@ def bootstrap(**kwargs):
         prRed("Failed bootstrap!")
 
 
-def configure(**kwargs):
-    generator = '"Ninja"'
+def configure():
+    generator = "Ninja"
 
     prCyan("Configuring ImageCreator...")
     p = subprocess.run(
-        f'cmake -S . -B build -G {generator} \
-                        -DCMAKE_INSTALL_PREFIX:PATH="../tools/ImageCreator" \
-                        -DCMAKE_TOOLCHAIN_FILE:PATH="../cmake/ImageCreatorToolchain.cmake"',
+        [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build",
+            "-G",
+            generator,
+            "-DCMAKE_INSTALL_PREFIX:PATH=../tools/ImageCreator",
+            "-DCMAKE_TOOLCHAIN_FILE:PATH=../cmake/ImageCreatorToolchain.cmake",
+        ],
         cwd="ImageCreator",
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error configuring ImageCreator!")
@@ -238,12 +249,22 @@ def configure(**kwargs):
 
     prCyan("Configuring UefiBootloader...")
     p = subprocess.run(
-        f'cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Debug \
-                        -DCMAKE_TOOLCHAIN_FILE:PATH="../cmake/UefiBootloaderToolchain.cmake" \
-                        -DCMAKE_INSTALL_PREFIX:PATH="../artifacts" -DUEFI_BUILD:BOOL="TRUE" -DFORCE_ELF:BOOL="TRUE"',
+        [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build",
+            "-G",
+            generator,
+            "-DCMAKE_BUILD_TYPE=Debug",
+            "-DCMAKE_TOOLCHAIN_FILE:PATH=../cmake/UefiBootloaderToolchain.cmake",
+            "-DCMAKE_INSTALL_PREFIX:PATH=../artifacts",
+            '-DUEFI_BUILD:BOOL="TRUE"',
+            '-DFORCE_ELF:BOOL="TRUE"',
+        ],
         cwd="UefiBootloader",
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error configuring UefiBootloader!")
@@ -252,12 +273,21 @@ def configure(**kwargs):
 
     prCyan("Configuring HAL9000...")
     p = subprocess.run(
-        f'cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Debug \
-                        -DCMAKE_TOOLCHAIN_FILE:PATH="../cmake/HalToolchain.cmake" \
-                        -DCMAKE_INSTALL_PREFIX:PATH="../artifacts" -DFORCE_ELF:BOOL="TRUE"',
+        [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build",
+            "-G",
+            generator,
+            "-DCMAKE_BUILD_TYPE=Debug",
+            "-DCMAKE_TOOLCHAIN_FILE:PATH=../cmake/HalToolchain.cmake",
+            "-DCMAKE_INSTALL_PREFIX:PATH=../artifacts",
+            '-DFORCE_ELF:BOOL="TRUE"',
+        ],
         cwd="HAL",
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error configuring HAL9000!")
@@ -268,10 +298,16 @@ def configure(**kwargs):
 def clean_hal(job_count):
     prCyan("Cleaning HAL9000...")
     p = subprocess.run(
-        f"cmake --build build -j{job_count} --target clean",
+        [
+            "cmake",
+            "--build",
+            "build",
+            f"-j{job_count}",
+            "--target",
+            "clean",
+        ],
         cwd="HAL",
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error cleaning HAL9000!")
@@ -280,13 +316,19 @@ def clean_hal(job_count):
     return True
 
 
-def clean_all(j, **kwargs):
+def clean_all(job_count: int):
     prCyan("Cleaning ImageCreator...")
     p = subprocess.run(
-        f"cmake --build build -j{j} --target clean",
+        [
+            "cmake",
+            "--build",
+            "build",
+            f"-j{job_count}",
+            "--target",
+            "clean",
+        ],
         cwd="ImageCreator",
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error cleaning ImageCreator!")
@@ -295,27 +337,35 @@ def clean_all(j, **kwargs):
 
     prCyan("Cleaning UefiBootloader...")
     p = subprocess.run(
-        f"cmake --build build -j{j} --target clean",
+        [
+            "cmake",
+            "--build",
+            "build",
+            f"-j{job_count}",
+            "--target",
+            "clean",
+        ],
         cwd="UefiBootloader",
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error cleaning UefiBootloader!")
         return
     prGreen("Done.")
 
-    clean_hal(j)
+    clean_hal(job_count)
 
 
-def clean(j, **kwargs):
-    clean_hal(j)
+def clean(job_count: int):
+    clean_hal(job_count)
 
 
 def build_hal(job_count):
     prCyan("Building HAL9000...")
     p = subprocess.run(
-        f"cmake --build build -j{job_count}", cwd="HAL", env=get_build_env(), shell=True
+        ["cmake", "--build", "build", f"-j{job_count}"],
+        cwd="HAL",
+        env=get_build_env(),
     )
     if p.returncode != 0:
         prRed("Error building HAL9000!")
@@ -334,11 +384,10 @@ def clear_tests_module():
 def install_hal():
     prCyan("Installing HAL9000...")
     p = subprocess.run(
-        f"cmake --install build",
+        ["cmake", "--install", "build"],
         cwd="HAL",
         env=get_build_env(),
         stdout=subprocess.DEVNULL,
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error installing HAL9000!")
@@ -350,34 +399,45 @@ def install_hal():
 def separate_debug_information():
     prCyan("Separating debug information...")
     subprocess.run(
-        f"{get_exe_name('llvm-objcopy')} --only-keep-debug artifacts/bin/HAL9000.bin artifacts/bin/HAL9000.dbg",
+        [
+            get_exe_name("llvm-objcopy"),
+            "--only-keep-debug",
+            "artifacts/bin/HAL9000.bin",
+            "artifacts/bin/HAL9000.dbg",
+        ],
         env=get_build_env(),
-        shell=True,
     )
 
     subprocess.run(
-        f"{get_exe_name('llvm-strip')} --strip-debug --strip-unneeded artifacts/bin/HAL9000.bin",
+        [
+            get_exe_name("llvm-strip"),
+            "--strip-debug",
+            "--strip-unneeded",
+            "artifacts/bin/HAL9000.bin",
+        ],
         env=get_build_env(),
-        shell=True,
     )
 
     subprocess.run(
-        f'{get_exe_name("llvm-objcopy")} --add-gnu-debuglink="artifacts/bin/HAL9000.dbg" artifacts/bin/HAL9000.bin',
+        [
+            get_exe_name("llvm-objcopy"),
+            "--add-gnu-debuglink=artifacts/bin/HAL9000.dbg",
+            "artifacts/bin/HAL9000.bin",
+        ],
         env=get_build_env(),
-        shell=True,
     )
     prGreen("Done.")
 
 
 def generate_qemu_image():
     prCyan("Generating QEMU image...")
+    cmd = [
+        get_exe_name("tools/ImageCreator/bin/ImageCreator"),
+        "config/HAL9000.json",
+    ]
     p = subprocess.run(
-        [
-            get_exe_name("tools/ImageCreator/bin/ImageCreator"),
-            "config/HAL9000.json",
-        ],
+        cmd,
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error generating QEMU image!")
@@ -386,18 +446,17 @@ def generate_qemu_image():
     return True
 
 
-def build_all(j, **kwargs):
+def build_all(job_count: int):
     if str(platform.system()).lower() == "windows":
-        build_type = "--config Release"
+        build_type = ["--config", "Release"]
     else:
-        build_type = ""
+        build_type = []
 
     prCyan("Building ImageCreator...")
     p = subprocess.run(
-        f"cmake --build build -j{j} {build_type}",
+        ["cmake", "--build", "build", f"-j{job_count}"] + build_type,
         cwd="ImageCreator",
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error building ImageCreator!")
@@ -406,26 +465,24 @@ def build_all(j, **kwargs):
 
     prCyan("Building UefiBootloader...")
     p = subprocess.run(
-        f"cmake --build build -j{j}",
+        ["cmake", "--build", "build", f"-j{job_count}"],
         cwd="UefiBootloader",
         env=get_build_env(),
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error building UefiBootloader!")
         return
     prGreen("Done.")
 
-    if not build_hal(j):
+    if not build_hal(job_count):
         return
 
     prCyan("Installing ImageCreator...")
     p = subprocess.run(
-        f"cmake --install build {build_type}",
+        ["cmake", "--install", "build"] + build_type,
         cwd="ImageCreator",
         env=get_build_env(),
         stdout=subprocess.DEVNULL,
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error installing ImageCreator!")
@@ -434,11 +491,10 @@ def build_all(j, **kwargs):
 
     prCyan("Installing UefiBootloader...")
     p = subprocess.run(
-        f"cmake --install build",
+        ["cmake", "--install", "build"],
         cwd="UefiBootloader",
         env=get_build_env(),
         stdout=subprocess.DEVNULL,
-        shell=True,
     )
     if p.returncode != 0:
         prRed("Error installing UefiBootloader!")
@@ -465,59 +521,54 @@ def build(j, **kwargs):
     separate_debug_information()
 
 
-def parse_qemu_options(debug):
+def parse_qemu_options(debug: bool):
     f = open("config/QEMU.json", "r")
     qemu_config = json.load(f)
     f.close()
 
-    qemu_options = ""
+    qemu_options: list[str] = []
     for option, param in qemu_config.items():
         if isinstance(param, list):
             for p in param:
-                qemu_options += f"-{option} {p} "
+                qemu_options.extend([f"-{option}", str(p)])
         else:
-            qemu_options += f"-{option} {param} "
+            qemu_options.extend([f"-{option}", str(param)])
 
-    qemu_options += "-s"
+    qemu_options.append("-s")
     if debug:
-        qemu_options += " -S "
+        qemu_options.append("-S")
 
     return qemu_options
 
 
-def run(d, **kwargs):
+def run(wait_debugger: bool):
     if not generate_qemu_image():
         return
 
     prCyan("Starting QEMU...")
-    qemu_options = parse_qemu_options(d)
+    qemu_options = parse_qemu_options(wait_debugger)
     subprocess.run(
-        f"qemu-system-x86_64{'.exe' if str(platform.system()).lower() == 'windows' else ''} \
-                   {qemu_options}",
-        shell=True,
+        [get_exe_name("qemu-system-x86_64")] + qemu_options,
     )
 
 
-def run_async(d, **kwargs) -> subprocess.Popen:
-    if not generate_qemu_image():
-        return
-
+def run_async(wait_debugger: bool) -> subprocess.Popen:
     prCyan("Starting QEMU...")
-    qemu_options = parse_qemu_options(d)
+    qemu_options = parse_qemu_options(wait_debugger)
     return subprocess.Popen(
-        f"qemu-system-x86_64{'.exe' if str(platform.system()).lower() == 'windows' else ''} \
-                            {qemu_options}",
-        shell=True,
+        [get_exe_name("qemu-system-x86_64")] + qemu_options,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         stdin=subprocess.DEVNULL,
     )
 
 
-def run_tests(t, timeout, j, d, **kwargs):
-    prCyan(f"Running tests matching: {t}")
+def run_tests(
+    tests: list[str], timeout: int, job_count: int, wait_debugger: bool, **kwargs
+):
+    prCyan(f"Running tests matching: {tests}")
 
-    if not build_hal(j):
+    if not build_hal(job_count):
         return
 
     if not install_hal():
@@ -525,8 +576,11 @@ def run_tests(t, timeout, j, d, **kwargs):
 
     separate_debug_information()
 
+    if not generate_qemu_image():
+        return
+
     tester = Tester(
-        "config/Tests.json", t, "tests", "artifacts/Tests", "HAL9000.log", timeout
+        "config/Tests.json", tests, "tests", "artifacts/Tests", "HAL9000.log", timeout
     )
 
     prCyan("Generating tests module...")
@@ -538,7 +592,7 @@ def run_tests(t, timeout, j, d, **kwargs):
 
     timeout = tester.timeout
 
-    p = run_async(d)
+    p = run_async(wait_debugger)
 
     if timeout == 0:
         prYellow("There is no timeout. Waiting for QEMU to finish...")
@@ -547,7 +601,7 @@ def run_tests(t, timeout, j, d, **kwargs):
         prYellow(f"Timeout is {timeout}s. Sleeping...")
         time.sleep(timeout)
 
-    if p.poll() == None:
+    if p.poll() is None:
         prRed("Error: QEMU did not finish in time.")
         p.terminate()
         clear_tests_module()
@@ -563,6 +617,16 @@ def run_tests(t, timeout, j, d, **kwargs):
 
 
 def main():
+    def job_count_arg(parser: argparse.ArgumentParser):
+        parser.add_argument(
+            "-j",
+            "--job-count",
+            help="Job count, use it for parallel build (default: number of CPUs)",
+            type=int,
+            required=False,
+            default=multiprocessing.cpu_count(),
+        )
+
     parser = argparse.ArgumentParser(
         prog="HAL9000.py",
         description="Script for working with HAL9000",
@@ -592,50 +656,27 @@ def main():
         "clean_all", help="Run the clean target for all projects"
     )
     clean_all_parser.set_defaults(dispatch=clean_all)
-    clean_all_parser.add_argument(
-        "-j",
-        help="Job count, use it for parallel build (default: number of CPUs)",
-        type=int,
-        required=False,
-        default=multiprocessing.cpu_count(),
-    )
+    job_count_arg(clean_all_parser)
 
     clean_parser = subparsers.add_parser(
         "clean", help="Run the clean target for HAL9000"
     )
     clean_parser.set_defaults(dispatch=clean)
-    clean_parser.add_argument(
-        "-j",
-        help="Job count, use it for parallel build (default: number of CPUs)",
-        type=int,
-        required=False,
-        default=multiprocessing.cpu_count(),
-    )
+    job_count_arg(clean_parser)
 
     build_all_parser = subparsers.add_parser("build_all", help="Build all projects")
     build_all_parser.set_defaults(dispatch=build_all)
-    build_all_parser.add_argument(
-        "-j",
-        help="Job count, use it for parallel build (default: number of CPUs)",
-        type=int,
-        required=False,
-        default=multiprocessing.cpu_count(),
-    )
+    job_count_arg(build_all_parser)
 
     build_parser = subparsers.add_parser("build", help="Build HAL9000")
     build_parser.set_defaults(dispatch=build)
-    build_parser.add_argument(
-        "-j",
-        help="Job count, use it for parallel build (default: number of CPUs)",
-        type=int,
-        required=False,
-        default=multiprocessing.cpu_count(),
-    )
+    job_count_arg(build_parser)
 
     run_parser = subparsers.add_parser("run", help="Run HAL9000")
     run_parser.set_defaults(dispatch=run)
     run_parser.add_argument(
         "-d",
+        "--wait-debugger",
         help="Make QEMU wait for the debugger",
         action="store_true",
         required=False,
@@ -646,19 +687,14 @@ def main():
         help="Run the matching tests, regular expressions are also accepted",
     )
     run_tests_parser.set_defaults(dispatch=run_tests)
-    run_tests_parser.add_argument("-t", help="Tests to run", nargs="+")
+    run_tests_parser.add_argument("-t", "--tests", help="Tests to run", nargs="+")
     run_tests_parser.add_argument(
         "--timeout", help="Timeout in seconds", type=int, required=False, default=0
     )
-    run_tests_parser.add_argument(
-        "-j",
-        help="Job count, use it for parallel build (default: number of CPUs)",
-        type=int,
-        required=False,
-        default=multiprocessing.cpu_count(),
-    )
+    job_count_arg(run_tests_parser)
     run_tests_parser.add_argument(
         "-d",
+        "--wait-debugger",
         help="Make QEMU wait for the debugger",
         action="store_true",
         required=False,
