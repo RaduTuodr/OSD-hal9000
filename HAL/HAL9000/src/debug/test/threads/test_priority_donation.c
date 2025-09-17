@@ -374,9 +374,12 @@ STATUS
 
                 ThreadCloseHandle(pThreads[i]);
                 pThreads[i] = NULL;
-
-                MutexDestroy(&contexes[i].Mutex);
             }
+        }
+        
+        for (DWORD i = 0; i < ARRAYSIZE(contexes); ++i)
+        {
+            MutexDestroy(&contexes[i].Mutex);
         }
     }
 
@@ -515,6 +518,8 @@ STATUS
             ExFreePoolWithTag((PVOID)pDonationChainData[0].ThreadContext.SynchronizationContext.Array, HEAP_TEST_TAG);
 
             CheckinQueueUninit(&pDonationChainData[0].ThreadContext.SynchronizationContext);
+
+            MutexDestroy(&pDonationChainData[0].ThreadMutex);
 
             ExFreePoolWithTag(pDonationChainData, HEAP_TEST_TAG);
             pDonationChainData = NULL;
