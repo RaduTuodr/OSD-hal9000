@@ -1446,6 +1446,7 @@ _MmuCreatePagingTables(
     }
 
     RecRwSpinlockInit(0, &pPagingData->Lock);
+    RecRwSpinlockSetName(&pPagingData->Lock, "PagingDataLock");
 
     // calculate size of paging structure
     framesForPagingStructures = _MmuCalculateReservedFrames(PAGING_STRUCTURES_BASE_MEMORY,

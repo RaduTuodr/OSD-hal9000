@@ -20,6 +20,7 @@ ExEventSystemPreinit(
 {
     memzero(&m_exEventData, sizeof(EX_EVENT_SYSTEM_DATA));
     LockInit(&m_exEventData.Lock);
+    LockSetName(&m_exEventData.Lock, "EventList");
     InitializeListHead(&m_exEventData.EventList);
 
     return STATUS_SUCCESS;
@@ -58,6 +59,7 @@ ExEventInit(
     }
 
     LockInit(&Event->EventLock);
+    LockSetName(&Event->EventLock, "EventLock");
     InitializeListHead(&Event->WaitingList);
 
     Event->EventType = EventType;

@@ -21,6 +21,7 @@ MutexSystemPreinit(
 {
     memzero(&m_mutexData, sizeof(MUTEX_SYSTEM_DATA));
     LockInit(&m_mutexData.Lock);
+    LockSetName(&m_mutexData.Lock, "MutexList");
     InitializeListHead(&m_mutexData.MutexList);
 
     return STATUS_SUCCESS;
@@ -53,6 +54,7 @@ MutexInit(
     memzero(Mutex, sizeof(MUTEX));
 
     LockInit(&Mutex->MutexLock);
+    LockSetName(&Mutex->MutexLock, "MutexLock");
 
     InitializeListHead(&Mutex->WaitingList);
 
