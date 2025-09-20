@@ -166,9 +166,7 @@ def run_cmd_with_echo_and_wait(cmd: list[str]):
     return p.returncode == 0
 
 
-def bootstrap_generic(
-    pkg_manager_cmd: list[str], packages: list[Package], ignore=False
-):
+def install_packages(pkg_manager_cmd: list[str], packages: list[Package], ignore=False):
     prYellow("The following packages will be installed:")
     for package in packages:
         prLightGray(package.name)
@@ -186,8 +184,8 @@ def bootstrap_generic(
     return True
 
 
-def bootstrap_darwin():
-    prCyan("Bootstrapping for macOS")
+def setup_darwin():
+    prCyan("Running setup for macOS")
 
     prCyan("Checking for Homebrew")
     p = shutil.which("brew")
@@ -196,15 +194,16 @@ def bootstrap_darwin():
         return False
     prGreen("Done.")
 
-    return bootstrap_generic(["brew", "install"], HOMEBREW_PACKAGES)
+    return install_packages(["brew", "install"], HOMEBREW_PACKAGES)
 
 
-def bootstrap_linux():
+def setup_linux():
     assert str(platform.system()).lower() == "linux"
     import distro
 
-    prCyan("Bootstrapping for linux")
+    prCyan("Running setup for linux")
 
+    prCyan("Checking distro")
     distro_id = distro.id().lower()
     if distro_id == "ubuntu":
         pkg_manager_cmd = ["sudo", "apt-get", "install", "-y"]
@@ -222,12 +221,13 @@ def bootstrap_linux():
             f"HAL was not tested on {distro_id}!. You need to install the packages manually."
         )
         return False
+    prGreen(f"Done. Detected distro: {distro_id}")
 
-    return bootstrap_generic(pkg_manager_cmd, packages)
+    return install_packages(pkg_manager_cmd, packages)
 
 
-def bootstrap_windows():
-    prCyan("Bootstrapping for Windows")
+def setup_windows():
+    prCyan("Running setup for Windows")
 
     prCyan("Checking for winget")
     p = shutil.which("winget")
@@ -236,29 +236,29 @@ def bootstrap_windows():
         return False
     prGreen("Done.")
 
-    return bootstrap_generic(["winget", "install"], WINGET_PACKAGES, True)
+    return install_packages(["winget", "install"], WINGET_PACKAGES, True)
 
 
-def bootstrap():
+def setup():
     plat_system = str(platform.system()).lower()
     if plat_system == "darwin":
-        result = bootstrap_darwin()
+        result = setup_darwin()
     elif plat_system == "linux":
-        result = bootstrap_linux()
+        result = setup_linux()
     elif plat_system == "windows":
-        result = bootstrap_windows()
+        result = setup_windows()
     else:
         raise Exception(f"Unknown platform {plat_system}")
 
     if result:
-        prGreen("Successful bootstrap!")
+        prGreen("Successful setup!")
         print("Hint: You might need to manually add some tools to PATH.")
         print(
             "Hint: After adding the tools to PATH, you need to close the current terminal and open a new one for the tools to be usable."
         )
 
     else:
-        prRed("Failed bootstrap!")
+        prRed("Setup failed!")
 
 
 def cmake_configure(
@@ -423,12 +423,12 @@ def clear_tests_module():
 
 
 def install_hal():
-    cmake_install("HAL9000", HAL_DIRECTORY)
+    return cmake_install("HAL9000", HAL_DIRECTORY)
 
 
 def separate_debug_information():
     prCyan("Separating debug information...")
-    subprocess.run(
+    p = subprocess.run(
         [
             get_exe_name("llvm-objcopy"),
             "--only-keep-debug",
@@ -437,8 +437,11 @@ def separate_debug_information():
         ],
         env=get_build_env(),
     )
+    if p.returncode != 0:
+        prRed("Failed to generate debug information")
+        return False
 
-    subprocess.run(
+    p = subprocess.run(
         [
             get_exe_name("llvm-strip"),
             "--strip-debug",
@@ -447,8 +450,11 @@ def separate_debug_information():
         ],
         env=get_build_env(),
     )
+    if p.returncode != 0:
+        prRed("Failed to strip debug information")
+        return False
 
-    subprocess.run(
+    p = subprocess.run(
         [
             get_exe_name("llvm-objcopy"),
             "--add-gnu-debuglink=artifacts/bin/HAL9000.dbg",
@@ -456,6 +462,10 @@ def separate_debug_information():
         ],
         env=get_build_env(),
     )
+    if p.returncode != 0:
+        prRed("Failed to link debug information")
+        return False
+
     prGreen("Done.")
 
 
@@ -537,9 +547,17 @@ def parse_qemu_options(debug: bool):
     return qemu_options
 
 
-def run(wait_debugger: bool):
+def run(wait_debugger: bool, job_count: int):
     if not TEST_MODULE_PATH.is_file():
         clear_tests_module()
+
+    if not build_hal(job_count):
+        return
+
+    if not install_hal():
+        return
+
+    separate_debug_information()
 
     if not generate_qemu_image():
         return
@@ -641,6 +659,8 @@ REQUIRED_EXECUTABLES = [
     Executable("llvm-strip"),
     Executable("llvm-objcopy"),
     Executable("nasm"),
+    Executable("lld"),
+    Executable("lldb"),
 ]
 
 
@@ -673,9 +693,9 @@ def check_env():
     prRed("The following required executables are missing from the system:")
     for exe_name in missing:
         print("  ", exe_name)
-    print("Note: Run the bootstrap command to install required dependencies.")
+    print("Note: Run the setup command to install required dependencies.")
     print(
-        "Note: If you already ran the bootstrap command, make sure the installed dependencies are in PATH."
+        "Note: If you already ran the setup command, make sure the installed dependencies are in PATH."
     )
     return False
 
@@ -703,20 +723,22 @@ def main():
 
     subparsers = parser.add_subparsers(required=True)
 
-    check_parser = subparsers.add_parser(
-        "check", help="Check if required dependencies (tools) are installed properly."
+    check_env_parser = subparsers.add_parser(
+        "check_env",
+        help="Check if required dependencies (tools) are installed properly.",
     )
-    check_parser.set_defaults(dispatch=check_env_cmd)
+    check_env_parser.set_defaults(dispatch=check_env_cmd)
+
+    setup_parser = subparsers.add_parser(
+        "setup",
+        help="Install the dependencies (tools) required to build and run HAL9000",
+    )
+    setup_parser.set_defaults(dispatch=setup)
 
     deep_clean_parser = subparsers.add_parser(
         "deep_clean", help="Remove all build directories and start with a clean slate"
     )
     deep_clean_parser.set_defaults(dispatch=deep_clean)
-
-    bootstrap_parser = subparsers.add_parser(
-        "bootstrap", help="Bootstrap HAL9000, it will install the required packages"
-    )
-    bootstrap_parser.set_defaults(dispatch=bootstrap)
 
     configure_parser = subparsers.add_parser("configure", help="Configure the projects")
     configure_parser.set_defaults(dispatch=configure, pre_check=check_env)
@@ -735,7 +757,7 @@ def main():
     )
     job_count_arg(clean_parser)
 
-    build_parser = subparsers.add_parser("build", help="Build HAL9000")
+    build_parser = subparsers.add_parser("build", aliases="b", help="Build HAL9000")
     build_parser.set_defaults(dispatch=build, pre_check=check_env)
     build_parser.add_argument(
         "-a",
@@ -759,7 +781,7 @@ def main():
     )
     job_count_arg(rebuild_parser)
 
-    run_parser = subparsers.add_parser("run", help="Run HAL9000")
+    run_parser = subparsers.add_parser("run", aliases="r", help="Run HAL9000")
     run_parser.set_defaults(dispatch=run, pre_check=check_env)
     run_parser.add_argument(
         "-d",
@@ -768,10 +790,12 @@ def main():
         action="store_true",
         required=False,
     )
+    job_count_arg(run_parser)
 
     run_tests_parser = subparsers.add_parser(
-        "run_tests",
-        help="Run the matching tests, regular expressions are also accepted",
+        "test",
+        aliases="t",
+        help="Run the tests for the HAL9000 project",
     )
     run_tests_parser.set_defaults(dispatch=run_tests, pre_check=check_env)
     run_tests_parser.add_argument(
