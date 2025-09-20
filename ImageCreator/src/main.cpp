@@ -1,5 +1,6 @@
 #include <iostream>
 #include <optional>
+#include <filesystem>
 
 #define UTF_CPP_CPLUSPLUS 202002L
 
@@ -14,11 +15,14 @@ using json = nlohmann::json;
 int main(int argc, char *argv[])
 {
     if (argc < 2)
+    {
+        printf("Usage: %s <config_path>\n", argv[0]);
         return 1;
+    }
 
     std::ifstream in(argv[1]);
     json jsonConfig = json::parse(in);
-    in.close();   
+    in.close();
 
     std::string outputImagePath = jsonConfig["output"];
     std::string diskId = jsonConfig["disk"];
@@ -37,8 +41,11 @@ int main(int argc, char *argv[])
         else if (jsonPartition["type"] == "LINUX_SWAP")
             partition.Type = EFI_PART_TYPE_LINUX_SWAP_GUID;
         else
+        {
+            std::cerr << "Invalid partition type: " << jsonPartition["type"].get<std::string>() << std::endl;
             return 2;
-        
+        }
+
         partition.LBACount = jsonPartition["size"].get<QWORD>() * 2;
         std::string partName = jsonPartition["name"].get<std::string>();
         partition.PartitionName = utf8::utf8to16(partName);
@@ -51,14 +58,18 @@ int main(int argc, char *argv[])
 
     GptDisk gptDisk(outputImagePath);
     gptDisk.configureDisk(diskId, partitionConfig);
-    gptDisk.createDisk(); 
+    gptDisk.createDisk();
 
     for (auto const &jsonFilesystem : jsonConfig["filesystems"])
     {
-        std::u16string partitionName = utf8::utf8to16(jsonFilesystem["partition"].get<std::string>());
-        std::optional<GptPartition> diskPartition = gptDisk.getPartition(partitionName);
+        const auto partitionName = jsonFilesystem["partition"].get<std::string>();
+        std::optional<GptPartition>
+            diskPartition = gptDisk.getPartition(utf8::utf8to16(partitionName));
         if (!diskPartition.has_value())
-            return 3; 
+        {
+            std::cerr << "Failed to create partition " << partitionName << std::endl;
+            return 3;
+        }
 
         Fat fat(outputImagePath, diskPartition.value());
         fat.createFilesystem();
@@ -66,14 +77,28 @@ int main(int argc, char *argv[])
 
         for (auto const &jsonDirectory : jsonFilesystem["directories"])
         {
-            if (!fat.createDirectory(jsonDirectory.get<std::string>()))
+            const auto &directory = jsonDirectory.get<std::string>();
+            if (!fat.createDirectory(directory))
+            {
+                std::cerr << "Failed to create directory " << directory << std::endl;
                 return 4;
+            }
         }
 
         for (auto const &jsonFile : jsonFilesystem["files"])
         {
-            if (!fat.createFile(jsonFile["destination"].get<std::string>(), jsonFile["source"].get<std::string>()))
+            const auto &source = jsonFile["source"].get<std::string>();
+            const auto &destination = jsonFile["destination"].get<std::string>();
+            if (!std::filesystem::is_regular_file(source))
+            {
+                std::cerr << "Invalid source path: " << source << std::endl;
                 return 5;
+            }
+            if (!fat.createFile(destination, source))
+            {
+                std::cerr << "Failed to create file: " << destination << std::endl;
+                return 6;
+            }
         }
 
         fat.closeFilesystem();
