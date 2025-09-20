@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from pathlib import Path
+import re
 import sys
 import os
 import argparse
@@ -7,8 +9,19 @@ import platform
 import subprocess
 import multiprocessing
 import json
-import time
 from tests.testing import Tester
+
+if (sys.version_info.major, sys.version_info.minor) < (3, 10):
+    print(
+        "This script requires at least Python 3.10, your current version is: {}.{}.{}".format(
+            sys.version_info.major, sys.version_info.minor, sys.version_info.micro
+        )
+    )
+    sys.exit(-1)
+
+ARTIFACTS_DIR = Path("artifacts")
+TEST_MODULE_PATH = ARTIFACTS_DIR / "Tests"
+HAL_DIRECTORY = Path("HAL")
 
 
 @dataclass
@@ -248,177 +261,169 @@ def bootstrap():
         prRed("Failed bootstrap!")
 
 
+def cmake_configure(
+    project_name: str,
+    generator: str,
+    project_cwd: Path | None = None,
+    definitions: dict[str, str] | None = None,
+):
+    prCyan(f"Configuring {project_name}...")
+    args = ["cmake", "-S", ".", "-B", "build", "-G", generator]
+    for name, value in (definitions or {}).items():
+        args.append(f"-D{name}={value}")
+    p = subprocess.run(
+        args,
+        cwd=project_cwd if project_cwd else project_name,
+        env=get_build_env(),
+    )
+    if p.returncode != 0:
+        prRed(f"Error configuring {project_name}!")
+        return False
+    prGreen("Done.")
+    return True
+
+
 def configure():
     generator = "Ninja"
 
-    prCyan("Configuring ImageCreator...")
-    p = subprocess.run(
-        [
-            "cmake",
-            "-S",
-            ".",
-            "-B",
-            "build",
-            "-G",
-            generator,
-            "-DCMAKE_INSTALL_PREFIX:PATH=../tools/ImageCreator",
-            "-DCMAKE_TOOLCHAIN_FILE:PATH=../cmake/ImageCreatorToolchain.cmake",
-        ],
-        cwd="ImageCreator",
-        env=get_build_env(),
+    ok = cmake_configure(
+        "ImageCreator",
+        generator,
+        definitions={
+            "CMAKE_INSTALL_PREFIX:PATH": "../tools/ImageCreator",
+            "CMAKE_TOOLCHAIN_FILE:PATH": "../cmake/ImageCreatorToolchain.cmake",
+        },
     )
-    if p.returncode != 0:
-        prRed("Error configuring ImageCreator!")
+    if not ok:
         return
-    prGreen("Done.")
 
-    prCyan("Configuring UefiBootloader...")
-    p = subprocess.run(
-        [
-            "cmake",
-            "-S",
-            ".",
-            "-B",
-            "build",
-            "-G",
-            generator,
-            "-DCMAKE_BUILD_TYPE=Debug",
-            "-DCMAKE_TOOLCHAIN_FILE:PATH=../cmake/UefiBootloaderToolchain.cmake",
-            "-DCMAKE_INSTALL_PREFIX:PATH=../artifacts",
-            '-DUEFI_BUILD:BOOL="TRUE"',
-            '-DFORCE_ELF:BOOL="TRUE"',
-        ],
-        cwd="UefiBootloader",
-        env=get_build_env(),
+    ok = cmake_configure(
+        "UefiBootloader",
+        generator,
+        definitions={
+            "CMAKE_BUILD_TYPE": "Debug",
+            "CMAKE_TOOLCHAIN_FILE:PATH": "../cmake/UefiBootloaderToolchain.cmake",
+            "CMAKE_INSTALL_PREFIX:PATH": "../artifacts",
+            "UEFI_BUILD:BOOL": '"TRUE"',
+            "FORCE_ELF:BOOL": '"TRUE"',
+        },
     )
-    if p.returncode != 0:
-        prRed("Error configuring UefiBootloader!")
+    if not ok:
         return
-    prGreen("Done.")
 
-    prCyan("Configuring HAL9000...")
+    cmake_configure(
+        "HAL9000",
+        generator,
+        project_cwd=HAL_DIRECTORY,
+        definitions={
+            "CMAKE_BUILD_TYPE": "Debug",
+            "CMAKE_TOOLCHAIN_FILE:PATH": "../cmake/HalToolchain.cmake",
+            "CMAKE_INSTALL_PREFIX:PATH": "../artifacts",
+            "FORCE_ELF:BOOL": '"TRUE"',
+        },
+    )
+
+
+def cmake_clean(
+    project_name: str,
+    project_cwd: Path | None = None,
+    job_count: int | None = None,
+):
+    prCyan(f"Cleaning {project_name}...")
+    args = [
+        "cmake",
+        "--build",
+        "build",
+        "--target",
+        "clean",
+    ]
+
+    if j := job_count:
+        args.append(f"-j{j}")
+
     p = subprocess.run(
-        [
-            "cmake",
-            "-S",
-            ".",
-            "-B",
-            "build",
-            "-G",
-            generator,
-            "-DCMAKE_BUILD_TYPE=Debug",
-            "-DCMAKE_TOOLCHAIN_FILE:PATH=../cmake/HalToolchain.cmake",
-            "-DCMAKE_INSTALL_PREFIX:PATH=../artifacts",
-            '-DFORCE_ELF:BOOL="TRUE"',
-        ],
-        cwd="HAL",
+        args,
+        cwd=project_cwd if project_cwd else project_name,
         env=get_build_env(),
     )
     if p.returncode != 0:
-        prRed("Error configuring HAL9000!")
-        return
-    prGreen("Done.")
-
-
-def clean_hal(job_count):
-    prCyan("Cleaning HAL9000...")
-    p = subprocess.run(
-        [
-            "cmake",
-            "--build",
-            "build",
-            f"-j{job_count}",
-            "--target",
-            "clean",
-        ],
-        cwd="HAL",
-        env=get_build_env(),
-    )
-    if p.returncode != 0:
-        prRed("Error cleaning HAL9000!")
+        prRed(f"Error cleaning {project_name}!")
         return False
     prGreen("Done.")
     return True
 
 
-def clean_all(job_count: int):
-    prCyan("Cleaning ImageCreator...")
+def clean(job_count: int, clean_all: bool):
+    if clean_all:
+        ok = cmake_clean("ImageCreator", job_count=job_count)
+        if not ok:
+            return
+
+        ok = cmake_clean("UefiBootloader", job_count=job_count)
+        if not ok:
+            return
+
+    return cmake_clean("HAL9000", project_cwd=HAL_DIRECTORY, job_count=job_count)
+
+
+def cmake_install(
+    project_name: str,
+    project_cwd: Path | None = None,
+    build_type: str | None = None,
+):
+    prCyan(f"Installing {project_name}...")
+    args = ["cmake", "--install", "build"]
+    if t := build_type:
+        args.append("--config")
+        args.append(t)
     p = subprocess.run(
-        [
-            "cmake",
-            "--build",
-            "build",
-            f"-j{job_count}",
-            "--target",
-            "clean",
-        ],
-        cwd="ImageCreator",
-        env=get_build_env(),
-    )
-    if p.returncode != 0:
-        prRed("Error cleaning ImageCreator!")
-        return
-    prGreen("Done.")
-
-    prCyan("Cleaning UefiBootloader...")
-    p = subprocess.run(
-        [
-            "cmake",
-            "--build",
-            "build",
-            f"-j{job_count}",
-            "--target",
-            "clean",
-        ],
-        cwd="UefiBootloader",
-        env=get_build_env(),
-    )
-    if p.returncode != 0:
-        prRed("Error cleaning UefiBootloader!")
-        return
-    prGreen("Done.")
-
-    clean_hal(job_count)
-
-
-def clean(job_count: int):
-    clean_hal(job_count)
-
-
-def build_hal(job_count: int):
-    prCyan("Building HAL9000...")
-    p = subprocess.run(
-        ["cmake", "--build", "build", f"-j{job_count}"],
-        cwd="HAL",
-        env=get_build_env(),
-    )
-    if p.returncode != 0:
-        prRed("Error building HAL9000!")
-        return False
-    prGreen("Done.")
-    return True
-
-
-def clear_tests_module():
-    f = open("artifacts/Tests", "w")
-    f.truncate(0)
-    f.write("/vol\n")
-    f.close()
-
-
-def install_hal():
-    prCyan("Installing HAL9000...")
-    p = subprocess.run(
-        ["cmake", "--install", "build"],
-        cwd="HAL",
+        args,
+        cwd=project_cwd if project_cwd else project_name,
         env=get_build_env(),
         stdout=subprocess.DEVNULL,
     )
     if p.returncode != 0:
-        prRed("Error installing HAL9000!")
+        prRed(f"Error installing {project_name}!")
         return False
     prGreen("Done.")
     return True
+
+
+def cmake_build(
+    project_name: str,
+    project_cwd: Path | None = None,
+    job_count: int | None = None,
+    build_type: str | None = None,
+):
+    prCyan(f"Building {project_name}...")
+    args = ["cmake", "--build", "build"]
+    if j := job_count:
+        args.append(f"-j{j}")
+    if t := build_type:
+        args.append("--config")
+        args.append(t)
+    p = subprocess.run(
+        args,
+        cwd=project_cwd if project_cwd else project_name,
+        env=get_build_env(),
+    )
+    if p.returncode != 0:
+        prRed(f"Error building {project_name}!")
+        return False
+    prGreen("Done.")
+    return True
+
+
+def build_hal(job_count: int):
+    return cmake_build("HAL9000", project_cwd=HAL_DIRECTORY, job_count=job_count)
+
+
+def clear_tests_module():
+    TEST_MODULE_PATH.write_text("/vol\n")
+
+
+def install_hal():
+    cmake_install("HAL9000", HAL_DIRECTORY)
 
 
 def separate_debug_information():
@@ -471,60 +476,32 @@ def generate_qemu_image():
     return True
 
 
-def build_all(job_count: int):
+def build(job_count: int, build_all: bool):
     if str(platform.system()).lower() == "windows":
-        build_type = ["--config", "Release"]
+        build_type = "Release"
     else:
-        build_type = []
+        build_type = None
 
-    prCyan("Building ImageCreator...")
-    p = subprocess.run(
-        ["cmake", "--build", "build", f"-j{job_count}"] + build_type,
-        cwd="ImageCreator",
-        env=get_build_env(),
-    )
-    if p.returncode != 0:
-        prRed("Error building ImageCreator!")
-        return
-    prGreen("Done.")
+    if build_all:
+        ok = cmake_build("ImageCreator", job_count=job_count, build_type=build_type)
+        if not ok:
+            return
 
-    prCyan("Building UefiBootloader...")
-    p = subprocess.run(
-        ["cmake", "--build", "build", f"-j{job_count}"],
-        cwd="UefiBootloader",
-        env=get_build_env(),
-    )
-    if p.returncode != 0:
-        prRed("Error building UefiBootloader!")
-        return
-    prGreen("Done.")
+        ok = cmake_build("UefiBootloader", job_count=job_count)
+        if not ok:
+            return
 
     if not build_hal(job_count):
         return
 
-    prCyan("Installing ImageCreator...")
-    p = subprocess.run(
-        ["cmake", "--install", "build"] + build_type,
-        cwd="ImageCreator",
-        env=get_build_env(),
-        stdout=subprocess.DEVNULL,
-    )
-    if p.returncode != 0:
-        prRed("Error installing ImageCreator!")
-        return
-    prGreen("Done.")
+    if build_all:
+        ok = cmake_install("ImageCreator", build_type=build_type)
+        if not ok:
+            return
 
-    prCyan("Installing UefiBootloader...")
-    p = subprocess.run(
-        ["cmake", "--install", "build"],
-        cwd="UefiBootloader",
-        env=get_build_env(),
-        stdout=subprocess.DEVNULL,
-    )
-    if p.returncode != 0:
-        prRed("Error installing UefiBootloader!")
-        return
-    prGreen("Done.")
+        ok = cmake_install("UefiBootloader")
+        if not ok:
+            return
 
     if not install_hal():
         return
@@ -534,16 +511,10 @@ def build_all(job_count: int):
     separate_debug_information()
 
 
-def build(job_count: int):
-    if not build_hal(job_count):
+def rebuild(job_count: int, build_all: bool):
+    if not clean(job_count, build_all):
         return
-
-    if not install_hal():
-        return
-
-    clear_tests_module()
-
-    separate_debug_information()
+    build(job_count, build_all)
 
 
 def parse_qemu_options(debug: bool):
@@ -567,6 +538,9 @@ def parse_qemu_options(debug: bool):
 
 
 def run(wait_debugger: bool):
+    if not TEST_MODULE_PATH.is_file():
+        clear_tests_module()
+
     if not generate_qemu_image():
         return
 
@@ -652,24 +626,29 @@ def run_tests(
     prGreen("Done.")
 
 
+@dataclass
+class Executable:
+    name: str
+
+
 REQUIRED_EXECUTABLES = [
-    "git",
-    "cmake",
-    "ninja",
-    "qemu-system-x86_64",
-    "clang",
-    "clang++",
-    "llvm-strip",
-    "llvm-objcopy",
-    "nasm",
+    Executable("git"),
+    Executable("cmake"),
+    Executable("ninja"),
+    Executable("qemu-system-x86_64"),
+    Executable("clang"),
+    Executable("clang++"),
+    Executable("llvm-strip"),
+    Executable("llvm-objcopy"),
+    Executable("nasm"),
 ]
 
 
 def check_env_cmd():
     build_env = get_build_env()
     missing = False
-    for exe_name in REQUIRED_EXECUTABLES:
-        exe_path = get_exe_name(exe_name)
+    for exe in REQUIRED_EXECUTABLES:
+        exe_path = get_exe_name(exe.name)
         print(f"{exe_path}:", end="")
         if path := shutil.which(exe_path, path=build_env["PATH"]):
             prGreen(f"OK, found at: {path}")
@@ -683,8 +662,8 @@ def check_env_cmd():
 def check_env():
     build_env = get_build_env()
     missing = []
-    for exe_name in REQUIRED_EXECUTABLES:
-        exe_path = get_exe_name(exe_name)
+    for exe in REQUIRED_EXECUTABLES:
+        exe_path = get_exe_name(exe.name)
         if not shutil.which(exe_path, path=build_env["PATH"]):
             missing.append(exe_path)
 
@@ -742,25 +721,43 @@ def main():
     configure_parser = subparsers.add_parser("configure", help="Configure the projects")
     configure_parser.set_defaults(dispatch=configure, pre_check=check_env)
 
-    clean_all_parser = subparsers.add_parser(
-        "clean_all", help="Run the clean target for all projects"
-    )
-    clean_all_parser.set_defaults(dispatch=clean_all, pre_check=check_env)
-    job_count_arg(clean_all_parser)
-
     clean_parser = subparsers.add_parser(
         "clean", help="Run the clean target for HAL9000"
     )
     clean_parser.set_defaults(dispatch=clean, pre_check=check_env)
+    clean_parser.add_argument(
+        "-a",
+        "--all",
+        dest="clean_all",
+        help="Clean all projects",
+        action="store_true",
+        required=False,
+    )
     job_count_arg(clean_parser)
-
-    build_all_parser = subparsers.add_parser("build_all", help="Build all projects")
-    build_all_parser.set_defaults(dispatch=build_all, pre_check=check_env)
-    job_count_arg(build_all_parser)
 
     build_parser = subparsers.add_parser("build", help="Build HAL9000")
     build_parser.set_defaults(dispatch=build, pre_check=check_env)
+    build_parser.add_argument(
+        "-a",
+        "--all",
+        dest="build_all",
+        help="Build all projects",
+        action="store_true",
+        required=False,
+    )
     job_count_arg(build_parser)
+
+    rebuild_parser = subparsers.add_parser("rebuild", help="Clean, then build HAL9000")
+    rebuild_parser.set_defaults(dispatch=rebuild, pre_check=check_env)
+    rebuild_parser.add_argument(
+        "-a",
+        "--all",
+        dest="build_all",
+        help="Rebuild all projects",
+        action="store_true",
+        required=False,
+    )
+    job_count_arg(rebuild_parser)
 
     run_parser = subparsers.add_parser("run", help="Run HAL9000")
     run_parser.set_defaults(dispatch=run, pre_check=check_env)
