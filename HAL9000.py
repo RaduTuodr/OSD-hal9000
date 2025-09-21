@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import enum
 from pathlib import Path
 import re
 import sys
@@ -24,36 +25,93 @@ TEST_MODULE_PATH = ARTIFACTS_DIR / "Tests"
 HAL_DIRECTORY = Path("HAL")
 
 
-def prRed(str):
-    print("\033[91m {}\033[00m".format(str))
+class Color(enum.Enum):
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
 
 
-def prGreen(str):
-    print("\033[92m {}\033[00m".format(str))
+class Styled:
+    END = "\033[0m"
+    BOLD = "\033[1m"
+
+    def __init__(self, s: str) -> None:
+        self._string = s
+        self._bold: bool = False
+        self._color: Color | None = None
+
+    def __str__(self) -> str:
+        escapes = []
+        if c := self._color:
+            escapes.append(c.value)
+        if self._bold:
+            escapes.append(Styled.BOLD)
+        return "".join(escapes) + self._string + Styled.END
+
+    def bold(self):
+        self._bold = True
+        return self
+
+    def color(self, color: Color):
+        self._color = color
+        return self
+
+    @staticmethod
+    def red(s: str):
+        this = Styled(s)
+        return this.color(Color.RED)
+
+    @staticmethod
+    def green(s: str):
+        this = Styled(s)
+        return this.color(Color.GREEN)
+
+    @staticmethod
+    def yellow(s: str):
+        this = Styled(s)
+        return this.color(Color.YELLOW)
+
+    @staticmethod
+    def blue(s: str):
+        this = Styled(s)
+        return this.color(Color.BLUE)
+
+    @staticmethod
+    def magenta(s: str):
+        this = Styled(s)
+        return this.color(Color.MAGENTA)
+
+    @staticmethod
+    def cyan(s: str):
+        this = Styled(s)
+        return this.color(Color.CYAN)
 
 
-def prYellow(str):
-    print("\033[93m {}\033[00m".format(str))
+def print_success(msg: str):
+    print(Styled.green(msg))
 
 
-def prLightPurple(str):
-    print("\033[94m {}\033[00m".format(str))
+def print_progress_info(msg: str):
+    print(Styled.cyan(msg))
 
 
-def prPurple(str):
-    print("\033[95m {}\033[00m".format(str))
+def print_note(msg: str):
+    print(Styled.yellow("Note:"), msg)
 
 
-def prCyan(str):
-    print("\033[96m {}\033[00m".format(str))
+def print_important(msg: str):
+    print(Styled.yellow(msg))
 
 
-def prLightGray(str):
-    print("\033[97m {}\033[00m".format(str))
+def print_warning(msg: str):
+    print(Styled.yellow(msg))
 
 
-def prBlack(str):
-    print("\033[98m {}\033[00m".format(str))
+def print_error(msg: str):
+    print(Styled.red(msg))
 
 
 @dataclass
@@ -81,12 +139,16 @@ def check_env_cmd():
     missing = False
     for exe in REQUIRED_EXECUTABLES:
         exe_path = get_exe_name(exe.name)
-        print(f"{exe_path}:", end="")
         if path := shutil.which(exe_path, path=build_env["PATH"]):
-            prGreen(f"OK, found at: {path}")
+            print(f"{exe_path:<24}: {Styled.green('OK')}, found at: {path}")
         else:
             missing = True
-            prRed("Missing!")
+            print(f"{exe_path:<24}: {Styled.red('Missing')}")
+
+    if missing:
+        print_note("The following paths are currently in PATH:")
+        for path in build_env["PATH"].split(";"):
+            print("  ", path)
 
     sys.exit(-1 if missing else 0)
 
@@ -103,12 +165,12 @@ def check_env(fail_with_message: bool = True):
         return True
 
     if fail_with_message:
-        prRed("The following required executables are missing from the system:")
+        print_error("The following required executables are missing from the system:")
         for exe_name in missing:
             print("  ", exe_name)
-        print("Note: Run the setup command to install required dependencies.")
-        print(
-            "Note: If you already ran the setup command, make sure the installed dependencies are in PATH."
+        print_note("Run the setup command to install required dependencies.")
+        print_note(
+            "If you already ran the setup command, make sure the installed dependencies are in PATH."
         )
 
     return False
@@ -198,23 +260,23 @@ def get_build_env():
 
 
 def deep_clean(**kwargs):
-    prCyan("Deep cleaning ImageCreator...")
+    print_progress_info("Deep cleaning ImageCreator...")
     shutil.rmtree("ImageCreator/build", ignore_errors=True)
-    prGreen("Done.")
+    print_success("Done.")
 
-    prCyan("Deep cleaning UefiBootloader...")
+    print_progress_info("Deep cleaning UefiBootloader...")
     shutil.rmtree("UefiBootloader/build", ignore_errors=True)
-    prGreen("Done.")
+    print_success("Done.")
 
-    prCyan("Deep cleaning HAL...")
+    print_progress_info("Deep cleaning HAL...")
     shutil.rmtree("HAL/build", ignore_errors=True)
-    prGreen("Done.")
+    print_success("Done.")
 
-    prCyan("Deep cleaning artifacts...")
+    print_progress_info("Deep cleaning artifacts...")
     shutil.rmtree("artifacts", ignore_errors=True)
-    prGreen("Done.")
+    print_success("Done.")
 
-    prYellow("Configure must be run now!")
+    print_note("You must run the configure command before you can build the project.")
 
 
 def prompt_yes_no():
@@ -226,9 +288,9 @@ def run_cmd_with_echo_and_wait(
     cmd: list[str], shell: bool = False, assume_yes: bool = False
 ):
     if assume_yes:
-        prYellow(f"Running command: {cmd}")
+        print_important(f"Running command: {cmd}")
     else:
-        prYellow(f"Will run: {cmd}. Press any key to continue.")
+        print_important(f"Will run: {cmd}. Press any key to continue.")
         input()
     p = subprocess.run(cmd, shell=shell)
     return p.returncode == 0
@@ -240,34 +302,34 @@ def install_packages(
     ignore: bool = False,
     assume_yes: bool = False,
 ):
-    prYellow("The following packages will be installed:")
+    print_important("The following packages will be installed:")
     for package in packages:
-        prLightGray(package.name)
+        print(package.name)
 
     for package in packages:
-        prCyan(f"Installing {package.name}...")
+        print_progress_info(f"Installing {package.name}...")
         if (
             not run_cmd_with_echo_and_wait(
                 pkg_manager_cmd + [package.name], assume_yes=assume_yes
             )
             and not ignore
         ):
-            prRed(f"Error installing {package.name}!")
+            print_error(f"Error installing {package.name}!")
             return False
-        prGreen("Done.")
+        print_success("Done.")
 
     return True
 
 
 def setup_darwin(assume_yes: bool):
-    prCyan("Running setup for macOS")
+    print_progress_info("Running setup for macOS")
 
-    prCyan("Checking for Homebrew")
+    print_progress_info("Checking for Homebrew")
     p = shutil.which("brew")
     if p is None:
-        prRed("Homebrew not found. Install Homebrew to continue.")
+        print_error("Homebrew not found. Install Homebrew to continue.")
         return False
-    prGreen("Done.")
+    print_success("Done.")
 
     return install_packages(
         ["brew", "install"], HOMEBREW_PACKAGES, assume_yes=assume_yes
@@ -278,9 +340,9 @@ def setup_linux(assume_yes: bool):
     assert str(platform.system()).lower() == "linux"
     import distro
 
-    prCyan("Running setup for linux")
+    print_progress_info("Running setup for linux")
 
-    prCyan("Checking distro")
+    print_progress_info("Checking distro")
     distro_id = distro.id().lower()
     if distro_id == "ubuntu":
         pkg_manager_cmd = ["sudo", "apt-get", "install", "-y"]
@@ -289,29 +351,31 @@ def setup_linux(assume_yes: bool):
         pkg_manager_cmd = ["sudo", "dnf", "install", "-y"]
         packages = DNF_PACKAGES
     elif distro_id == "debian":
-        prRed(
-            "HAL was not tested on debian!. Because debian usually has older versions of packages, you might need to install the packages manually."
+        print_error("HAL was not tested on debian!")
+        print_note(
+            "Because debian usually has older versions of packages, you might need to install the packages manually."
         )
         return False
     else:
-        prRed(
-            f"HAL was not tested on {distro_id}!. You need to install the packages manually."
+        print_error(f"HAL was not tested on {distro_id}!.")
+        print_note(
+            "We recommend using Ubuntu, even if you might be able to install the packages manually."
         )
         return False
-    prGreen(f"Done. Detected distro: {distro_id}")
+    print_success(f"Done. Detected distro: {distro_id}")
 
     return install_packages(pkg_manager_cmd, packages, assume_yes=assume_yes)
 
 
 def setup_windows(assume_yes: bool):
-    prCyan("Running setup for Windows")
+    print_progress_info("Running setup for Windows")
 
-    prCyan("Checking for winget")
+    print_progress_info("Checking for winget")
     p = shutil.which("winget")
     if p is None:
-        prRed("winget is required to install dependencies on Windows.")
+        print_error("winget is required to install dependencies on Windows.")
         return False
-    prGreen("Done.")
+    print_success("Done.")
 
     return install_packages(
         ["winget", "install"], WINGET_PACKAGES, ignore=True, assume_yes=assume_yes
@@ -321,28 +385,33 @@ def setup_windows(assume_yes: bool):
 def setup_vscode(system: str, assume_yes: bool):
     code_path = shutil.which("code")
     if code_path is None:
-        prRed("VSCode not found.")
+        print_error("VSCode not found.")
         return False
+
+    print_important("The following VSCode extensions will be installed:")
+    for ext_name in VSCODE_EXTENSIONS:
+        print(ext_name)
 
     code_exe = "code.cmd" if system == "windows" else "code"
     for ext_name in VSCODE_EXTENSIONS:
+        print_progress_info(f"Installing {ext_name}...")
         ok = run_cmd_with_echo_and_wait(
             [code_exe, "--install-extension", ext_name],
             shell=True,
             assume_yes=assume_yes,
         )
         if not ok:
-            prRed(f"Failed to install extension {ext_name}")
+            print_error(f"Failed to install extension {ext_name}")
             return False
 
-    prGreen("Successfully installed VSCode extensions.")
+    print_success("Successfully installed VSCode extensions.")
 
 
 def setup_packages(system: str, assume_yes: bool, force: bool):
     env_ok = check_env(fail_with_message=False)
 
     if env_ok and not force:
-        prYellow(
+        print_important(
             "The environment already contains all required tools. Do you want to run the install commands anyway?"
         )
         if not prompt_yes_no():
@@ -359,13 +428,13 @@ def setup_packages(system: str, assume_yes: bool, force: bool):
         raise Exception(f"Unknown platform {system}")
 
     if not result:
-        prRed("Setup failed!")
+        print_error("Setup failed!")
         return False
 
-    prGreen("Successful setup.")
-    print("Hint: You might need to manually add some tools to PATH.")
-    print(
-        "Hint: After adding the tools to PATH, you need to close the current terminal and open a new one for the tools to be usable."
+    print_success("Successful setup.")
+    print_note("You might need to manually add some tools to PATH.")
+    print_note(
+        "After adding the tools to PATH, you need to close the current terminal and open a new one for the tools to be usable."
     )
     return True
 
@@ -386,7 +455,7 @@ def cmake_configure(
     project_cwd: Path | None = None,
     definitions: dict[str, str] | None = None,
 ):
-    prCyan(f"Configuring {project_name}...")
+    print_progress_info(f"Configuring {project_name}...")
     args = ["cmake", "-S", ".", "-B", "build", "-G", generator]
     for name, value in (definitions or {}).items():
         args.append(f"-D{name}={value}")
@@ -396,9 +465,9 @@ def cmake_configure(
         env=get_build_env(),
     )
     if p.returncode != 0:
-        prRed(f"Error configuring {project_name}!")
+        print_error(f"Error configuring {project_name}!")
         return False
-    prGreen("Done.")
+    print_success("Done.")
     return True
 
 
@@ -448,7 +517,7 @@ def cmake_clean(
     project_cwd: Path | None = None,
     job_count: int | None = None,
 ):
-    prCyan(f"Cleaning {project_name}...")
+    print_progress_info(f"Cleaning {project_name}...")
     args = [
         "cmake",
         "--build",
@@ -466,9 +535,9 @@ def cmake_clean(
         env=get_build_env(),
     )
     if p.returncode != 0:
-        prRed(f"Error cleaning {project_name}!")
+        print_error(f"Error cleaning {project_name}!")
         return False
-    prGreen("Done.")
+    print_success("Done.")
     return True
 
 
@@ -490,7 +559,7 @@ def cmake_install(
     project_cwd: Path | None = None,
     build_type: str | None = None,
 ):
-    prCyan(f"Installing {project_name}...")
+    print_progress_info(f"Installing {project_name}...")
     args = ["cmake", "--install", "build"]
     if t := build_type:
         args.append("--config")
@@ -502,9 +571,9 @@ def cmake_install(
         stdout=subprocess.DEVNULL,
     )
     if p.returncode != 0:
-        prRed(f"Error installing {project_name}!")
+        print_error(f"Error installing {project_name}!")
         return False
-    prGreen("Done.")
+    print_success("Done.")
     return True
 
 
@@ -514,7 +583,7 @@ def cmake_build(
     job_count: int | None = None,
     build_type: str | None = None,
 ):
-    prCyan(f"Building {project_name}...")
+    print_progress_info(f"Building {project_name}...")
     args = ["cmake", "--build", "build"]
     if j := job_count:
         args.append(f"-j{j}")
@@ -527,9 +596,9 @@ def cmake_build(
         env=get_build_env(),
     )
     if p.returncode != 0:
-        prRed(f"Error building {project_name}!")
+        print_error(f"Error building {project_name}!")
         return False
-    prGreen("Done.")
+    print_success("Done.")
     return True
 
 
@@ -546,7 +615,7 @@ def install_hal():
 
 
 def separate_debug_information():
-    prCyan("Separating debug information...")
+    print_progress_info("Separating debug information...")
     p = subprocess.run(
         [
             get_exe_name("llvm-objcopy"),
@@ -557,7 +626,7 @@ def separate_debug_information():
         env=get_build_env(),
     )
     if p.returncode != 0:
-        prRed("Failed to generate debug information")
+        print_error("Failed to generate debug information")
         return False
 
     p = subprocess.run(
@@ -570,7 +639,7 @@ def separate_debug_information():
         env=get_build_env(),
     )
     if p.returncode != 0:
-        prRed("Failed to strip debug information")
+        print_error("Failed to strip debug information")
         return False
 
     p = subprocess.run(
@@ -582,14 +651,14 @@ def separate_debug_information():
         env=get_build_env(),
     )
     if p.returncode != 0:
-        prRed("Failed to link debug information")
+        print_error("Failed to link debug information")
         return False
 
-    prGreen("Done.")
+    print_success("Done.")
 
 
 def generate_qemu_image():
-    prCyan("Generating QEMU image...")
+    print_progress_info("Generating QEMU image...")
     cmd = [
         get_exe_name("tools/ImageCreator/bin/ImageCreator"),
         "config/HAL9000.json",
@@ -599,9 +668,9 @@ def generate_qemu_image():
         env=get_build_env(),
     )
     if p.returncode != 0:
-        prRed("Error generating QEMU image!")
+        print_error("Error generating QEMU image!")
         return False
-    prGreen("Done.")
+    print_success("Done.")
     return True
 
 
@@ -681,7 +750,7 @@ def run(wait_debugger: bool, job_count: int):
     if not generate_qemu_image():
         return
 
-    prCyan("Starting QEMU...")
+    print_progress_info("Starting QEMU...")
     qemu_options = parse_qemu_options(wait_debugger)
     subprocess.run(
         [get_exe_name("qemu-system-x86_64")] + qemu_options,
@@ -689,7 +758,7 @@ def run(wait_debugger: bool, job_count: int):
 
 
 def run_async(wait_debugger: bool) -> subprocess.Popen:
-    prCyan("Starting QEMU...")
+    print_progress_info("Starting QEMU...")
     qemu_options = parse_qemu_options(wait_debugger)
     return subprocess.Popen(
         [get_exe_name("qemu-system-x86_64")] + qemu_options,
@@ -702,7 +771,7 @@ def run_async(wait_debugger: bool) -> subprocess.Popen:
 def run_tests(
     tests: list[str], job_count: int, wait_debugger: bool, timeout: int | None = None
 ):
-    prCyan(f"Running tests matching: {tests}")
+    print_progress_info(f"Running tests matching: {tests}")
 
     if not build_hal(job_count):
         return
@@ -716,12 +785,12 @@ def run_tests(
         "config/Tests.json", tests, "tests", "artifacts/Tests", "HAL9000.log", timeout
     )
 
-    prCyan("Generating tests module...")
+    print_progress_info("Generating tests module...")
     err = tester.generate_tests_module()
     if err:
-        prRed(f"Error: {err}")
+        print_error(f"Error: {err}")
         return
-    prGreen("Done.")
+    print_success("Done.")
 
     if not generate_qemu_image():
         return
@@ -731,22 +800,22 @@ def run_tests(
     timeout = tester.timeout
     time_limit_exceeded = False
     if timeout == 0:
-        prYellow("Timeout set to 0. Waiting for QEMU to finish...")
+        print_important("Timeout set to 0. Waiting for QEMU to finish...")
         p.wait()
     elif wait_debugger:
-        prYellow(
+        print_important(
             "Debugger attached, won't enforce timeout. Waiting for QEMU to finish..."
         )
         p.wait()
     else:
-        prYellow(f"Timeout is {timeout}s.")
+        print_important(f"Timeout is {timeout}s.")
         try:
             p.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
             time_limit_exceeded = True
 
     if time_limit_exceeded:
-        prRed("Error: QEMU did not finish in time.")
+        print_error("Error: QEMU did not finish in time.")
         print(
             "Note: Attach debugger on start with --wait-debugger or use --timeout 0 to wait indefinitely."
         )
@@ -754,13 +823,13 @@ def run_tests(
         clear_tests_module()
         return
 
-    prCyan("Evaluating results...")
+    print_progress_info("Evaluating results...")
 
     print(tester.evaluate_results())
 
     clear_tests_module()
 
-    prGreen("Done.")
+    print_success("Done.")
 
 
 def main():
