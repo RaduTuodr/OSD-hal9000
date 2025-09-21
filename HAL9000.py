@@ -857,7 +857,7 @@ def main():
 
     check_env_parser = subparsers.add_parser(
         "check_env",
-        help="Check if required dependencies (tools) are installed properly.",
+        help="Check if required dependencies (tools) are installed properly",
     )
     check_env_parser.set_defaults(dispatch=check_env_cmd)
 
@@ -892,11 +892,11 @@ def main():
     )
     deep_clean_parser.set_defaults(dispatch=deep_clean)
 
-    configure_parser = subparsers.add_parser("configure", help="Configure the projects")
+    configure_parser = subparsers.add_parser("configure", help="Configure the projects (must be run before first build and after adding new files)")
     configure_parser.set_defaults(dispatch=configure, pre_check=check_env)
 
     clean_parser = subparsers.add_parser(
-        "clean", help="Run the clean target for HAL9000"
+        "clean", help="Delete build artifacts (default target: HAL9000)"
     )
     clean_parser.set_defaults(dispatch=clean, pre_check=check_env)
     clean_parser.add_argument(
@@ -909,7 +909,7 @@ def main():
     )
     job_count_arg(clean_parser)
 
-    build_parser = subparsers.add_parser("build", aliases="b", help="Build HAL9000")
+    build_parser = subparsers.add_parser("build", aliases="b", help="Build (default target: HAL9000)")
     build_parser.set_defaults(dispatch=build, pre_check=check_env)
     build_parser.add_argument(
         "-a",
@@ -921,7 +921,7 @@ def main():
     )
     job_count_arg(build_parser)
 
-    rebuild_parser = subparsers.add_parser("rebuild", help="Clean, then build HAL9000")
+    rebuild_parser = subparsers.add_parser("rebuild", help="Clean, then build (default target: HAL9000)")
     rebuild_parser.set_defaults(dispatch=rebuild, pre_check=check_env)
     rebuild_parser.add_argument(
         "-a",
