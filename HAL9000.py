@@ -276,8 +276,6 @@ def deep_clean(**kwargs):
     shutil.rmtree("artifacts", ignore_errors=True)
     print_success("Done.")
 
-    print_note("You must run the configure command before you can build the project.")
-
 
 def prompt_yes_no():
     i = input("[Y]es/[N]o: ")
@@ -657,24 +655,16 @@ def separate_debug_information():
     print_success("Done.")
 
 
-def generate_qemu_image():
-    print_progress_info("Generating QEMU image...")
-    cmd = [
-        get_exe_name("tools/ImageCreator/bin/ImageCreator"),
-        "config/HAL9000.json",
-    ]
-    p = subprocess.run(
-        cmd,
-        env=get_build_env(),
-    )
-    if p.returncode != 0:
-        print_error("Error generating QEMU image!")
-        return False
-    print_success("Done.")
-    return True
+def build(
+    job_count: int,
+    build_all: bool,
+    run_configure: bool,
+):
+    if run_configure:
+        configure()
+    else:
+        print_warning("Skipping configure")
 
-
-def build(job_count: int, build_all: bool):
     if str(platform.system()).lower() == "windows":
         build_type = "Release"
     else:
@@ -704,15 +694,17 @@ def build(job_count: int, build_all: bool):
     if not install_hal():
         return
 
-    clear_tests_module()
-
     separate_debug_information()
 
 
-def rebuild(job_count: int, build_all: bool):
+def rebuild(
+    job_count: int,
+    build_all: bool,
+    run_configure: bool,
+):
     if not clean(job_count, build_all):
         return
-    build(job_count, build_all)
+    build(job_count, build_all, run_configure)
 
 
 def parse_qemu_options(debug: bool, no_graphic: bool):
@@ -738,17 +730,52 @@ def parse_qemu_options(debug: bool, no_graphic: bool):
     return qemu_options
 
 
-def run(wait_debugger: bool, no_graphic: bool, job_count: int):
+def generate_qemu_image():
+    print_progress_info("Generating QEMU image...")
+    image_creator = get_exe_name("tools/ImageCreator/bin/ImageCreator")
+    cmd = [
+        image_creator,
+        "config/HAL9000.json",
+    ]
+
+    p = subprocess.run(
+        cmd,
+        env=get_build_env(),
+    )
+    if p.returncode != 0:
+        print_error("Error generating QEMU image!")
+        return False
+    print_success("Done.")
+    return True
+
+
+def prepare_hal_for_run(
+    job_count: int,
+    run_configure: bool,
+    run_build: bool,
+):
+    if not run_build:
+        print_warning("Skipping build")
+        return
+
+    # If ImageCreator does not exist, build all projects
+    image_creator_path = Path(get_exe_name("tools/ImageCreator/bin/ImageCreator"))
+    build_all = not image_creator_path.is_file()
+
+    build(job_count, build_all, run_configure=run_configure)
+
+
+def run(
+    wait_debugger: bool,
+    no_graphic: bool,
+    job_count: int,
+    run_configure: bool,
+    run_build: bool,
+):
+    prepare_hal_for_run(job_count, run_configure, run_build)
+
     if not TEST_MODULE_PATH.is_file():
         clear_tests_module()
-
-    if not build_hal(job_count):
-        return
-
-    if not install_hal():
-        return
-
-    separate_debug_information()
 
     if not generate_qemu_image():
         return
@@ -781,18 +808,13 @@ def run_tests(
     job_count: int,
     wait_debugger: bool,
     no_graphic: bool,
+    run_configure: bool,
+    run_build: bool,
     timeout: int | None = None,
 ):
+    prepare_hal_for_run(job_count, run_configure, run_build)
+
     print_progress_info(f"Running tests matching: {tests}")
-
-    if not build_hal(job_count):
-        return
-
-    if not install_hal():
-        return
-
-    separate_debug_information()
-
     tester = Tester(
         "config/Tests.json", tests, "tests", "artifacts/Tests", "HAL9000.log", timeout
     )
@@ -863,6 +885,17 @@ def main():
             default=multiprocessing.cpu_count(),
         )
 
+    def no_configure_arg(parser: argparse.ArgumentParser):
+        parser.add_argument(
+            "-C",
+            "--no-configure",
+            dest="run_configure",
+            help="Don't run configure (not recommended unless you known what you're doing)",
+            action="store_false",
+            default=True,
+            required=False,
+        )
+
     parser = argparse.ArgumentParser(
         prog="HAL9000.py",
         description="Script for working with HAL9000",
@@ -914,7 +947,7 @@ def main():
 
     configure_parser = subparsers.add_parser(
         "configure",
-        help="Configure the projects (must be run before first build and after adding new files)",
+        help="Configure the projects (will be run automatically when needed)",
     )
     configure_parser.set_defaults(dispatch=configure, pre_check=check_env)
 
@@ -944,6 +977,7 @@ def main():
         action="store_true",
         required=False,
     )
+    no_configure_arg(build_parser)
     job_count_arg(build_parser)
 
     rebuild_parser = subparsers.add_parser(
@@ -958,6 +992,7 @@ def main():
         action="store_true",
         required=False,
     )
+    no_configure_arg(rebuild_parser)
     job_count_arg(rebuild_parser)
 
     run_parser = subparsers.add_parser("run", aliases="r", help="Run HAL9000")
@@ -974,6 +1009,16 @@ def main():
         "--no-graphic",
         help="Don't show QEMU display output",
         action="store_true",
+        required=False,
+    )
+    no_configure_arg(run_parser)
+    run_parser.add_argument(
+        "-B",
+        "--no-build",
+        dest="run_build",
+        help="Don't run configure and build (not recommended unless you known what you're doing)",
+        action="store_false",
+        default=True,
         required=False,
     )
     job_count_arg(run_parser)
@@ -1008,6 +1053,16 @@ def main():
         "--no-graphic",
         help="Don't show QEMU display output",
         action="store_true",
+        required=False,
+    )
+    no_configure_arg(run_tests_parser)
+    run_tests_parser.add_argument(
+        "-B",
+        "--no-build",
+        dest="run_build",
+        help="Don't run configure and build (not recommended unless you known what you're doing)",
+        action="store_false",
+        default=True,
         required=False,
     )
     job_count_arg(run_tests_parser)
