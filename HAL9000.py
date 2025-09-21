@@ -715,7 +715,7 @@ def rebuild(job_count: int, build_all: bool):
     build(job_count, build_all)
 
 
-def parse_qemu_options(debug: bool):
+def parse_qemu_options(debug: bool, no_graphic: bool):
     f = open("config/QEMU.json", "r")
     qemu_config = json.load(f)
     f.close()
@@ -732,10 +732,13 @@ def parse_qemu_options(debug: bool):
     if debug:
         qemu_options.append("-S")
 
+    if no_graphic:
+        qemu_options.append("-nographic")
+
     return qemu_options
 
 
-def run(wait_debugger: bool, job_count: int):
+def run(wait_debugger: bool, no_graphic: bool, job_count: int):
     if not TEST_MODULE_PATH.is_file():
         clear_tests_module()
 
@@ -751,15 +754,20 @@ def run(wait_debugger: bool, job_count: int):
         return
 
     print_progress_info("Starting QEMU...")
-    qemu_options = parse_qemu_options(wait_debugger)
-    subprocess.run(
+    qemu_options = parse_qemu_options(wait_debugger, no_graphic=no_graphic)
+    p = subprocess.run(
         [get_exe_name("qemu-system-x86_64")] + qemu_options,
     )
+    if p.returncode != 0:
+        print_important(f"QEMU returned with exit status: {p.returncode}")
+        print_note(
+            "If QEMU doesn't start because of gtk, use the -G option to run without graphics."
+        )
 
 
-def run_async(wait_debugger: bool) -> subprocess.Popen:
+def run_async(wait_debugger: bool, no_graphic: bool) -> subprocess.Popen:
     print_progress_info("Starting QEMU...")
-    qemu_options = parse_qemu_options(wait_debugger)
+    qemu_options = parse_qemu_options(wait_debugger, no_graphic=no_graphic)
     return subprocess.Popen(
         [get_exe_name("qemu-system-x86_64")] + qemu_options,
         stdout=subprocess.DEVNULL,
@@ -769,7 +777,11 @@ def run_async(wait_debugger: bool) -> subprocess.Popen:
 
 
 def run_tests(
-    tests: list[str], job_count: int, wait_debugger: bool, timeout: int | None = None
+    tests: list[str],
+    job_count: int,
+    wait_debugger: bool,
+    no_graphic: bool,
+    timeout: int | None = None,
 ):
     print_progress_info(f"Running tests matching: {tests}")
 
@@ -795,7 +807,7 @@ def run_tests(
     if not generate_qemu_image():
         return
 
-    p = run_async(wait_debugger)
+    p = run_async(wait_debugger, no_graphic=no_graphic)
 
     timeout = tester.timeout
     time_limit_exceeded = False
@@ -820,6 +832,14 @@ def run_tests(
             "Note: Attach debugger on start with --wait-debugger or use --timeout 0 to wait indefinitely."
         )
         p.terminate()
+        clear_tests_module()
+        return
+
+    if p.returncode != 0:
+        print_important(f"QEMU returned with exit status: {p.returncode}")
+        print_note(
+            "If QEMU doesn't start because of gtk, use the -G option to run without graphics."
+        )
         clear_tests_module()
         return
 
@@ -892,7 +912,10 @@ def main():
     )
     deep_clean_parser.set_defaults(dispatch=deep_clean)
 
-    configure_parser = subparsers.add_parser("configure", help="Configure the projects (must be run before first build and after adding new files)")
+    configure_parser = subparsers.add_parser(
+        "configure",
+        help="Configure the projects (must be run before first build and after adding new files)",
+    )
     configure_parser.set_defaults(dispatch=configure, pre_check=check_env)
 
     clean_parser = subparsers.add_parser(
@@ -909,7 +932,9 @@ def main():
     )
     job_count_arg(clean_parser)
 
-    build_parser = subparsers.add_parser("build", aliases="b", help="Build (default target: HAL9000)")
+    build_parser = subparsers.add_parser(
+        "build", aliases="b", help="Build (default target: HAL9000)"
+    )
     build_parser.set_defaults(dispatch=build, pre_check=check_env)
     build_parser.add_argument(
         "-a",
@@ -921,7 +946,9 @@ def main():
     )
     job_count_arg(build_parser)
 
-    rebuild_parser = subparsers.add_parser("rebuild", help="Clean, then build (default target: HAL9000)")
+    rebuild_parser = subparsers.add_parser(
+        "rebuild", help="Clean, then build (default target: HAL9000)"
+    )
     rebuild_parser.set_defaults(dispatch=rebuild, pre_check=check_env)
     rebuild_parser.add_argument(
         "-a",
@@ -939,6 +966,13 @@ def main():
         "-d",
         "--wait-debugger",
         help="Make QEMU wait for the debugger",
+        action="store_true",
+        required=False,
+    )
+    run_parser.add_argument(
+        "-G",
+        "--no-graphic",
+        help="Don't show QEMU display output",
         action="store_true",
         required=False,
     )
@@ -962,7 +996,6 @@ def main():
     run_tests_parser.add_argument(
         "--timeout", help="Timeout in seconds", type=int, required=False
     )
-    job_count_arg(run_tests_parser)
     run_tests_parser.add_argument(
         "-d",
         "--wait-debugger",
@@ -970,6 +1003,14 @@ def main():
         action="store_true",
         required=False,
     )
+    run_tests_parser.add_argument(
+        "-G",
+        "--no-graphic",
+        help="Don't show QEMU display output",
+        action="store_true",
+        required=False,
+    )
+    job_count_arg(run_tests_parser)
 
     args = vars(parser.parse_args())
 
