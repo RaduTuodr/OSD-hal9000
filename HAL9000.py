@@ -24,18 +24,101 @@ TEST_MODULE_PATH = ARTIFACTS_DIR / "Tests"
 HAL_DIRECTORY = Path("HAL")
 
 
+def prRed(str):
+    print("\033[91m {}\033[00m".format(str))
+
+
+def prGreen(str):
+    print("\033[92m {}\033[00m".format(str))
+
+
+def prYellow(str):
+    print("\033[93m {}\033[00m".format(str))
+
+
+def prLightPurple(str):
+    print("\033[94m {}\033[00m".format(str))
+
+
+def prPurple(str):
+    print("\033[95m {}\033[00m".format(str))
+
+
+def prCyan(str):
+    print("\033[96m {}\033[00m".format(str))
+
+
+def prLightGray(str):
+    print("\033[97m {}\033[00m".format(str))
+
+
+def prBlack(str):
+    print("\033[98m {}\033[00m".format(str))
+
+
+@dataclass
+class Executable:
+    name: str
+
+
+REQUIRED_EXECUTABLES = [
+    Executable("git"),
+    Executable("cmake"),
+    Executable("ninja"),
+    Executable("qemu-system-x86_64"),
+    Executable("clang"),
+    Executable("clang++"),
+    Executable("llvm-strip"),
+    Executable("llvm-objcopy"),
+    Executable("nasm"),
+    Executable("lld"),
+    Executable("lldb"),
+]
+
+
+def check_env_cmd():
+    build_env = get_build_env()
+    missing = False
+    for exe in REQUIRED_EXECUTABLES:
+        exe_path = get_exe_name(exe.name)
+        print(f"{exe_path}:", end="")
+        if path := shutil.which(exe_path, path=build_env["PATH"]):
+            prGreen(f"OK, found at: {path}")
+        else:
+            missing = True
+            prRed("Missing!")
+
+    sys.exit(-1 if missing else 0)
+
+
+def check_env(fail_with_message: bool = True):
+    build_env = get_build_env()
+    missing = []
+    for exe in REQUIRED_EXECUTABLES:
+        exe_path = get_exe_name(exe.name)
+        if not shutil.which(exe_path, path=build_env["PATH"]):
+            missing.append(exe_path)
+
+    if not missing:
+        return True
+
+    if fail_with_message:
+        prRed("The following required executables are missing from the system:")
+        for exe_name in missing:
+            print("  ", exe_name)
+        print("Note: Run the setup command to install required dependencies.")
+        print(
+            "Note: If you already ran the setup command, make sure the installed dependencies are in PATH."
+        )
+
+    return False
+
+
 @dataclass
 class Package:
     name: str
     version: str | None = None
 
-
-VSCODE_EXTENSIONS: list[str] = [
-    "ms-python.python",
-    "ms-vscode.cpptools",
-    "ms-vscode.cmake-tools",
-    "vadimcn.vscode-lldb",
-]
 
 HOMEBREW_PACKAGES: list[Package] = [
     Package("qemu"),
@@ -78,37 +161,12 @@ WINGET_PACKAGES: list[Package] = [
     Package("Microsoft.WindowsSDK.10.0.22621"),
 ]
 
-
-def prRed(str):
-    print("\033[91m {}\033[00m".format(str))
-
-
-def prGreen(str):
-    print("\033[92m {}\033[00m".format(str))
-
-
-def prYellow(str):
-    print("\033[93m {}\033[00m".format(str))
-
-
-def prLightPurple(str):
-    print("\033[94m {}\033[00m".format(str))
-
-
-def prPurple(str):
-    print("\033[95m {}\033[00m".format(str))
-
-
-def prCyan(str):
-    print("\033[96m {}\033[00m".format(str))
-
-
-def prLightGray(str):
-    print("\033[97m {}\033[00m".format(str))
-
-
-def prBlack(str):
-    print("\033[98m {}\033[00m".format(str))
+VSCODE_EXTENSIONS: list[str] = [
+    "ms-python.python",
+    "ms-vscode.cpptools",
+    "ms-vscode.cmake-tools",
+    "vadimcn.vscode-lldb",
+]
 
 
 def get_exe_name(path: str, quote: bool = False):
@@ -159,14 +217,29 @@ def deep_clean(**kwargs):
     prYellow("Configure must be run now!")
 
 
-def run_cmd_with_echo_and_wait(cmd: list[str]):
-    prYellow(f"Will run: {cmd}. Press any key to continue.")
-    input()
-    p = subprocess.run(cmd)
+def prompt_yes_no():
+    i = input("[Y]es/[N]o: ")
+    return i.lower() in ["y", "yes"]
+
+
+def run_cmd_with_echo_and_wait(
+    cmd: list[str], shell: bool = False, assume_yes: bool = False
+):
+    if assume_yes:
+        prYellow(f"Running command: {cmd}")
+    else:
+        prYellow(f"Will run: {cmd}. Press any key to continue.")
+        input()
+    p = subprocess.run(cmd, shell=shell)
     return p.returncode == 0
 
 
-def install_packages(pkg_manager_cmd: list[str], packages: list[Package], ignore=False):
+def install_packages(
+    pkg_manager_cmd: list[str],
+    packages: list[Package],
+    ignore: bool = False,
+    assume_yes: bool = False,
+):
     prYellow("The following packages will be installed:")
     for package in packages:
         prLightGray(package.name)
@@ -174,7 +247,9 @@ def install_packages(pkg_manager_cmd: list[str], packages: list[Package], ignore
     for package in packages:
         prCyan(f"Installing {package.name}...")
         if (
-            not run_cmd_with_echo_and_wait(pkg_manager_cmd + [package.name])
+            not run_cmd_with_echo_and_wait(
+                pkg_manager_cmd + [package.name], assume_yes=assume_yes
+            )
             and not ignore
         ):
             prRed(f"Error installing {package.name}!")
@@ -184,7 +259,7 @@ def install_packages(pkg_manager_cmd: list[str], packages: list[Package], ignore
     return True
 
 
-def setup_darwin():
+def setup_darwin(assume_yes: bool):
     prCyan("Running setup for macOS")
 
     prCyan("Checking for Homebrew")
@@ -194,10 +269,12 @@ def setup_darwin():
         return False
     prGreen("Done.")
 
-    return install_packages(["brew", "install"], HOMEBREW_PACKAGES)
+    return install_packages(
+        ["brew", "install"], HOMEBREW_PACKAGES, assume_yes=assume_yes
+    )
 
 
-def setup_linux():
+def setup_linux(assume_yes: bool):
     assert str(platform.system()).lower() == "linux"
     import distro
 
@@ -223,10 +300,10 @@ def setup_linux():
         return False
     prGreen(f"Done. Detected distro: {distro_id}")
 
-    return install_packages(pkg_manager_cmd, packages)
+    return install_packages(pkg_manager_cmd, packages, assume_yes=assume_yes)
 
 
-def setup_windows():
+def setup_windows(assume_yes: bool):
     prCyan("Running setup for Windows")
 
     prCyan("Checking for winget")
@@ -236,29 +313,71 @@ def setup_windows():
         return False
     prGreen("Done.")
 
-    return install_packages(["winget", "install"], WINGET_PACKAGES, True)
+    return install_packages(
+        ["winget", "install"], WINGET_PACKAGES, ignore=True, assume_yes=assume_yes
+    )
 
 
-def setup():
-    plat_system = str(platform.system()).lower()
-    if plat_system == "darwin":
-        result = setup_darwin()
-    elif plat_system == "linux":
-        result = setup_linux()
-    elif plat_system == "windows":
-        result = setup_windows()
-    else:
-        raise Exception(f"Unknown platform {plat_system}")
+def setup_vscode(system: str, assume_yes: bool):
+    code_path = shutil.which("code")
+    if code_path is None:
+        prRed("VSCode not found.")
+        return False
 
-    if result:
-        prGreen("Successful setup!")
-        print("Hint: You might need to manually add some tools to PATH.")
-        print(
-            "Hint: After adding the tools to PATH, you need to close the current terminal and open a new one for the tools to be usable."
+    code_exe = "code.cmd" if system == "windows" else "code"
+    for ext_name in VSCODE_EXTENSIONS:
+        ok = run_cmd_with_echo_and_wait(
+            [code_exe, "--install-extension", ext_name],
+            shell=True,
+            assume_yes=assume_yes,
         )
+        if not ok:
+            prRed(f"Failed to install extension {ext_name}")
+            return False
 
+    prGreen("Successfully installed VSCode extensions.")
+
+
+def setup_packages(system: str, assume_yes: bool, force: bool):
+    env_ok = check_env(fail_with_message=False)
+
+    if env_ok and not force:
+        prYellow(
+            "The environment already contains all required tools. Do you want to run the install commands anyway?"
+        )
+        if not prompt_yes_no():
+            print("Exiting.")
+            return
+
+    if system == "darwin":
+        result = setup_darwin(assume_yes)
+    elif system == "linux":
+        result = setup_linux(assume_yes)
+    elif system == "windows":
+        result = setup_windows(assume_yes)
     else:
+        raise Exception(f"Unknown platform {system}")
+
+    if not result:
         prRed("Setup failed!")
+        return False
+
+    prGreen("Successful setup.")
+    print("Hint: You might need to manually add some tools to PATH.")
+    print(
+        "Hint: After adding the tools to PATH, you need to close the current terminal and open a new one for the tools to be usable."
+    )
+    return True
+
+
+def setup(assume_yes: bool, force: bool, vscode: bool):
+    plat_system = str(platform.system()).lower()
+
+    if vscode:
+        setup_vscode(plat_system, assume_yes)
+        return
+
+    setup_packages(plat_system, assume_yes, force)
 
 
 def cmake_configure(
@@ -644,62 +763,6 @@ def run_tests(
     prGreen("Done.")
 
 
-@dataclass
-class Executable:
-    name: str
-
-
-REQUIRED_EXECUTABLES = [
-    Executable("git"),
-    Executable("cmake"),
-    Executable("ninja"),
-    Executable("qemu-system-x86_64"),
-    Executable("clang"),
-    Executable("clang++"),
-    Executable("llvm-strip"),
-    Executable("llvm-objcopy"),
-    Executable("nasm"),
-    Executable("lld"),
-    Executable("lldb"),
-]
-
-
-def check_env_cmd():
-    build_env = get_build_env()
-    missing = False
-    for exe in REQUIRED_EXECUTABLES:
-        exe_path = get_exe_name(exe.name)
-        print(f"{exe_path}:", end="")
-        if path := shutil.which(exe_path, path=build_env["PATH"]):
-            prGreen(f"OK, found at: {path}")
-        else:
-            missing = True
-            prRed("Missing!")
-
-    sys.exit(-1 if missing else 0)
-
-
-def check_env():
-    build_env = get_build_env()
-    missing = []
-    for exe in REQUIRED_EXECUTABLES:
-        exe_path = get_exe_name(exe.name)
-        if not shutil.which(exe_path, path=build_env["PATH"]):
-            missing.append(exe_path)
-
-    if not missing:
-        return True
-
-    prRed("The following required executables are missing from the system:")
-    for exe_name in missing:
-        print("  ", exe_name)
-    print("Note: Run the setup command to install required dependencies.")
-    print(
-        "Note: If you already ran the setup command, make sure the installed dependencies are in PATH."
-    )
-    return False
-
-
 def main():
     def job_count_arg(parser: argparse.ArgumentParser):
         parser.add_argument(
@@ -734,6 +797,26 @@ def main():
         help="Install the dependencies (tools) required to build and run HAL9000",
     )
     setup_parser.set_defaults(dispatch=setup)
+    setup_parser.add_argument(
+        "-y",
+        "--yes",
+        dest="assume_yes",
+        help="Don't prompt before running commands",
+        action="store_true",
+        required=False,
+    )
+    setup_parser.add_argument(
+        "--force",
+        help="Run all install commands even if the dependencies are already installed.",
+        action="store_true",
+        required=False,
+    )
+    setup_parser.add_argument(
+        "--vscode",
+        help="Check for VSCode and install the required extensions. Will not install other dependencies.",
+        action="store_true",
+        required=False,
+    )
 
     deep_clean_parser = subparsers.add_parser(
         "deep_clean", help="Remove all build directories and start with a clean slate"
