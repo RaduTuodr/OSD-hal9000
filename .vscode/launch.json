@@ -2,7 +2,7 @@
     "configurations": [
         {
             "type": "lldb",
-            "request": "custom",
+            "request": "launch",
             "name": "Debug HAL9000",
             "targetCreateCommands": [
                 "target create artifacts/bin/HAL9000.bin"
