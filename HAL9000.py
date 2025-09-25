@@ -1,15 +1,16 @@
-from dataclasses import dataclass
-import enum
-from pathlib import Path
-import re
-import sys
-import os
 import argparse
-import shutil
-import platform
-import subprocess
-import multiprocessing
+import enum
 import json
+import multiprocessing
+import os
+import platform
+import re
+import shutil
+import subprocess
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
 from tests.testing import Tester
 
 if (sys.version_info.major, sys.version_info.minor) < (3, 10):
@@ -21,8 +22,10 @@ if (sys.version_info.major, sys.version_info.minor) < (3, 10):
     sys.exit(-1)
 
 ARTIFACTS_DIR = Path("artifacts")
-TEST_MODULE_PATH = ARTIFACTS_DIR / "Tests"
+TESTS_MODULE_PATH = ARTIFACTS_DIR / "Tests"
+USER_TEST_MODULE_PATH = Path("./Tests.txt")
 HAL_DIRECTORY = Path("HAL")
+DEFAULT_TESTS_MODULE_LINES = ["/vol"]
 
 
 class Color(enum.Enum):
@@ -302,7 +305,7 @@ def install_packages(
 ):
     print_important("The following packages will be installed:")
     for package in packages:
-        print(package.name)
+        print("  ", package.name)
 
     for package in packages:
         print_progress_info(f"Installing {package.name}...")
@@ -340,10 +343,13 @@ def setup_linux(assume_yes: bool):
 
     print_progress_info("Running setup for linux")
 
+    pre_run_cmd = None
+
     print_progress_info("Checking distro")
     distro_id = distro.id().lower()
     if distro_id == "ubuntu":
-        pkg_manager_cmd = ["sudo", "apt-get", "install", "-y"]
+        pre_run_cmd = ["sudo", "apt", "update"]
+        pkg_manager_cmd = ["sudo", "apt", "install", "-y"]
         packages = APT_PACKAGES
     elif distro_id == "fedora":
         pkg_manager_cmd = ["sudo", "dnf", "install", "-y"]
@@ -361,6 +367,9 @@ def setup_linux(assume_yes: bool):
         )
         return False
     print_success(f"Done. Detected distro: {distro_id}")
+
+    if pre_run_cmd:
+        run_cmd_with_echo_and_wait(pre_run_cmd, assume_yes=assume_yes)
 
     return install_packages(pkg_manager_cmd, packages, assume_yes=assume_yes)
 
@@ -388,14 +397,13 @@ def setup_vscode(system: str, assume_yes: bool):
 
     print_important("The following VSCode extensions will be installed:")
     for ext_name in VSCODE_EXTENSIONS:
-        print(ext_name)
+        print("  ", ext_name)
 
     code_exe = "code.cmd" if system == "windows" else "code"
     for ext_name in VSCODE_EXTENSIONS:
         print_progress_info(f"Installing {ext_name}...")
         ok = run_cmd_with_echo_and_wait(
             [code_exe, "--install-extension", ext_name],
-            shell=True,
             assume_yes=assume_yes,
         )
         if not ok:
@@ -604,8 +612,18 @@ def build_hal(job_count: int):
     return cmake_build("HAL9000", project_cwd=HAL_DIRECTORY, job_count=job_count)
 
 
-def clear_tests_module():
-    TEST_MODULE_PATH.write_text("/vol\n")
+def copy_tests_module(src: Path | None = None):
+    if src is not None:
+        tests_module = src
+    else:
+        tests_module = USER_TEST_MODULE_PATH
+        # Create default Tests file if it does not exist
+        if not tests_module.is_file():
+            lines = "\n".join(DEFAULT_TESTS_MODULE_LINES) + "\n"
+            tests_module.write_text(lines)
+    print_progress_info(f"Copying tests module {tests_module} to {TESTS_MODULE_PATH}")
+    contents = (tests_module).read_text()
+    TESTS_MODULE_PATH.write_text(contents)
 
 
 def install_hal():
@@ -771,11 +789,11 @@ def run(
     job_count: int,
     run_configure: bool,
     run_build: bool,
+    tests_file: Path | None = None,
 ):
     prepare_hal_for_run(job_count, run_configure, run_build)
 
-    if not TEST_MODULE_PATH.is_file():
-        clear_tests_module()
+    copy_tests_module(tests_file)
 
     if not generate_qemu_image():
         return
@@ -854,7 +872,6 @@ def run_tests(
             "Note: Attach debugger on start with --wait-debugger or use --timeout 0 to wait indefinitely."
         )
         p.terminate()
-        clear_tests_module()
         return
 
     if p.returncode != 0:
@@ -862,14 +879,11 @@ def run_tests(
         print_note(
             "If QEMU doesn't start because of gtk, use the -G option to run without graphics."
         )
-        clear_tests_module()
         return
 
     print_progress_info("Evaluating results...")
 
     print(tester.evaluate_results())
-
-    clear_tests_module()
 
     print_success("Done.")
 
@@ -895,6 +909,12 @@ def main():
             default=True,
             required=False,
         )
+
+    def arg_is_file(arg: str):
+        path = Path(arg)
+        if not path.is_file():
+            raise argparse.ArgumentTypeError(f"{arg} is not a valid file")
+        return path
 
     parser = argparse.ArgumentParser(
         prog="HAL9000.py",
@@ -1002,6 +1022,13 @@ def main():
         "--wait-debugger",
         help="Make QEMU wait for the debugger",
         action="store_true",
+        required=False,
+    )
+    run_parser.add_argument(
+        "-t",
+        "--tests-file",
+        help=f"Use the provided file as the Tests module instead of {USER_TEST_MODULE_PATH}",
+        type=arg_is_file,
         required=False,
     )
     run_parser.add_argument(

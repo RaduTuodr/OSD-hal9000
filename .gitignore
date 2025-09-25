@@ -20,3 +20,4 @@ temp/*
 !tools/OVMF/OVMF.fd
 tests/__pycache__/*
 tests/evaluators/__pycache__/*
+Tests.txt
