@@ -1,113 +1,93 @@
+# HAL9000
+
 ## Introduction
 
-Repository structure:
-- `.vscode`:
-    - `launch.json` &rarr; debug configuration.
-    - `tasks.json` &rarr; tasks for building `HAL` and running test, you can map shortcuts.
-- `artifacts` &rarr; will contain the final build artifacts.
-- `cmake` &rarr; `CMake` toolchain configuration files. 
-- `config`:
-    - `HAL9000.ini` &rarr; indicates which is the system partition.
-    - `HAL9000.json` &rarr; describes the disk layout and contents.
-    - `QEMU.json` &rarr; contains all arguments passed to `QEMU`.
-    - `Tests` &rarr; the boot module used for running commands after `HAL` boots.
-- `ConfigGen` &rarr; scripts used to generate some of the configuration files.
-- `HAL` &rarr; `HAL's` source code.
-- `HalDbg` &rarr; `python` scripts for the custom commands.
-- `ImageCreator` &rarr; sources of the program which generates the disk image.
-- `tests` &rarr; contains files required for verifying test results
-- `tools`:
-    - `OVMF` &rarr; `UEFI` firmware implementation for `QEMU`, built using `EDK2`.
-    - `ImageCreator` &rarr; will contain the executable of `ImageCreator`.
-- `UefiBootloader` &rarr; source code of the `UEFI` bootloader used for loading `HAL` and its boot modules.
-- `yasm` &rarr; not used anymore.
-- `HAL9000.py` &rarr; utility script. 
+The initial version of HAL9000's source code was managed as a Visual Studio project (not VS Code), which meant it could only be compiled on the Windows operating system (OS). In the current version, the build process has been migrated to CMake and Clang, making the project buildable on any platform. Keep in mind, however, that the target platform on which HAL9000 runs was and still is x86-64.
 
-## Debugger commands
+Previously, the compiled HAL9000 OS required a full virtual machine (VM) to run. Now, it can be executed directly inside QEMU, in emulator mode.
 
-- `hal_commands`
-- `list_threads`
-- `dump_thread`
-- `list_processes`
-- `dump_process`
-- `list_running_threads`
-- `list_file_objects`
-- `dump_file_object`
-- `dump_vmm_reservation_space`
-- `dump_vmm_reservation`
-- `list_locks`
-- `dump_spinlock`
-- `dump_rwspinlock`
-- `list_mutexes`
-- `dump_mutex`
-- `list_ex_events`
-- `dump_ex_event`
-- `list_cpus`
-- `dump_cpu`
+With these changes, the project can be compiled and run on your normal "daily driver" OS (i.e. the one installed on your computer) (Linux, MacOS, Windows) without a virtualization solution (i.e. VMWare Workstation, VirtualBox).
 
-Run `help <command>` in `lldb` to see description.
+Despite the improvements described above and the increased flexibility of the build environment, we strongly recommend working on the project inside a Linux VM, since this is the configuration we thoroughly tested. In particular, we suggest using Ubuntu 24.04 LTS, as the project has been validated on this version.
 
-## Prerequisites
+Running HAL9000 in a VM provides an isolated environment, avoiding version conflicts between its dependencies and the software installed on your host system. Moreover, a VM makes cleanup trivial—once you are done: you can simply delete the VM to "uninstall" everything at once.
 
-Install `Visual Studio Code` with the `Python` and `CodeLLDB` extensions.
-Install `Python` at least 3.10.
+## Recommended Setup
 
-Tools used by `HAL`:
-- `qemu` &rarr; the emulator.
-- `CMake` &rarr; build configuration generator.
-- `ninja` &rarr; build tool.
-- `nasm` &rarr; x86_64 assembler (`yasm` cannot be used, it is not capable of producing `ELF` binaries).
-- `llvm toolchain` &rarr; all code in this repository is built using LLVM.
-- `python3` &rarr; used for interacting with `HAL` and the debugger (3.10 should be fine but if you get errors try another version).
-- `CodeLLDB` &rarr; Visual Studio Code debugging extension for `LLDB`; a `launch.json` is already provided for attaching to `QEMU`.
+1. Download and install a virtualization solution such as [VMWare Workstation](https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion) or [Oracle Virtualbox](https://www.virtualbox.org/wiki/Downloads). Alternatively, you may enable the built-in virtualization solution of your OS (e.g., Hyper-V on Windows, Apple Virtualization Framework on macOS, KVM on Linux).
+2. Download [Ubuntu 24.04 LTS](https://ubuntu.com/download/desktop) and install it in a virtual machine (VM). Configure the VM with at least 50 GB of storage, 4 GB of RAM and 4 processors.
+3. Start Ubuntu VM, log in and open a terminal.
+4. Install the `git` tool, by running:
 
-Useful tools for development:
-- `lldb` &rarr; the debugger.
-- `qemu monitor` &rarr; lets you peek into the running VM.
-- `llvm-addr2line` &rarr; converts an address to a location in the code.
-- `llvm-readelf` &rarr; provides detailed information about `ELF` binaries and static libraries.
+    ```bash
+    sudo apt install git
+    ```
 
-## Bootstrap
+5. Clone the HAL9000 repository in your VM, by running:
 
-The `HAL9000.py` installs for you the required packages, provided you have `python3`.
+    ```bash
+    git clone URL
+    ```
 
-1. Run `HAL9000.py bootstrap`, downloads the necessary software.
-2. If it succeeds run `HAL9000.py configure`, this will configure `CMake`.
+6. Change into the cloned directory and run the setup script:
 
-**NOTE**:
-- If you have problems installing `LLVM` on `Windows` using the script, download and run the installer 
-  used by `winget` (the link is displayed during bootstrap).
-- Configure must be run if you add new files to the project.
+    ```bash
+    python3 HAL9000.py setup
+    ```
 
-## Build
+### Test the Setup
 
-<!-- Visual Studio: 
-To build the project, open **"Developer Powershell for Visual Studio 2022"** (can be found in the start menu, under the "Visual Studio 2022" folder) and run `Build.ps1`. -->
+1. Build the project, by running:
 
-Run `HAL9000.py build_all` to compile everything, prepare the debug information and generate the `QEMU` image.
+    ```bash
+    python3 HAL9000.py build --all
+    ```
 
-Run `HAL9000.py build` to build just HAL, prepare the debug information and generate the `QEMU` image.
+2. Run the HAL9000 in a virtualized environment created and managed by QEMU, by running:
 
-## Run
+    ```bash
+    python3 HAL9000.py run
+    ```
 
-<!-- Visual Studio:
-Run using `Run.ps1`. -->
+## Install VSCode
 
-Run with `HAL9000.py run`, use the `-d` flag if you want to attach the debugger to the virtual machine.
+Download VSCode as a [deb package](https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64). Be aware that **installing VSCode as a snap package (i.e. from the store) will NOT work!**
 
-## Testing
+After the file is downloaded, open a terminal in the Downloads folder and install VSCode, by running:
 
-You can run tests with `HAL9000.py run-tests`. A list of test patterns can be given and all matching
-tests are run. Pattern syntax: Module:Category:Name.
+```bash
+sudo apt install "code*.deb"
+```
 
-## Clean
+Then, in the HAL9000 folder, run the following command to automatically install the required extensions:
 
-To clean the build directory of all projects run `HAL9000.py clean_all`, runs every `clean` target.
+```bash
+python3 HAL9000.py setup --vscode
+```
 
-To clean the build directory of HAL run `HAL9000.py clean`, runs HAL's `clean` target.
+### Test the VSCode Setup
 
-To start with a clean slate run `HAL9000.py deep_clean` (this will delete the build directories), then you need to configure again.
+1. Open a terminal, change the directory to the cloned HAL9000 repository and run HAL9000, by running:
 
-## Help
+    ```bash
+    python3 HAL9000.py run -d
+    ```
 
-Run `HAL9000.py -h` or `HAL9000.py --help` to see all options.
+2. Add a breakpoint in the code:
+   1. Find the `SystemInit()` function in HAL9000 using "*Go -> Go to Symbol in Workspace ...*".
+   2. Add a breakpoint after the line with calling `EfiRuntimeGetTime()`.
+
+3. Start the debugger:
+   1. Go to the "*Run and Debug*" tab in VSCode.
+   2. Choose the "*Debug HAL9000*" target.
+   3. Click "*Run*".
+
+4. The debugger should break once it's connected to QEMU. Click "*Continue*".
+
+5. Once the breakpoint in `SystemInit()` is hit, inspect the value in the `Time` variable in the debugging panel.
+
+6. Test the debug console:
+   1. Open the Debug Console "*View -> Debug Console*".
+   2. Type `expression Time`. It should print the `Time` variable.
+   3. Type `list_processes` to see a list of currently running processes.
+   4. Type `list_threads` to see a list of currently running threads.
