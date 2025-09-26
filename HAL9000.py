@@ -8,8 +8,10 @@ import re
 import shutil
 import subprocess
 import sys
+import operator
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 from tests.testing import Tester
 
@@ -118,63 +120,266 @@ def print_error(msg: str):
 
 
 @dataclass
+class Version:
+    major: int
+    minor: int
+    patch: int
+
+    @staticmethod
+    def from_match(m: re.Match):
+        return Version(
+            major=int(m.group("major")),
+            minor=int(m.group("minor")),
+            patch=int(m.group("patch")),
+        )
+
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}.{self.patch}"
+
+
+@dataclass
+class VersionConstraintBound:
+    major: int
+    minor: int | None = None
+
+    @staticmethod
+    def parse(s: str):
+        if "." in s:
+            major, minor = s.split(".")
+            return VersionConstraintBound(major=int(major), minor=int(minor))
+        return VersionConstraintBound(major=int(s))
+
+    def cmp(self, op: Callable[[tuple, tuple], bool], version: Version):
+        if min_minor := self.minor:
+            return op((version.major, version.minor), (self.major, min_minor))
+        else:
+            return op((version.major,), (self.major,))
+
+
+@dataclass
+class VersionConstraint:
+    min: VersionConstraintBound
+    max: VersionConstraintBound
+    min_inclusive: bool
+    max_inclusive: bool
+
+    @staticmethod
+    def parse(s: str):
+        """
+        Syntax: (\\(|\\[) min_major.[min_minor], max_major.[max_minor]) (\\)|\\]
+        Example: [3.28, 4)
+        Example: [18, 21)
+        """
+
+        constraint_min, constraint_max = s.split(",")
+        assert constraint_min[0] in "(["
+        min_inclusive = constraint_min[0] == "["
+        assert constraint_max[-1] in ")]"
+        max_inclusive = constraint_max[-1] == "]"
+
+        return VersionConstraint(
+            min=VersionConstraintBound.parse(constraint_min[1:].strip()),
+            max=VersionConstraintBound.parse(constraint_max[:-1].strip()),
+            min_inclusive=min_inclusive,
+            max_inclusive=max_inclusive,
+        )
+
+    def check_version(self, version: Version):
+        min_op = operator.ge if self.min_inclusive else operator.gt
+        max_op = operator.le if self.max_inclusive else operator.lt
+
+        return self.min.cmp(min_op, version) and self.max.cmp(max_op, version)
+
+    def __str__(self) -> str:
+        s = ""
+        s += "[" if self.min_inclusive else "("
+        s += str(self.min.major)
+        if min_minor := self.min.minor:
+            s += "."
+            s += str(min_minor)
+        s += ", "
+        s += str(self.max.major)
+        if max_minor := self.max.minor:
+            s += "."
+            s += str(max_minor)
+        s += "]" if self.max_inclusive else ")"
+        return s
+
+
+@dataclass
 class Executable:
     name: str
+    version_arg: str = "--version"
+    extract_version: re.Pattern | None = None
+    required_version: VersionConstraint | None = None
 
 
 REQUIRED_EXECUTABLES = [
     Executable("git"),
-    Executable("cmake"),
-    Executable("ninja"),
-    Executable("qemu-system-x86_64"),
-    Executable("clang"),
-    Executable("clang++"),
-    Executable("llvm-strip"),
-    Executable("llvm-objcopy"),
-    Executable("nasm"),
+    Executable(
+        "cmake",
+        extract_version=re.compile(r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"),
+        required_version=VersionConstraint.parse("[3.25, 4)"),
+    ),
+    Executable(
+        "ninja",
+        extract_version=re.compile(r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"),
+        required_version=VersionConstraint.parse("[1.10, 2)"),
+    ),
+    Executable(
+        "qemu-system-x86_64",
+        extract_version=re.compile(
+            r"QEMU emulator version (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+        ),
+        required_version=VersionConstraint.parse("[8.2, 10.1]"),
+    ),
+    Executable(
+        "clang",
+        extract_version=re.compile(
+            r"clang version (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+        ),
+        required_version=VersionConstraint.parse("[18.1, 20]"),
+    ),
+    Executable(
+        "clang++",
+        extract_version=re.compile(
+            r"clang version (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+        ),
+        required_version=VersionConstraint.parse("[18.1, 20]"),
+    ),
+    Executable(
+        "llvm-strip",
+        extract_version=re.compile(
+            r"LLVM version (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+        ),
+        required_version=VersionConstraint.parse("[18.1, 20]"),
+    ),
+    Executable(
+        "llvm-objcopy",
+        extract_version=re.compile(
+            r"LLVM version (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+        ),
+        required_version=VersionConstraint.parse("[18.1, 20]"),
+    ),
+    Executable(
+        "nasm",
+        version_arg="-version",
+        extract_version=re.compile(
+            r"NASM version (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+        ),
+        required_version=VersionConstraint.parse("[2.16, 3)"),
+    ),
     Executable("lld"),
-    Executable("lldb"),
+    Executable(
+        "lldb",
+        extract_version=re.compile(
+            r"lldb version (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+        ),
+        required_version=VersionConstraint.parse("[18.1, 20]"),
+    ),
 ]
+
+
+def get_exe_version(exe_path: str, version_arg: str, version_re: re.Pattern):
+    result = subprocess.run([exe_path, version_arg], text=True, capture_output=True)
+    if m := version_re.search(result.stdout):
+        return Version.from_match(m)
+    return None
 
 
 def check_env_cmd():
     build_env = get_build_env()
     missing = False
+    version_problem = False
     for exe in REQUIRED_EXECUTABLES:
         exe_path = get_exe_name(exe.name)
-        if path := shutil.which(exe_path, path=build_env["PATH"]):
-            print(f"{exe_path:<24}: {Styled.green('OK')}, found at: {path}")
-        else:
+        path = shutil.which(exe_path, path=build_env["PATH"])
+        if not path:
             missing = True
-            print(f"{exe_path:<24}: {Styled.red('Missing')}")
+            print(f"{exe_path}: {Styled.red('Missing')}")
+            continue
 
-    if missing:
+        print(f"{exe_path}: {Styled.green('OK')}")
+        print(f"   path: {path}")
+
+        if not exe.extract_version:
+            continue
+
+        version = get_exe_version(exe_path, exe.version_arg, exe.extract_version)
+        if not version:
+            print(f"   version: {Styled.red('invalid version string')} (the version is likely very old or very new)")
+            version_problem = True
+            continue
+
+        print(f"   version: {version}", end="")
+        if not exe.required_version:
+            print()
+            continue
+
+        if not exe.required_version.check_version(version):
+            print(f" {Styled.red('Outside range')} {exe.required_version}")
+            version_problem = True
+        else:
+            print(f" {Styled.green('OK')}, in range {exe.required_version}")
+
+    if missing or version_problem:
         print_note("The following paths are currently in PATH:")
-        for path in build_env["PATH"].split(";"):
+        for path in build_env["PATH"].split(os.path.pathsep):
             print("  ", path)
 
-    sys.exit(-1 if missing else 0)
+    sys.exit(-1 if missing or version_problem else 0)
 
 
 def check_env(fail_with_message: bool = True):
     build_env = get_build_env()
     missing = []
+    version_problems = []
     for exe in REQUIRED_EXECUTABLES:
         exe_path = get_exe_name(exe.name)
         if not shutil.which(exe_path, path=build_env["PATH"]):
             missing.append(exe_path)
+            continue
 
-    if not missing:
+        if not exe.extract_version:
+            continue
+
+        version = get_exe_version(exe_path, exe.version_arg, exe.extract_version)
+        if not version:
+            version_problems.append((exe_path, "invalid version string (the version is likely very old or very new)"))
+            continue
+
+        if not exe.required_version:
+            continue
+
+        if not exe.required_version.check_version(version):
+            version_problems.append(
+                (exe_path, f"version {version} is outside range {exe.required_version}")
+            )
+
+    if (not missing) and (not version_problems):
         return True
 
     if fail_with_message:
-        print_error("The following required executables are missing from the system:")
-        for exe_name in missing:
-            print("  ", exe_name)
-        print_note("Run the setup command to install required dependencies.")
-        print_note(
-            "If you already ran the setup command, make sure the installed dependencies are in PATH."
-        )
+        if missing:
+            print_error(
+                "The following required executables are missing from the system:"
+            )
+            for exe_name in missing:
+                print("  ", exe_name)
+            print_note("Run the setup command to install required dependencies.")
+            print_note(
+                "If you already ran the setup command, make sure the installed dependencies are in PATH."
+            )
+        if version_problems:
+            print_error(
+                "The following required executables don't match the version required by the project:"
+            )
+            for exe_name, problem in version_problems:
+                print("  ", exe_name, problem)
+
+            print_note(
+                "You should install versions that are in the version ranges printed above."
+            )
 
     return False
 
