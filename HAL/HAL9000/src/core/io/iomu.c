@@ -121,7 +121,7 @@ static const DRIVER_DECLARATION DRIVER_NAMES[] = {
     DECLARE_DRIVER("vol", VolDriverEntry, FALSE),
     DECLARE_DRIVER("fat", FatDriverEntry, FALSE),
     DECLARE_DRIVER("swapfs", SwapFsDriverEntry, FALSE),
-    DECLARE_DRIVER("eth82574L", Eth82574LDriverEntry, FALSE)
+    // DECLARE_DRIVER("eth82574L", Eth82574LDriverEntry, FALSE) // FIXME: Commented because the networking devices causes a kernel panic when a breakpoint is added in this function
 };
 
 static FUNC_CompareFunction     _VpbCompareFunction;

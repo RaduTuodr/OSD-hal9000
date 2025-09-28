@@ -360,14 +360,15 @@ MSVC_WARNING_SUPPRESS(28039)
 
     LOGL("IOMU late initialization successfully completed\n");
 
-    status = NetworkStackInit(TRUE);
-    if (!SUCCEEDED(status))
-    {
-        LOG_FUNC_ERROR("NetworkStackInit", status);
-        return status;
-    }
+    // FIXME: Commented because the networking devices causes a kernel panic when a breakpoint is added in this function
+    // status = NetworkStackInit(TRUE);
+    // if (!SUCCEEDED(status))
+    // {
+    //     LOG_FUNC_ERROR("NetworkStackInit", status);
+    //     return status;
+    // }
 
-    LOGL("Network stack successfully initialized\n");
+    // LOGL("Network stack successfully initialized\n");
 
     EFI_TIME Time;
     EfiRuntimeGetTime(&Time, NULL);
