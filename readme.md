@@ -49,6 +49,16 @@ Running HAL9000 in a VM provides an isolated environment, avoiding version confl
     python3 HAL9000.py run
     ```
 
+### Configure git
+
+To configure git, run:
+
+```bash
+python3 HAL9000.py setup git <your_repo>
+```
+
+where `<your_repo>` should look like `git@github.com:PSO-OSD-UTCN/hal9000-lab-<youruser>.git`.
+
 ## Install VSCode
 
 Download VSCode as a [deb package](https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64). Be aware that **installing VSCode as a snap package (i.e. from the store) will NOT work!**
@@ -62,7 +72,7 @@ sudo apt install "code*.deb"
 Then, in the HAL9000 folder, run the following command to automatically install the required extensions:
 
 ```bash
-python3 HAL9000.py setup --vscode
+python3 HAL9000.py setup vscode
 ```
 
 ### Test the VSCode Setup

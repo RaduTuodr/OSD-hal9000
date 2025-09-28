@@ -2,13 +2,13 @@ import argparse
 import enum
 import json
 import multiprocessing
+import operator
 import os
 import platform
 import re
 import shutil
 import subprocess
 import sys
-import operator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -307,7 +307,9 @@ def check_env_cmd():
 
         version = get_exe_version(exe_path, exe.version_arg, exe.extract_version)
         if not version:
-            print(f"   version: {Styled.red('invalid version string')} (the version is likely very old or very new)")
+            print(
+                f"   version: {Styled.red('invalid version string')} (the version is likely very old or very new)"
+            )
             version_problem = True
             continue
 
@@ -345,7 +347,12 @@ def check_env(fail_with_message: bool = True):
 
         version = get_exe_version(exe_path, exe.version_arg, exe.extract_version)
         if not version:
-            version_problems.append((exe_path, "invalid version string (the version is likely very old or very new)"))
+            version_problems.append(
+                (
+                    exe_path,
+                    "invalid version string (the version is likely very old or very new)",
+                )
+            )
             continue
 
         if not exe.required_version:
@@ -594,7 +601,9 @@ def setup_windows(assume_yes: bool):
     )
 
 
-def setup_vscode(system: str, assume_yes: bool):
+def setup_vscode(assume_yes: bool, force: bool):
+    system = str(platform.system()).lower()
+
     code_path = shutil.which("code")
     if code_path is None:
         print_error("VSCode not found.")
@@ -650,14 +659,85 @@ def setup_packages(system: str, assume_yes: bool, force: bool):
     return True
 
 
-def setup(assume_yes: bool, force: bool, vscode: bool):
+def setup(assume_yes: bool, force: bool):
     plat_system = str(platform.system()).lower()
 
-    if vscode:
-        setup_vscode(plat_system, assume_yes)
-        return
-
     setup_packages(plat_system, assume_yes, force)
+
+
+def setup_git(assume_yes: bool, force: bool, student_repo: str | None):
+    print_progress_info("Checking git remotes")
+
+    result = subprocess.run(["git", "remote", "-v"], capture_output=True, text=True)
+    upstream = None
+    origin = None
+    remotes: set[tuple[str, str]] = set()
+    for line in result.stdout.splitlines():
+        name, url, direction = line.split()
+        remotes.add((name, url))
+
+    other_remotes: list[tuple[str, str]] = []
+    for name, url in remotes:
+        print(f"   Found remote {name} {url}")
+        if (upstream is None) and url.lower().endswith(
+            "github.com/pso-osd-utcn/hal9000.git"
+        ):
+            upstream = (name, url)
+        elif name == "origin":
+            origin = (name, url)
+        else:
+            other_remotes.append((name, url))
+
+    if upstream is None:
+        print_error(
+            "Could not find the upstream repository github.com/pso-osd-utcn/hal9000.git"
+        )
+        print_note(
+            "Without the upstream repository you won't be able to easily fetch the latest changes we make to the project"
+        )
+        sys.exit(-1)
+
+    upstream_name, upstream_url = upstream
+
+    if upstream_name == "origin":
+        print_progress_info(f"Renaming {upstream_name} to pso-osd-utcn-upstream")
+        if not run_cmd_with_echo_and_wait(
+            ["git", "remote", "rename", upstream_name, "pso-osd-utcn-upstream"],
+            assume_yes=assume_yes,
+        ):
+            print_error("Failed to rename origin")
+            sys.exit(-1)
+
+    if origin and (origin != upstream):
+        print(f"You already have {origin[1]} set as origin")
+        sys.exit(0)
+
+    if not student_repo:
+        print_important("Currently there is no repository set as origin.")
+        print_note(
+            "You can add your repository by running this command with your repository url (i.e. python3 HAL9000.py setup git git@github.com/owner_name/repo_name)"
+        )
+        sys.exit(1)
+
+    print_progress_info(f"Adding repository '{student_repo}' as origin")
+    if not run_cmd_with_echo_and_wait(
+        ["git", "remote", "add", "origin", student_repo], assume_yes=assume_yes
+    ):
+        print_error("Failed to add remote")
+        sys.exit(-1)
+
+    print_success("Git configuration done.")
+
+    print("Would you like do a test push to your repository?")
+    if not prompt_yes_no():
+        sys.exit(0)
+
+    print_progress_info("Pushing branch main to origin")
+    result = subprocess.run(["git", "push", "-u", "origin", "main"])
+    if result.returncode != 0:
+        print_error("Failed to push to origin")
+
+    sys.exit(result.returncode)
 
 
 def cmake_configure(
@@ -1121,6 +1201,13 @@ def main():
             raise argparse.ArgumentTypeError(f"{arg} is not a valid file")
         return path
 
+    def arg_is_git_remote(arg: str):
+        if (not arg.startswith("git@")) and (not arg.startswith("https://")):
+            raise argparse.ArgumentTypeError(
+                f"{arg} is not valid git remote. It must start with 'git@' or 'https://'"
+            )
+        return arg
+
     parser = argparse.ArgumentParser(
         prog="HAL9000.py",
         description="Script for working with HAL9000",
@@ -1158,11 +1245,22 @@ def main():
         action="store_true",
         required=False,
     )
-    setup_parser.add_argument(
-        "--vscode",
+
+    setup_subparsers = setup_parser.add_subparsers(required=False)
+
+    setup_vscode_parser = setup_subparsers.add_parser(
+        "vscode",
         help="Check for VSCode and install the required extensions. Will not install other dependencies.",
-        action="store_true",
-        required=False,
+    )
+    setup_vscode_parser.set_defaults(dispatch=setup_vscode)
+
+    setup_git_parser = setup_subparsers.add_parser("git")
+    setup_git_parser.set_defaults(dispatch=setup_git)
+    setup_git_parser.add_argument(
+        "student_repo",
+        help="The git repository you will use for working on the project",
+        type=arg_is_git_remote,
+        nargs="?",
     )
 
     deep_clean_parser = subparsers.add_parser(
