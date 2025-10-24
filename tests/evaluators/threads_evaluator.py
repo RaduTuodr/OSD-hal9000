@@ -2,7 +2,7 @@ import re
 
 from .evaluator import AbstractEvaluator
 
-class ThreadNonDecreasingPriorityEvaluator(AbstractEvaluator):
+class ThreadDecreasingPriorityEvaluator(AbstractEvaluator):
     def evaluate(self, result, args):
         if '[ERROR]' in result or '[CRITICAL]' in result:
             return 0, '[ERROR] or [CRITICAL] found in result!'
@@ -15,13 +15,13 @@ class ThreadNonDecreasingPriorityEvaluator(AbstractEvaluator):
             if m:
                 captured_data.append(int(m.group(1)))
         
-        sorted_data = captured_data
-        sorted_data.sort()
+        sorted_data = captured_data.copy()
+        sorted_data.sort(reverse=True)
 
         if captured_data == sorted_data:
             return 10, '' 
 
-        return 0, 'Priorities should appear in non-decreasing order!'
+        return 0, 'Priorities should appear in decreasing order!'
 
 class ThreadRoundRobinEvaluator(AbstractEvaluator):
     def evaluate(self, result, args):

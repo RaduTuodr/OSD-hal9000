@@ -507,19 +507,14 @@ STATUS
                     ThreadWaitForTermination(pDonationChainData[i].Thread, &exitStatus);
                     ThreadCloseHandle(pDonationChainData[i].Thread);
                 }
+            }
 
+            for (int i = 0; i < noOfThreads; ++i)
+            {
                 ExFreePoolWithTag((PVOID)pDonationChainData[i].ThreadContext.SynchronizationContext.Array, HEAP_TEST_TAG);
-
                 CheckinQueueUninit(&pDonationChainData[i].ThreadContext.SynchronizationContext);
-
                 MutexDestroy(&pDonationChainData[i].ThreadMutex);
             }
-            // free this also for 0
-            ExFreePoolWithTag((PVOID)pDonationChainData[0].ThreadContext.SynchronizationContext.Array, HEAP_TEST_TAG);
-
-            CheckinQueueUninit(&pDonationChainData[0].ThreadContext.SynchronizationContext);
-
-            MutexDestroy(&pDonationChainData[0].ThreadMutex);
 
             ExFreePoolWithTag(pDonationChainData, HEAP_TEST_TAG);
             pDonationChainData = NULL;

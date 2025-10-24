@@ -71,7 +71,7 @@
                 {
                     "name": "TestThreadPriorityMutex",
                     "type": "simple",
-                    "evaluator": "ThreadNonDecreasingPriority"
+                    "evaluator": "ThreadDecreasingPriority"
                 },
                 {
                     "name": "TestThreadPriorityRoundRobin",
@@ -81,7 +81,7 @@
                 {
                     "name": "TestThreadPriorityWakeup",
                     "type": "simple",
-                    "evaluator": "ThreadNonDecreasingPriority"
+                    "evaluator": "ThreadDecreasingPriority"
                 },
                 {
                     "name": "TestThreadPriorityYield",
