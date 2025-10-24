@@ -509,7 +509,7 @@ STATUS
                 }
             }
 
-            for (int i = 0; i < noOfThreads; ++i)
+            for (DWORD i = 0; i < noOfThreads; ++i)
             {
                 ExFreePoolWithTag((PVOID)pDonationChainData[i].ThreadContext.SynchronizationContext.Array, HEAP_TEST_TAG);
                 CheckinQueueUninit(&pDonationChainData[i].ThreadContext.SynchronizationContext);
