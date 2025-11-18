@@ -3,7 +3,7 @@
 #include "um_lib_helper.h"
 #include "cal_seh.h"
 
-#define EXPECTED_BUFFER "UserModeApplications:Applications"
+#define EXPECTED_BUFFER "HAL9000 init file"
 
 #define MIN_BUFFER_SIZE     0x200
 
