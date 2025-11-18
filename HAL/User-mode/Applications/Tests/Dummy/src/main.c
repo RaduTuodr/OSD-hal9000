@@ -11,7 +11,5 @@ __main(
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
-    LOG("Hello from your usermode application!\n");
-
     return STATUS_SUCCESS;
 }
