@@ -68,6 +68,8 @@ __main(
 
     _AllocateAlmostAPageOfLocalVariables(NO_OF_TIMES_TO_ALLOCATE_ALMOST_A_PAGE_OF_LOCAL_VARIABLES);
 
+    LOG_TEST_PASS;
+
     return STATUS_SUCCESS;
 }
 

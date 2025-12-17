@@ -50,5 +50,7 @@ __main(
         handles[i] = UM_INVALID_HANDLE_VALUE;
     }
 
+    LOG_TEST_PASS;
+
     return STATUS_SUCCESS;
 }

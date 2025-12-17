@@ -26,6 +26,8 @@ __main(
 
     _RecursiveFunction(NO_OF_TIMES_TO_CALL_RECURSIVE_FUNCTIONS);
 
+    LOG_TEST_PASS;
+
     return STATUS_SUCCESS;
 }
 
