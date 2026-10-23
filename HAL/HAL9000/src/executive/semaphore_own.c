@@ -38,9 +38,7 @@ SemaphoreInit(
     memzero(Semaphore, sizeof(SEMAPHORE));
 
     LockInit(&Semaphore->SemaphoreLock);
-    LockSetName(&Semaphore->SemaphoreLock, "SemaphoreLock");
     Semaphore->Value = InitialValue;
-
     InitializeListHead(&Semaphore->WaitingList);
     
     LockAcquire(&s_semaphoreData.Lock, &oldState);
@@ -89,7 +87,6 @@ SemaphoreUp(
     ASSERT(NULL != Semaphore);
 
     LockAcquire(&Semaphore->SemaphoreLock, &oldState);
-    //================================================
 
     pEntry = RemoveHeadList(&Semaphore->WaitingList);
 
@@ -100,10 +97,8 @@ SemaphoreUp(
     }
     else
     {
-        ASSERT(Semaphore->Value < MAX_DWORD);
         Semaphore->Value++;
     }
 
-    //================================================
     LockRelease(&Semaphore->SemaphoreLock, oldState);
 }
