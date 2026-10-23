@@ -132,6 +132,9 @@ void
 
     ASSERT(NumberOfParameters == 0);
 
+    QWORD NoThreads = GetSystemThreadDataNoThreads();
+
+    LOG("NoThreads: %d\n", NoThreads);
     LOG("%7s", "TID|");
     LOG("%20s", "Name|");
     LOG("%5s", "Prio|");

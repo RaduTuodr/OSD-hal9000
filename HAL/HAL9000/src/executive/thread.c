@@ -16,8 +16,9 @@
 #include "cal_seh.h"
 
 #define TID_INCREMENT               4
+#define TID_INCREMENT2              16
 
-#define THREAD_TIME_SLICE           1
+#define THREAD_TIME_SLICE           4
 
 extern void MS_ABI ThreadStart();
 
@@ -42,6 +43,11 @@ typedef struct _THREAD_SYSTEM_DATA
 
     _Guarded_by_(ReadyThreadsLock)
     LIST_ENTRY          ReadyThreadsList;
+
+    LOCK                NoThreadsLock;       
+
+    _Guarded_by_(NoThreadsLock)
+    DWORD               NoThreads;
 } THREAD_SYSTEM_DATA, *PTHREAD_SYSTEM_DATA;
 
 // DO NOT CHANGE THE NAME OF THIS VARIABLE
@@ -57,6 +63,18 @@ _ThreadSystemGetNextTid(
     static volatile TID __currentTid = 0;
 
     return AtomicExchangeAdd64(&__currentTid, TID_INCREMENT);
+}
+
+ALWAYS_INLINE
+static
+TID
+_ThreadSystemGetNextTid2(
+    void
+    )
+{
+    static volatile TID __currentTid = 0;
+
+    return AtomicExchangeAdd64(&__currentTid, TID_INCREMENT2);
 }
 
 static
@@ -156,6 +174,10 @@ ThreadSystemPreinit(
     InitializeListHead(&m_threadSystemData.ReadyThreadsList);
     LockInit(&m_threadSystemData.ReadyThreadsLock);
     LockSetName(&m_threadSystemData.ReadyThreadsLock, "RdyThreads");
+    
+    m_threadSystemData.NoThreads = 0;
+    LockInit(&m_threadSystemData.AllThreadsLock);
+    LockSetName(&m_threadSystemData.AllThreadsLock, "AllThreads");
 }
 
 void
@@ -442,6 +464,13 @@ MSVC_WARNING_SUPPRESS(4152)
     {
         ThreadUnblock(pThread);
     }
+
+    INTR_STATE old;
+    LOGPL("[new*] Thread created: ", pThread->Id, pThread->Name);
+
+    LockAcquire(&m_threadSystemData.NoThreadsLock, &old);
+    m_threadSystemData.NoThreads++;
+    LockRelease(&m_threadSystemData.NoThreadsLock, old);
 
     *Thread = pThread;
 
@@ -822,6 +851,11 @@ _ThreadInit(
         strcpy(pThread->Name, Name);
 
         pThread->Id = _ThreadSystemGetNextTid();
+        if (NULL != GetCurrentThread())
+        {
+            pThread->ParentId = GetCurrentThread()->Id;
+        }
+
         pThread->State = ThreadStateBlocked;
         pThread->Priority = Priority;
 
@@ -1239,6 +1273,7 @@ _ThreadDestroy(
     
     ExEventDestroy(&pThread->TerminationEvt);
     LockDestroy(&pThread->BlockLock);
+    LOG("[new*] Thread destroyed %d %s\n", pThread->Id, pThread->Name);
 
     if (NULL != pThread->Name)
     {
@@ -1255,6 +1290,12 @@ _ThreadDestroy(
     }
 
     ExFreePoolWithTag(pThread, HEAP_THREAD_TAG);
+
+    INTR_STATE old;
+
+    LockAcquire(&m_threadSystemData.NoThreadsLock, &old);
+    m_threadSystemData.NoThreads--;
+    LockRelease(&m_threadSystemData.NoThreadsLock, old);
 }
 
 static
@@ -1276,4 +1317,10 @@ _ThreadKernelFunction(
 
     ThreadExit(exitStatus);
     NOT_REACHED;
+}
+
+QWORD
+GetSystemThreadDataNoThreads()
+{
+    return m_threadSystemData.NoThreads;
 }
